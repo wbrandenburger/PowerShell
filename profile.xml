@@ -1,0 +1,20 @@
+<SourceCode>
+	<PowerShell>
+		<Path>
+			<PSModules>A:/OneDrive/Projects/PSModules</PSModules>
+		</Path>
+		<!-- <Module >
+			<Name>KnowledgeManagement</Name>
+		</Module> -->
+		<Module Name='PowerShell-Yaml'/>
+		<Module Name='PowerTab'>
+			<ArgumentList>A:\OneDrive\Projects\.config\powertab\PowerTabConfig.xml</ArgumentList>
+		</Module>
+		<Module Name='PSPapis'/>
+		<Module Name='PSScriptAnalyzer'/>
+		<Module Name='VirtualEnvWrapper'/>
+		<Module Name='WindowsTools'/>
+			<!-- <Module Name="posh-git"/> -->
+		<Verbose>0</Verbose>
+	</PowerShell>
+</SourceCode>
