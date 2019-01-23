@@ -1,0 +1,179 @@
+<PowerShell>
+
+<Package>
+	<Name>cChoco</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>SoftwareManagement</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="false">
+		<Url></Url>
+	</GitHub>
+	<Description>Desired State Configuration (DSC) Resources provide the building blocks for the DSC configuration of Chocolatey packages.</Description>
+</Package>
+
+<Package>
+	<Name>PackageManagement</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>SoftwareManagement</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="true">
+		<Url>https://github.com/PowerShell/PackageManagementProviderResource</Url>
+	</GitHub>
+	<Description>Modules with DSC resources for the PackageManagement(aka OneGet) providers.</Description>
+</Package>
+
+<Package>
+	<Name>Posh-Git</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>Usability</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="true"/>
+	<GitHub Available="true">
+		<Url>https://github.com/dahlbyk/posh-git"</Url>
+	</GitHub>
+	<RequiredPackages>PSReadLine</RequiredPackages>
+	<Description>A set of PowerShell scripts which provide Git/PowerShell integration.</Description>
+</Package>
+
+<Package>
+	<Name>PowerShellGet</Name>
+	<Deactivated>false</Deactivated>	
+	<UserProfile>SoftwareManagement</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="true">
+		<Url>https://github.com/PowerShell/PowerShellGet"</Url>
+	</GitHub>
+	<RequiredPackages>PackageManagement</RequiredPackages>
+	<Description>PowerShell module with commands for discovering, installing, updating and publishing the PowerShell artifacts like Modules, DSC Resources, Role Capabilities and Scripts.</Description>
+</Package>
+
+<Package>
+	<Name>Powershell-Yaml</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>FileManagement</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="true">
+		<Url>https://github.com/cloudbase/powershell-yaml"</Url>
+	</GitHub>
+	<Description>Powershell module for serializing and deserializing Yaml.</Description>
+</Package>
+    
+<Package>
+	<Name>PowerTab</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>Usability</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="true">
+		<Url>https://github.com/jasonmarcher/PowerTab"</Url>
+	</GitHub>
+	<Import>
+		<Type>PSLocalConfig</Type>
+		<Pattern>%s</Pattern>
+		<Text>%s\PowerTabConfig.xml</Text>
+	</Import>
+    <Description>Enables a GUI-style tab-completion menu for PowerShell.</Description>
+</Package>
+
+<Package>
+	<Name>PSPapis</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>FileManagement</UserProfile>
+	<Repository>LocalRepository</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="false"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="false">
+		<Url></Url>
+	</GitHub>
+	<RequiredPackages>VirtualEnvWrapper</RequiredPackages>
+	<Description>A set of PowerShell scripts which provide integration of Python package Papis.</Description>
+</Package>
+
+<Package>
+	<Name>PSConsoleTheme</Name>
+	<Deactivated>true</Deactivated>
+	<UserProfile>Usability</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="true">
+		<Url>https://github.com/mmims/PSConsoleTheme"</Url>
+	</GitHub>
+	<Description>PowerShell module to manage Windows console colors and PSReadline token colors.</Description>
+</Package>
+
+<Package>
+	<Name>PSReadLine</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>Usability</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="true">
+		<Url>https://github.com/lzybkr/PSReadLine"</Url>
+	</GitHub>
+	<Description>Great command line editing in the PowerShell console host</Description>
+</Package>
+
+<Package>
+	<Name>PSScriptAnalyzer</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>Miscellaneous</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="true"/>
+	<Chocolatey Available="true"/>
+	<GitHub Available="true">
+		<Url>https://github.com/PowerShell/PSScriptAnalyzer"</Url>
+	</GitHub>
+	<Description>Great command line editing in the PowerShell console host</Description>
+</Package>
+
+<Package>
+	<Name>VirtualEnvWrapper</Name>
+	<Deactivated>false</Deactivated>	
+	<UserProfile>Programming</UserProfile>
+	<Repository>LocalRepository</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="false"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="true">
+		<Url>https://github.com/regisf/virtualenvwrapper-powershell"</Url>
+	</GitHub>
+	<Description>A mimic of the VirtualEnvWrapper project but with Powershell</Description>
+</Package>
+
+<Package>
+	<Name>WindowsTools</Name>
+	<Deactivated>false</Deactivated>
+	<UserProfile>SoftwareManagement</UserProfile>
+		<UserProfile>FileManagement</UserProfile>	
+	<Repository>LocalRepository</Repository>
+	<Scope>AllUsers</Scope>
+	<PSGallery Available="false"/>
+	<Chocolatey Available="false"/>
+	<GitHub Available="false"></GitHub>
+	<RequiredPackages>Posh-Git</RequiredPackages> <!-- Deprecated -->
+	<Description>Set of powershell functions for administrative work in windows (Contains PSEnvironment)</Description>
+</Package>
+
+</PowerShell>
