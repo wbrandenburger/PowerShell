@@ -274,9 +274,26 @@ Class Profile
     #   ShowPackages
     #---------------------------------------------------------------------------
     [System.Object] ShowPackages() 
-    {
+    # {
+    #     $LocalPackages = $This.Packages 
+        
+    #     $Color = $This.Packages | ForEach-Object { [PSCustomObject] @{
+    #         GroupProfile = $_
+    #         Package = $This[$_]
+    #     }})
+    #     # Add-Member -MemberType SciptProperty -Name Color -Value  
+    #     {ForEach {
+    #         If ($_.Repository -match "PSGallery" -and (-not $_.Installed))
+    #         {$_.Color = "31"}
+    #         ElseIf ($_.Repository -match "LocalRepository")
+    #         {$_.Color = "36"}
+    #     }
         # Show the lists of profiles
-        Return $This.Packages | Format-Table
+        Return $LocalPackages | Format-Table Version,Installed, @{
+            Label = "Name"
+            Expression = {$Color = $_.Color;"$E[${Color}m$($_.Name)${E}[0m"
+            }
+        },Repository,Description
     }
 
     #---------------------------------------------------------------------------
@@ -439,16 +456,16 @@ Class Profile
 
 
         # Loop through all elements with the defined tag
-        $TempPackages = ForEach ($Loop_Item in (Select-Xml -Xml $ProfileConfig -XPath "//Package[Deactivated='false']").Node) 
+        $TempPackages = ForEach ($_ in (Select-Xml -Xml $ProfileConfig -XPath "//Package[Deactivated='false']").Node) 
             {
-                $InstalledPackage = $InstalledPackages | Where-Object -Property Name -contains $Loop_Item.Name
+                $InstalledPackage = $InstalledPackages | Where-Object -Property Name -contains $_.Name
 
                 [PSCustomObject]@{
                     Version = $InstalledPackage.Version
                     Installed =  $InstalledPackage -ne $Null 
-                    Name = $Loop_Item.Name
-                    Repository = $Loop_Item.Repository
-                    Description = $Loop_Item.Description}
+                    Name = $_.Name
+                    Repository = $_.Repository
+                    Description = $_.Description}
             } 
 
         $This.Packages = $TempPackages| Sort-Object -Property @{Expression = "Repository"; Descending = $True}, @{Expression = "Name"; Descending = $False} 
@@ -461,9 +478,10 @@ Class Profile
     {
         $LocalPackages = $This.Packages
 
-        ForEach ($Loop_Item in ($LocalPackages | Where-Object {$_.Repository -match "PSGallery" -and $_.Installed -eq $True}))
+        # ADDMEMBER!!!!!!!!!!!!!!!!!!!!!!!
+        ForEach ($_ in ($LocalPackages | Where-Object {$_.Repository -match "PSGallery" -and $_.Installed -eq $True}))
         {
-            $Loop_Item.UpToDate = $Loop_Item.Version -match (Find-Module -Name $Loop_Item.Name).Version
+            $_.UpToDate = $_.Version -match (Find-Module -Name $_.Name).Version
         }
 
         Return $LocalPackages
@@ -477,25 +495,6 @@ Class Profile
     {
         # $This.Update()
         # $This.GetVersionsUpdates()
-
-
-
-
-
-
-
-        Write-PSObject  $This.Packages -MatchMethod Match -Column Installed -Value $False -ValueForeColor White -ValueBackColor Blue;
-
-
-
-
-
-
-
-
-
-
-
 
         #     $Expression =
         #     {
@@ -557,17 +556,17 @@ Class Profile
         $HashTable_Profiles = [HashTableList]::New()
 
         # Loop through all elements with the defined tag
-        ForEach ($Loop_Item in (Select-Xml -Xml $ProfileConfig -XPath "//Package[Deactivated='false']").Node) 
+        ForEach ($_ in (Select-Xml -Xml $ProfileConfig -XPath "//Package[Deactivated='false']").Node) 
         {
             # Array for storing required packages
             $Array = [System.Collections.Arraylist]::New()
-            [Void] $Array.Add($Loop_Item.Name);
+            [Void] $Array.Add($_.Name);
 
             # Recursive search to get required packages
-            $This.RecursiveSearchProfile($ProfileConfig, $Array, $Loop_Item)
+            $This.RecursiveSearchProfile($ProfileConfig, $Array, $_)
 
             # Add the profile groups to the hashtable
-            ForEach ($Loop_SubItem in (Select-Xml -Xml $Loop_Item -XPath ".//UserProfile").Node) 
+            ForEach ($Loop_SubItem in (Select-Xml -Xml $_ -XPath ".//UserProfile").Node) 
             { 
                 $HashTable_Profiles.ExtAdd($Loop_SubItem.InnerText,$Array)
             }
@@ -587,14 +586,14 @@ Class Profile
     {
         # !!!!!!!!!!!!!!!!!!!! Task: Effiency if programming a hash
         # 
-        ForEach ($Loop_Item_1 in (Select-Xml -Xml $Element -XPath ".//RequiredPackages").Node)
+        ForEach ($__1 in (Select-Xml -Xml $Element -XPath ".//RequiredPackages").Node)
         {   
-            ForEach ($Loop_Item_2 in (Select-Xml -Xml $ProfileConfig -XPath "//Package[Name='$($Loop_Item_1.InnerText)' and Deactivated='false']").Node)
+            ForEach ($__2 in (Select-Xml -Xml $ProfileConfig -XPath "//Package[Name='$($__1.InnerText)' and Deactivated='false']").Node)
             {
-                If ( -not ($Array -contains $Loop_Item_2.Name)) 
+                If ( -not ($Array -contains $__2.Name)) 
                 {
-                    [Void] $Array.Add($Loop_Item_2.Name)
-                    $This.RecursiveSearchProfile($ProfileConfig, $Array, $Loop_Item_2)
+                    [Void] $Array.Add($__2.Name)
+                    $This.RecursiveSearchProfile($ProfileConfig, $Array, $__2)
                 }
             }
         }
