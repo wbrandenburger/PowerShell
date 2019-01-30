@@ -215,7 +215,6 @@ Class Profile
 
         # Loop through all elements with the defined tag
         $This.PackageMgr = ForEach ($Loop_Pckgs in ($This.Packages | Where { $_.Deactivated -match "false"})) {
-                Write-Host $Loop_Pckgs.Name
                 $Name = $Loop_Pckgs.Name; $Task = $Null
                 $Color = 0; $Repo = $Loop_Pckgs.Repository
                 $Version = ($PckgsInst | Where {$_.Name -eq $Loop_Pckgs.Name}).Version
