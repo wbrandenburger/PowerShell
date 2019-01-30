@@ -10,27 +10,12 @@
 # =============================================================================
 
 
-# Tasks REQUIRED  Tools - Dont Remove!!!!!
-# Questions and Task Combine as Table for better 
-
 #psd1
-
-
-# $UrlPath = "https://docs.microsoft.com/en-us/dotnet/api/system.management.automation.%s?view=pscore-6.0.0"
-
-# [Regex]::Replace($UrlPath,"%s", $Query)
-
-# scope=.NET
-# nuget
-# pscore-6.0.0
 
 # Color Module
 
 # Environment Path Module C#
 # Windows Tools!!!
-
-# Fill Profil XML from Find Moduel and so on!!!!
-
 
 # =============================================================================
 #    Define Global Variables
@@ -38,11 +23,11 @@
 
     # Set Modules Path
     $PSModulePath = [Environment]::GetEnvironmentVariable("PSModulePath")
-    $PSModulePath += ";$env:Home\PSModules"
+    $PSModulePath += ";$env:Home\Repositories"
     [Environment]::SetEnvironmentVariable("PSModulePath", $PSModulePath)
 
     # Import ProfileManagement module
-    Import-Module "A:\OneDrive\Projects\PSModules\PSProfile\bin\Debug\net472\PSProfile.dll"
+    Import-Module "A:\OneDrive\Projects\Repositories\PSCommandLine\bin\Debug\net472\PSCommandLine.dll"
 
     # Initialize object of class profile
     $Global:UserProfile = [Profile]::New($PSScriptRoot)
@@ -50,6 +35,29 @@
     # Clear Variables
     Remove-Variable -Name PSModulePath
 
+#-------------------------------------------------------------------------------
+#   Prompt
+#-------------------------------------------------------------------------------
+Function Global:Prompt 
+{
+    $User = [Security.Principal.WindowsIdentity]::GetCurrent();
+    $CheckAs = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+
+
+    Write-Host "[" -NoNewline -ForegroundColor DarkCyan
+    Write-Host (Get-Date -UFormat %R) -NoNewline -ForegroundColor DarkCyan
+    Write-Host "] " -NoNewline -ForegroundColor DarkCyan
+	If ($CheckAs) { 
+        Write-Host "(Admin) " -NoNewline -ForegroundColor DarkRed
+    } 
+    Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor DarkGreen 
+    
+    Write-Host " " -NoNewline
+
+    If ((Get-Module).Name -contains "Posh-Git") {
+        Write-VcsStatus
+    }
+}
 
 # =============================================================================
 #    PowerShell Cmdlets
@@ -129,16 +137,16 @@ Class Progress
 # =============================================================================
 Class Profile 
 {   
-    [System.String] $PathLocal
-    [System.String] $FilePathProfile
-    [System.String] $PathConfig
-    [System.String] $FilePathGroupProfiles
+    Hidden [System.String] $PathLocal
+    Hidden [System.String] $FilePathProfile
+    Hidden [System.String] $PathConfig
+    Hidden [System.String] $FilePathGroupProfiles
     
-    [System.Object] $GroupProfiles
-    [System.Object] $Packages
-    [System.Object] $PackageStatus
-
-    [System.Collections.ArrayList] $PackageTasks
+    Hidden [System.Object] $Packages
+    Hidden [System.Object] $GroupProfiles
+    Hidden [System.Object] $PackagesRaw
+    
+    Hidden [System.Collections.ArrayList] $PackageTasks
 
     #---------------------------------------------------------------------------
     #   Constructor
@@ -149,7 +157,7 @@ Class Profile
         $This.PathLocal = $Path_Home
         $This.FilePathProfile = Join-Path -Path $Path_Home -ChildPath "profile.ps1"
         $This.PathConfig = Join-Path -Path $Path_Home -ChildPath ".config"
-        $This.FilePathGroupProfiles = Join-Path -Path $Path_Home -ChildPath ".config\profile.xml"
+        $This.FilePathGroupProfiles = Join-Path -Path $Path_Home -ChildPath ".config\ProfilePackages.xml"
 
         $This.PackageTasks = [System.Collections.ArrayList]::New( @(
             "Install",
@@ -160,8 +168,6 @@ Class Profile
             "Import-Group",
             "Remove-Group")
         )
-        
-        $This.GetGroupProfileFromFile()
     }
 
     #---------------------------------------------------------------------------
@@ -170,36 +176,37 @@ Class Profile
     [Void] Update()
     {
         $This.GetGroupProfileFromFile()
-        $This.GetPackageStatus()
+        $This.GetPackages()
     }
 
     #---------------------------------------------------------------------------
     #   ShowProfiles
     #---------------------------------------------------------------------------
-    [System.Object] ShowProfiles() 
+    [System.Object] ShowGroupProfiles() 
     {
+        $This.Update()
+
         Return $This.GroupProfiles | Format-Table
     }
 
     #---------------------------------------------------------------------------
     #   ShowPackages
     #---------------------------------------------------------------------------
-    [System.Object] ShowPackages() 
+    [System.Object] ShowPackagesRaw() 
     {
-        Return $This.Packages | Format-Table Deactivated, Name, Repository, Scope, UserProfile, Description 
+        $This.Update()
+
+        Return $This.PackagesRaw | Format-Table 
     }
 
     #---------------------------------------------------------------------------
     #   ShowPackageStatus
     #---------------------------------------------------------------------------
-    [System.Object] ShowPackageStatus() 
+    [System.Object] ShowPackages() 
     {
-        If ($This.PackageStatus -eq $Null)
-        {
-            $This.GetPackageStatus() 
-        }
-        
-        Return $This.PackageStatus | Format-Table @{
+        $This.Update()
+
+        Return $This.Packages | Format-Table @{
             Label = "Task"
             Expression = {$_.ColoredTask}}, Version, @{
             Label = "Name"
@@ -207,9 +214,17 @@ Class Profile
     }
 
     #---------------------------------------------------------------------------
+    #   ShowPackageTasks
+    #--------------------------------------------------------------------------
+    [System.Object] ShowPackageTasks() 
+    {
+        Return $This.PackageTasks
+    }
+
+    #---------------------------------------------------------------------------
     #   GetGroupProfiles
     #---------------------------------------------------------------------------
-    [System.Object] GetGroupProfilesPackages(
+    Hidden [System.Object] GetGroupProfilesPackages(
         [System.String[]] $GroupProfiles) 
     {
         # Return a profile list
@@ -219,7 +234,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   GetGroupProfiles
     #---------------------------------------------------------------------------
-    [System.Object] GetGroupProfiles() 
+    Hidden [System.Object] GetGroupProfiles() 
     {
         # Return a profile list
         Return $This.GroupProfiles | Select-Object -Property GroupProfile | Sort
@@ -228,7 +243,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   GetGroupProfiles
     #---------------------------------------------------------------------------
-    [System.Object] GetGroupProfilesPackages() 
+    Hidden [System.Object] GetGroupProfilesPackages() 
     {
         # Return a profile list
         Return $This.GroupProfiles.Packages | Sort -Unique | ForEach {
@@ -236,10 +251,31 @@ Class Profile
     }
 
     #---------------------------------------------------------------------------
+    #   FindPackage
+    #---------------------------------------------------------------------------
+    Hidden [Void] FindPackage(
+        [System.String] $PackageName
+    )
+    {
+        $Package = Find-Module -Name $PackageName
+        If ($Package -ne $Null ) {
+        Out-File -FilePath  "$($This.PathConfig)\Package.$PackageName.txt" -InputObject ($Package | Select-Object -Property Name, Author, Version, PublishedDate, Repository, Description)
+        }
+    }
+    #---------------------------------------------------------------------------
+    #   FindPackage
+    #---------------------------------------------------------------------------
+    [Void] FindPackage()
+    {
+        $This.Update()
+
+        $This.Packages | Where {$_.Repository -match "PSGallery" } | ForEach { $This.FindPackage( $_.Name ) }
+    }
+
+    #---------------------------------------------------------------------------
     #   GetVTSequence
     #---------------------------------------------------------------------------
-
-    [System.String] GetVTSequence(
+    Hidden [System.String] GetVTSequence(
         [System.String] $Value,
         [System.ValueType] $Color
     )
@@ -250,36 +286,38 @@ Class Profile
     #---------------------------------------------------------------------------
     #  GetPackageStatus()
     #---------------------------------------------------------------------------
-    [Void] GetPackageStatus()  
+    Hidden [Void] GetPackages()  
     {
         # Get installed Module
         $PckgsInst = Get-InstalledModule
         $PckgsIprt = Get-Module
 
         # Loop through all elements with the defined tag
-        $This.PackageStatus = ForEach ($Loop_Pckgs in ($This.Packages | Where { $_.Deactivated -match "false"})) {
-                $Name = $Loop_Pckgs.Name; $Task = $Null
-                $Color = 0; $Repo = $Loop_Pckgs.Repository
-                $Version = ($PckgsInst | Where {$_.Name -eq $Loop_Pckgs.Name}).Version
-                If ( $PckgsInst.Name -contains $Loop_Pckgs.Name) {
-                    # If ( -not ($Version -eq (Find-Module $Loop_Pckgs.Name).Version)){
-                    #     $Task = "Update";  $Color = 36
-                    # }
+        $This.Packages =  $This.PackagesRaw | Where { $_.Deactivated -match "false"} | ForEach {
+                $Name = $_.Name; $Task = $Null; $Color = 0;
+                $Version = ($PckgsInst | Where {$_.Name -eq $Name}).Version
+
+                If ( $PckgsInst.Name -contains $_.Name) {
+                    If ( -not ($Version -eq $_.Version)){
+                        $Task = "Update";  $Color = 36
+                    }
                 }
-                ElseIf ($Repo -match "PSGallery" ) {
+                ElseIf ($_.Repository -match "PSGallery" ) {
                     $Task = "Install"; $Color = 31;}
+
                 $ColoredTask = $This.GetVTSequence($Task, $Color)
                 
-                If ($PckgsIprt.Name -contains $Loop_Pckgs.Name) {
+                If ($PckgsIprt.Name -contains $_.Name) {
                     $Color = 32;}
-                $ColoredName = $This.GetVTSequence($Loop_Pckgs.Name, $Color)
+
+                $ColoredName = $This.GetVTSequence($_.Name, $Color)
 
                 [PSCustomObject]@{
-                    Name = $Loop_Pckgs.Name; Version = $Version; Task = $Task
-                    Session = ($PckgsIprt.Name -contains $Loop_Pckgs.Name)
+                    Name = $_.Name; Version = $Version; Task = $Task
+                    Session = ($PckgsIprt.Name -contains $_.Name)
                     ColoredTask = $ColoredTask 
                     ColoredName = $ColoredName
-                    Repository = $Repo; Description = $Loop_Pckgs.Description
+                    Repository = $_.Repository; Description = $_.Description
                 }
             }
     }
@@ -290,62 +328,63 @@ Class Profile
     [System.Object] PackageManager(
         [System.String] $Task) 
     {
+        $This.Update()
+
         $Question = ""; $Object = New-Object PSCustomObject
         Switch ($Task) {
             "Install" {
                 $Question = "Which packages should be get installed?"
-                $Object = $This.PackageStatus | Where {$_.Task -match $Task}
+                $Object = ($This.Packages | Where {$_.Task -match $Task}).Name
             }
             "Uninstall" {
                 $Question = "Which packages should be get uninstalled?"
-                $Object = $This.PackageStatus | Where {$_.Repository -match "PSGallery"}
+                $Object = ($This.Packages | Where {$_.Repository -match "PSGallery"}).Name
             }
             "Update" {
                 $Question = "Which packages should be get updated?"
-                $Object = $This.PackageStatus | Where {$_.Task -match $Task}
+                $Object = ($This.Packages | Where {$_.Task -match $Task}).Name
             }                     
             "Import" {
                 $Question = "Which packages should be get imported?"
-                $Object = $This.GroupProfiles.Packages | Sort -Unique
+                $Object = $This.Packages.Name
             }
             "Remove" {
                 $Question = "Which packages should be get removed?"
-                $Object = $This.GroupProfiles.Packages | Sort -Unique
+                $Object = $This.Packages.Name
             }
             "Import-Group" {
                 $Question = "Which group profile should be get imported?"
-                $Object = $This.GetGroupProfiles().GroupProfile
+                $Object = $This.GroupProfiles.GroupProfile
             }
             "Remove-Group" {
                 $Question = "Which group profile should be get removed?"
-                $Object = $This.GetGroupProfiles().GroupProfile
+                $Object = $This.GroupProfiles.GroupProfile
             }
             Default {
                 Write-Warning "Task $Task is not valid."        
             }
         }
-
         $This.ChangeManager( $Task, $Question, $This.GetArrayList( $Object))
 
-        Return $This.ShowPackageStatus() 
+        Return $This.ShowPackages() 
     }
 
     #---------------------------------------------------------------------------
     #   GetPackagesInstall
     #---------------------------------------------------------------------------
-    [System.Collections.ArrayList] GetArrayList(
+    Hidden [System.Collections.ArrayList] GetArrayList(
         [System.Object] $Object
     )
     {   $Array = [System.Collections.ArrayList]::New();
-        $Object | ForEach { [Void] $Array.Add( $_ ) }
-
+        If ($Object.Count -gt 0) {$Object | ForEach { [Void] $Array.Add( $_ ) }}
+        
         Return $Array
     }
 
     #---------------------------------------------------------------------------
     #   ChangeManager
     #---------------------------------------------------------------------------
-    [Void] ChangeManager(
+    Hidden [Void] ChangeManager(
         [System.String] $Task,
         [System.String] $Question,
         [System.Collections.ArrayList] $Options
@@ -353,21 +392,17 @@ Class Profile
     {
         If ($Options.Count -gt 0 )
         {
-            $LoopIdx = 0;
             $Abort = $True
             Do {
                 $Abort = $This.ChangePackages(
                     $This.ChangeQuery($Question,$Options),
                     $Options, 
                     $Task)
-                $LoopIdx++
+                $This.Update();
             } While ($Options.Count -gt 0 -and $Abort)
 
             If ($Abort) {Write-Warning "Completion of Task $Task." }
             Else {Write-Warning "Task $Task aborted." }
-            If ($LoopIdx -gt 1) {
-                $This.Update();
-            }
         }
         Else {
             Write-Warning "There are no packages which are available for Task $Task."
@@ -377,7 +412,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   ChangeQuery
     #---------------------------------------------------------------------------
-    [Int] ChangeQuery(
+    Hidden [Int] ChangeQuery(
         [System.String] $Question,
         [System.Collections.ArrayList] $Options 
     ) 
@@ -389,8 +424,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   ChangePackages
     #---------------------------------------------------------------------------
-
-    [Bool] ChangePackages(
+    Hidden [Bool] ChangePackages(
         [Int] $UserInput,
         [System.Collections.ArrayList] $Options,
         [System.String] $Task
@@ -413,12 +447,12 @@ Class Profile
         {
             Switch ($Task) {
             "Install" {
-                Start-Process PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -NoExit -Command Find-Module -Name $($ChangePckg[$LoopIdx_Pckg]) | Install-Module -Scope AllUsers -Verbose -Force" -Verb RunAs
+                Start-Process PowerShell -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command Find-Module -Name $($ChangePckg[$LoopIdx_Pckg]) | Install-Module -Scope AllUsers -Verbose -Force"
                 $Options.Remove($ChangePckg[$LoopIdx_Pckg])
                 Break
             }
             "Uninstall" {
-                Start-Process PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -NoExit -Command Uninstall-Module -Name $($ChangePckg[$LoopIdx_Pckg]) -Verbose -Force" -Verb RunAs
+                Start-Process PowerShell -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command Uninstall-Module -Name $($ChangePckg[$LoopIdx_Pckg]) -Verbose -Force" 
                 $Options.Remove($ChangePckg[$LoopIdx_Pckg])
                 Break
             }
@@ -452,17 +486,14 @@ Class Profile
     #---------------------------------------------------------------------------
     #   ImportPackage
     #---------------------------------------------------------------------------
-    [System.Object] ImportPackage(
+    Hidden [Void] ImportPackage(
         [System.String] $Package
     )
     {
         Import-Module -Name $Package -Verbose:($True)
-        # If ($Package.Import){ $ArgumentList = [Regex]::Replace($Package.Import.Text,$Package.Import.Pattern, (Get-Variable -Name $Package.Import.Type).Value)}
-        #  Import-Module -Name $Package.Name -ArgumentList $ArgumentList -Verbose:($False)
-        Return Get-Module;
     }
     
-    [System.Object] RemovePackage(
+    Hidden [Void] RemovePackage(
         [System.String] $Package
     )
     {
@@ -470,14 +501,12 @@ Class Profile
         If ($LoadedModule | Where-Object { $_.Name -match $Package}) {
             Remove-Module -Name $Package -Force:($True) -Verbose:($True)
         }
-
-        Return Get-Module;
     }
 
     #---------------------------------------------------------------------------
-    #   ImportGroupProfile
+    #   ManageGroupProfiles
     #---------------------------------------------------------------------------
-    [System.Object] ManageGroupProfiles(
+    Hidden [Void] ManageGroupProfiles(
         [System.String] $Task,
         [System.String[]] $GroupProfiles
     )
@@ -495,14 +524,12 @@ Class Profile
                 $This.ImportPackage($Lop_Packages)
             }
         }
-
-        Return Get-Module;
     }
 
     #---------------------------------------------------------------------------
     #   ReadGroupProfiles
     #---------------------------------------------------------------------------
-    [System.Xml.XmlDocument] ReadGroupProfiles() 
+    Hidden [System.Xml.XmlDocument] ReadGroupProfiles() 
     {
         # Read the profile config file
         Return ([System.Xml.XmlDocument] (Get-Content -Path $This.FilePathGroupProfiles))
@@ -511,7 +538,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   GetGroupProfileFromFile
     #---------------------------------------------------------------------------
-    [Void] GetGroupProfileFromFile()
+    Hidden [Void] GetGroupProfileFromFile()
     {
         # Read the profile config file
         $GroupProfileXml = $This.ReadGroupProfiles()
@@ -526,7 +553,7 @@ Class Profile
             [Void] $Array.Add($_.Name);
 
             # Recursive search to get required packages
-            $This.RecursiveSearchProfile($GroupProfileXml, $Array, $_)
+            $This.RecursiveRequiredPackages($GroupProfileXml, $Array, $_)
 
             # Add the profile groups to the hashtable
             ForEach ($Loop_SubItem in (Select-Xml -Xml $_ -XPath ".//UserProfile").Node) 
@@ -549,14 +576,14 @@ Class Profile
                                 Packages = $Array
                             }
                         }
-        $This.Packages = (Select-Xml -Xml $GroupProfileXml -XPath "//Package").Node
+
+        $This.PackagesRaw = (Select-Xml -Xml $GroupProfileXml -XPath "//Package").Node
     }
 
     #---------------------------------------------------------------------------
-    #   RecursiveSearchProfile
+    #   RecursiveRequiredPackages
     #---------------------------------------------------------------------------
-    # Search for required packages and insert them into the related array
-    [Void] RecursiveSearchProfile(
+    Hidden [Void] RecursiveRequiredPackages(
         [System.Xml.XmlDocument] $GroupProfileXml,     
         [System.Collections.Arraylist] $Array,
         [System.Xml.XmlElement] $Element
@@ -569,7 +596,7 @@ Class Profile
                 If ( -not ($Array -contains $__2.Name)) 
                 {
                     [Void] $Array.Add($__2.Name)
-                    $This.RecursiveSearchProfile($GroupProfileXml, $Array, $__2)
+                    $This.RecursiveRequiredPackages($GroupProfileXml, $Array, $__2)
                 }
             }
         }

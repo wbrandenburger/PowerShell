@@ -1,0 +1,128 @@
+<PowerShell>
+
+<Package>
+	<Name>cChoco</Name>
+	<Version>2.4.0.0</Version>
+	<PublishedDate>13/11/2018 09:33:14</PublishedDate>
+	<Deactivated>false</Deactivated>
+	<UserProfile>SoftwareManagement</UserProfile>
+	<Repository>PSGallery</Repository>
+	<Description>Chocolatey DSC Resources for use with internal packages and the community package repository. Learn more at http://chocolatey.org/.
+	</Description>
+</Package>
+
+<Package>
+	<Name>PackageManagement</Name>
+	<Version>1.2.4</Version>
+	<PublishedDate>01/12/2018 03:01:27</PublishedDate>
+	<Deactivated>false</Deactivated>
+	<UserProfile>PowerShellTools</UserProfile>
+	<Repository>PSGallery</Repository>
+	<GitHub>https://github.com/PowerShell/PackageManagementProviderResource</GitHub>
+	<Description>PackageManagement (a.k.a. OneGet) is a new way to discover and install software packages from around the web. It is a manager or multiplexor of existing package managers (also called package providers) that unifies Windows package management with a single Windows PowerShell interface
+	</Description>
+</Package>
+
+<Package>
+	<Name>posh-git</Name>
+	<Version>0.7.3</Version>
+	<PublishedDate>20/04/2018 04:31:11</PublishedDate>
+	<Deactivated>false</Deactivated>
+	<UserProfile>Usability</UserProfile>
+	<Repository>PSGallery</Repository>
+	<GitHub>https://github.com/dahlbyk/posh-git"</GitHub>
+	<Description>Provides prompt with Git status summary information and tab completion for Git commands, parameters, remotes and branch names.
+	</Description>
+</Package>
+
+<Package>
+	<Name>PowerShellGet</Name>
+	<Version>2.0.4</Version>
+	<PublishedDate>15/01/2019 00:33:16</PublishedDate>
+	<Deactivated>false</Deactivated>	
+	<UserProfile>PowerShellTools</UserProfile>
+	<Repository>PSGallery</Repository>
+	<GitHub>https://github.com/PowerShell/PowerShellGet"</GitHub>
+	<RequiredPackages>PackageManagement</RequiredPackages>
+	<Description>PowerShell module with commands for discovering, installing, updating and publishing the PowerShell artifacts like Modules, DSC Resources, Role Capabilities and Scripts.
+	</Description>
+</Package>
+
+<Package>
+	<Name>powershell-yaml</Name>
+	<Version>0.4.0</Version>
+	<PublishedDate>15/01/2019 11:55:42</PublishedDate>
+	<Deactivated>false</Deactivated>
+	<UserProfile>Programming</UserProfile>
+	<Repository>PSGallery</Repository>
+	<GitHub>https://github.com/cloudbase/powershell-yaml"</GitHub>
+	<Description>Powershell module for serializing and deserializing Yaml.
+	</Description>
+</Package>
+    
+<Package>
+	<Name>PSPapis</Name>
+	<Version></Version>
+	<PublishedDate></PublishedDate>
+	<Deactivated>false</Deactivated>
+	<UserProfile>FileManagement</UserProfile>
+	<Repository>GitHub</Repository>
+	<RequiredPackages>VirtualEnvWrapper</RequiredPackages>
+	<Description>A set of PowerShell scripts which provide integration of Python package Papis.</Description>
+</Package>
+
+<Package>
+	<Name>PSConsoleTheme</Name>
+	<Version>0.5.0</Version>
+	<PublishedDate>22/05/2018 14:53:46</PublishedDate>
+	<Deactivated>false</Deactivated>
+	<UserProfile>Usability</UserProfile>
+	<Repository>PSGallery</Repository>
+	<GitHub>https://github.com/mmims/PSConsoleTheme"</GitHub>
+	<Description>PowerShell module to manage Windows console colors and PSReadline token colors.</Description>
+</Package>
+
+<Package>
+	<Name>PSReadLine</Name>
+	<Version>1.2</Version>
+	<PublishedDate>25/01/2016 20:43:22</PublishedDate>
+	<Deactivated>true</Deactivated>
+	<UserProfile>PowerShellTools</UserProfile>
+	<Repository>PSGallery</Repository>
+	<GitHub>https://github.com/lzybkr/PSReadLine"</GitHub>
+	<Description>Great command line editing in the PowerShell console host</Description>
+</Package>
+
+<Package>
+	<Name>PSScriptAnalyzer</Name>
+	<Version>1.17.1</Version>
+	<PublishedDate>05/06/2018 21:32:49</PublishedDate>
+	<Deactivated>false</Deactivated>
+	<UserProfile>Programming</UserProfile>
+	<Repository>PSGallery</Repository>
+	<GitHub>https://github.com/PowerShell/PSScriptAnalyzer"</GitHub>
+	<Description>PSScriptAnalyzer provides script analysis and checks for potential code defects in the scripts by  applying a group of built-in or customized rules on the scripts being analyzed</Description>
+</Package>
+
+<Package>
+	<Name>VirtualEnvWrapper</Name>
+	<Version></Version>
+	<PublishedDate></PublishedDate>
+	<Deactivated>false</Deactivated>	
+	<UserProfile>Programming</UserProfile>
+	<Repository>GitHub</Repository>
+	<GitHub>https://github.com/regisf/virtualenvwrapper-powershell"</GitHub>
+	<Description>A mimic of the VirtualEnvWrapper project but with Powershell</Description>
+</Package>
+
+<Package>
+	<Name>PSEnvironment</Name>
+	<Version></Version>
+	<PublishedDate></PublishedDate>
+	<Deactivated>false</Deactivated>
+	<UserProfile>SoftwareManagement</UserProfile>
+	<Repository>GitHub</Repository>
+	<Description>Module to make working with environment variables easier.</Description>
+</Package>
+
+</PowerShell>
