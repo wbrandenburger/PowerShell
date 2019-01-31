@@ -13,6 +13,12 @@
 #    Define Global Variables
 # =============================================================================
 
+# @ToDo Add PSCommandLine to ProfilePackages.Xml
+
+# @ToDo Open recently used file with Papis YES Open-Profile especially - deprecated
+
+# @ToDo[I-Prty] Provide Cmdlets for ProfileManagement - Don't provide variable $Pro -> Only import ProfileManagement and PSCommandLine if its recommended
+
     # Set Modules Path
     $PSModulePath = [Environment]::GetEnvironmentVariable("PSModulePath")
     $PSModulePath += ";$env:Home\Repositories"
@@ -21,7 +27,7 @@
     Import-Module PSCommandLine -Verbose
 
     # Initialize object of class profile
-    $Global:Pro = [Profile]::New($PSScriptRoot)
+    $Pro = [Profile]::New($PSScriptRoot)
 
     # Clear Variables
     Remove-Variable -Name PSModulePath
@@ -59,7 +65,7 @@ Function Global:Prompt
 #   Show-HostColors
 #------------------------------------------------------------------------------
 # @ToDo:Outsourcing of ColorsManagement in own class with the colors specified in MindManager
-Function Global:Show-HostColors
+Function Global:Show-HostColor
 {
     $Colors = [Enum]::GetValues([System.ConsoleColor])
     Foreach ($BgColor in $Colors)
@@ -212,7 +218,7 @@ Class Profile
     #--------------------------------------------------------------------------
     [System.Object] ShowTasks() 
     {
-        Return $This.PackageTasks | ForEach {[PSCustomObject]@{
+        Return $This.PackageTasks | ForEach-Object{[PSCustomObject]@{
             Task = $_
         }}
     }
@@ -224,7 +230,7 @@ Class Profile
         [System.String[]] $GroupProfiles) 
     {
         # Return a profile list
-        Return ($GroupProfiles | ForEach { $GroupProfile = $_; $This.GroupProfiles | Where-Object {$_.GroupProfile -contains $GroupProfile}}).Packages | Sort -Unique | ForEach {[PSCustomObject] @{ Packages = $_ }}
+        Return ($GroupProfiles | ForEach-Object { $GroupProfile = $_; $This.GroupProfiles | Where-Object {$_.GroupProfile -contains $GroupProfile}}).Packages | Sort-Object -Unique | ForEach-Object {[PSCustomObject] @{ Packages = $_ }}
     }
 
     #---------------------------------------------------------------------------
@@ -233,7 +239,7 @@ Class Profile
     Hidden [System.Object] GetGroupProfiles() 
     {
         # Return a profile list
-        Return $This.GroupProfiles | Select-Object -Property GroupProfile | Sort
+        Return $This.GroupProfiles | Select-Object -Property GroupProfile | Sort-Object
     }
 
     #---------------------------------------------------------------------------
@@ -242,7 +248,7 @@ Class Profile
     Hidden [System.Object] GetGroupProfilesPackages() 
     {
         # Return a profile list
-        Return $This.GroupProfiles.Packages | Sort -Unique | ForEach {
+        Return $This.GroupProfiles.Packages | Sort-Object -Unique | ForEach-Object {
             [PSCustomObject] @{ Packages = $_ }}
     }
 
@@ -266,7 +272,7 @@ Class Profile
     {
         $This.Update()
 
-        $This.Packages | Where {$_.Repository -match "PSGallery" } | ForEach { $This.FindPackage( $_.Name ) }
+        $This.Packages | Where-Object {$_.Repository -match "PSGallery" } | ForEach-Object { $This.FindPackage( $_.Name ) }
     }
 
 # @ToDo: Virtual Terminal Sequences - Outsourcing in own class
@@ -291,9 +297,9 @@ Class Profile
         $PckgsIprt = Get-Module
 
         # Loop through all elements with the defined tag
-        $This.Packages =  $This.PackagesRaw | Where { $_.Deactivated -match "false"} | ForEach {
+        $This.Packages =  $This.PackagesRaw | Where-Object { $_.Deactivated -match "false"} | ForEach-Object {
                 $Name = $_.Name; $Task = $Null; $Color = 0;
-                $Version = ($PckgsInst | Where {$_.Name -eq $Name}).Version
+                $Version = ($PckgsInst | Where-Object {$_.Name -eq $Name}).Version
 
                 If ( $PckgsInst.Name -contains $_.Name) {
                     If ( -not ($Version -eq $_.Version)){
@@ -332,15 +338,15 @@ Class Profile
         Switch ($Task) {
             "Install" {
                 $Question = "Which packages should be get installed?"
-                $Object = ($This.Packages | Where {$_.Task -match $Task}).Name
+                $Object = ($This.Packages | Where-Object {$_.Task -match $Task}).Name
             }
             "Uninstall" {
                 $Question = "Which packages should be get uninstalled?"
-                $Object = ($This.Packages | Where {$_.Repository -match "PSGallery"}).Name
+                $Object = ($This.Packages | Where-Object {$_.Repository -match "PSGallery"}).Name
             }
             "Update" {
                 $Question = "Which packages should be get updated?"
-                $Object = ($This.Packages | Where {$_.Task -match $Task}).Name
+                $Object = ($This.Packages | Where-Object {$_.Task -match $Task}).Name
             }                     
             "Import" {
                 $Question = "Which packages should be get imported?"
@@ -374,7 +380,7 @@ Class Profile
         [System.Object] $Object
     )
     {   $Array = [System.Collections.ArrayList]::New();
-        If ($Object.Count -gt 0) {$Object | ForEach { [Void] $Array.Add( $_ ) }}
+        If ($Object.Count -gt 0) {$Object | ForEach-Object { [Void] $Array.Add( $_ ) }}
         
         Return $Array
     }
@@ -510,8 +516,6 @@ Class Profile
     )
     {
         $GroupProfilesPackages = $This.GetGroupProfilesPackages($GroupProfiles).Packages
-
-        $Progress = [Progress]::New("Import/remove packages", "Progress:", $GroupProfilesPackages.Count)
 
         # Loop through all elements with the defined tag
         ForEach ($Lop_Packages in $GroupProfilesPackages)
