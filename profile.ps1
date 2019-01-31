@@ -82,7 +82,6 @@ Function Global:Test-Verb
     Param
     (
         [Parameter(Position=0, Mandatory=$True, ValueFromPipeline=$True,HelpMessage="Verb which will be tested being a member of approved PowerShell verbs")]
-        [Alias("Verb")]
         [String] $Input_Verb   
     )
     
@@ -123,8 +122,8 @@ Class Progress
     
 }
 
-# ToDo: Export class in a own Module
-# ToDo: Avoid invokin Get-InstalledModules with initialization
+# @ToDo: Outsourcing Profile a own class and provide Cmdlets
+# @ToDo: Avoid invoking Get-InstalledModules with initialization
 # =============================================================================
 #    Class Profile
 # =============================================================================
@@ -183,9 +182,9 @@ Class Profile
     }
 
     #---------------------------------------------------------------------------
-    #   ShowPackages
+    #   ShowRaw
     #---------------------------------------------------------------------------
-    [System.Object] ShowPackagesRaw() 
+    [System.Object] ShowRaw() 
     {
         $This.Update()
 
@@ -209,9 +208,11 @@ Class Profile
     #---------------------------------------------------------------------------
     #   ShowPackageTasks
     #--------------------------------------------------------------------------
-    [System.Object] ShowPackageTasks() 
+    [System.Object] ShowTasks() 
     {
-        Return $This.PackageTasks
+        Return $This.PackageTasks | ForEach {[PSCustomObject]@{
+            Task = $_
+        }}
     }
 
     #---------------------------------------------------------------------------
@@ -243,7 +244,7 @@ Class Profile
             [PSCustomObject] @{ Packages = $_ }}
     }
 
-    # ToDo: FindPackage - Write directly information like version, publishedDate into file profiles
+# @ToDo: I-Prty FindPackage - Write directly information like version, publishedDate into file profiles
     #---------------------------------------------------------------------------
     #   FindPackage
     #---------------------------------------------------------------------------
@@ -266,6 +267,7 @@ Class Profile
         $This.Packages | Where {$_.Repository -match "PSGallery" } | ForEach { $This.FindPackage( $_.Name ) }
     }
 
+# @ToDo: Virtual Terminal Sequences - Outsourcing in own class
     #---------------------------------------------------------------------------
     #   GetVTSequence
     #---------------------------------------------------------------------------
@@ -550,7 +552,7 @@ Class Profile
             $This.RecursiveRequiredPackages($GroupProfileXml, $Array, $_)
 
             # Add the profile groups to the hashtable
-            ForEach ($Loop_SubItem in (Select-Xml -Xml $_ -XPath ".//Profile").Node) 
+            ForEach ($Loop_SubItem in (Select-Xml -Xml $_ -XPath ".//GroupProfile").Node) 
             { 
                 If (-not $UniqueHashTableList.ContainsKey($Loop_SubItem.InnerText))
                 {
