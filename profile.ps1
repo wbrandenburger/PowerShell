@@ -244,7 +244,7 @@ Class Profile
             [PSCustomObject] @{ Packages = $_ }}
     }
 
-# @ToDo: I-Prty FindPackage - Write directly information like version, publishedDate into file profiles
+# @ToDo[I-Prty]: FindPackage - Write directly information like version, publishedDate into file profiles
     #---------------------------------------------------------------------------
     #   FindPackage
     #---------------------------------------------------------------------------
