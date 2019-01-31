@@ -26,9 +26,14 @@
     # Clear Variables
     Remove-Variable -Name PSModulePath
 
+# =============================================================================
+#    PowerShell Cmdlets
+# =============================================================================
+
 #-------------------------------------------------------------------------------
 #   Prompt
 #-------------------------------------------------------------------------------
+# @ToDo[I-Prty] Add the used GroupProfile to the prompt - GrouProfiles should manage these packages which are needed for completing specific tasks
 Function Global:Prompt 
 {
     $User = [Security.Principal.WindowsIdentity]::GetCurrent();
@@ -50,13 +55,10 @@ Function Global:Prompt
     }
 }
 
-# =============================================================================
-#    PowerShell Cmdlets
-# =============================================================================
-
 #------------------------------------------------------------------------------
 #   Show-HostColors
 #------------------------------------------------------------------------------
+# @ToDo:Outsourcing of ColorsManagement in own class with the colors specified in MindManager
 Function Global:Show-HostColors
 {
     $Colors = [Enum]::GetValues([System.ConsoleColor])
