@@ -123,6 +123,8 @@ Class Progress
     
 }
 
+# ToDo: Export class in a own Module
+# ToDo: Avoid invokin Get-InstalledModules with initialization
 # =============================================================================
 #    Class Profile
 # =============================================================================
@@ -241,6 +243,7 @@ Class Profile
             [PSCustomObject] @{ Packages = $_ }}
     }
 
+    # ToDo: FindPackage - Write directly information like version, publishedDate into file profiles
     #---------------------------------------------------------------------------
     #   FindPackage
     #---------------------------------------------------------------------------
