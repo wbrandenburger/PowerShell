@@ -9,14 +9,6 @@
 # =============================================================================
 # =============================================================================
 
-
-#psd1
-
-# Color Module
-
-# Environment Path Module C#
-# Windows Tools!!!
-
 # =============================================================================
 #    Define Global Variables
 # =============================================================================
@@ -26,11 +18,10 @@
     $PSModulePath += ";$env:Home\Repositories"
     [Environment]::SetEnvironmentVariable("PSModulePath", $PSModulePath)
 
-    # Import ProfileManagement module
-    Import-Module "A:\OneDrive\Projects\Repositories\PSCommandLine\bin\Debug\net472\PSCommandLine.dll"
+    Import-Module PSCommandLine -Verbose
 
     # Initialize object of class profile
-    $Global:UserProfile = [Profile]::New($PSScriptRoot)
+    $Global:Pro = [Profile]::New($PSScriptRoot)
 
     # Clear Variables
     Remove-Variable -Name PSModulePath
@@ -556,7 +547,7 @@ Class Profile
             $This.RecursiveRequiredPackages($GroupProfileXml, $Array, $_)
 
             # Add the profile groups to the hashtable
-            ForEach ($Loop_SubItem in (Select-Xml -Xml $_ -XPath ".//UserProfile").Node) 
+            ForEach ($Loop_SubItem in (Select-Xml -Xml $_ -XPath ".//Profile").Node) 
             { 
                 If (-not $UniqueHashTableList.ContainsKey($Loop_SubItem.InnerText))
                 {
