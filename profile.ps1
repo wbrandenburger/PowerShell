@@ -256,7 +256,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   FindPackage
     #---------------------------------------------------------------------------
-    Hidden [Void] FindPackage(
+    Hidden [Void] WritePackageFromFindModule(
         [System.String] $PackageName
     )
     {
@@ -273,6 +273,14 @@ Class Profile
         $This.Update()
 
         $This.Packages | Where-Object {$_.Repository -match "PSGallery" } | ForEach-Object { $This.FindPackage( $_.Name ) }
+    }
+
+    #---------------------------------------------------------------------------
+    #   FindPackage
+    #---------------------------------------------------------------------------
+    [Void] FindPackage($PackageName)
+    {
+        $This.WritePackageFromFindModule($PackageName)
     }
 
 # @ToDo: Virtual Terminal Sequences - Outsourcing in own class
