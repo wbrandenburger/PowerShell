@@ -24,7 +24,11 @@
     $PSModulePath += ";$env:Home\Repositories"
     [Environment]::SetEnvironmentVariable("PSModulePath", $PSModulePath)
 
-    Import-Module PSCommandLine -Verbose
+    $PSCommandLine = "PSCommandLine"
+    If (Get-Module | Where-Object { $_.Name -match $PSCommandLine}) {
+        Remove-Module -Name $PSCommandLine -Force:($True) -Verbose:($True)
+    }
+    Import-Module $PSCommandLine -Verbose
 
     # Initialize object of class profile
     $Pro = [Profile]::New($PSScriptRoot)
@@ -35,6 +39,19 @@
 # =============================================================================
 #    PowerShell Cmdlets
 # =============================================================================
+
+#-------------------------------------------------------------------------------
+#   Start-Profile 
+#-------------------------------------------------------------------------------
+Function Start-Profile 
+{
+
+    Param
+    (
+    )
+
+    Invoke-Expression -Command $Pro.GetFilePathProfile()
+}
 
 #-------------------------------------------------------------------------------
 #   Prompt
@@ -168,6 +185,14 @@ Class Profile
             "Import-Group",
             "Remove-Group")
         )
+    }
+
+    #---------------------------------------------------------------------------
+    #   Get-FilePathProfile
+    #---------------------------------------------------------------------------
+    [System.String] GetFilePathProfile()
+    {
+        Return $This.FilePathProfile
     }
 
     #---------------------------------------------------------------------------
