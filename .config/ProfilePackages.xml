@@ -42,6 +42,7 @@
 	<Version>0.7.3</Version>
 	<PublishedDate>20/04/2018 04:31:11</PublishedDate>
 	<Deactivated>false</Deactivated>
+	<GroupProfile>Git</GroupProfile>
 	<GroupProfile>SoftwareManagement</GroupProfile>
 	<GroupProfile>Programming</GroupProfile>
 	<Repository>PSGallery</Repository>

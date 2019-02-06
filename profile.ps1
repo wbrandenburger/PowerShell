@@ -31,7 +31,7 @@
     Import-Module $PSCommandLine -Verbose
 
     # Initialize object of class profile
-    $Pro = [Profile]::New($PSScriptRoot)
+    $PSPackages = [Profile]::New($PSScriptRoot)
 
     # Clear Variables
     Remove-Variable -Name PSModulePath
@@ -50,7 +50,135 @@ Function Start-Profile
     (
     )
 
-    Invoke-Expression -Command $Pro.GetFilePathProfile()
+    Invoke-Expression -Command $PSPackages.GetFilePathProfile()
+}
+
+#-------------------------------------------------------------------------------
+#   Open-ProfileXml
+#-------------------------------------------------------------------------------
+Function Open-ProfileXml
+{
+
+    Param
+    (
+    )
+
+    Start-Process $PSPackages.GetFilePathGroupProfiles()
+}
+
+#---------------------------------------------------------------------------
+#   Start-PSPackageManager
+#---------------------------------------------------------------------------
+Function Start-PSPackageManager
+{
+        [CmdletBinding()]
+    
+        [OutputType([Void])]
+        
+        Param
+        (
+            [Parameter(HelpMessage="Task Import")]
+            [Switch] $Import,
+            [Parameter(HelpMessage="Task Remove")]
+            [Switch] $Remove,
+            [Parameter(HelpMessage="Task Import-Group")]
+            [Switch] $ImportGroup,
+            [Parameter(HelpMessage="Task Remove-Group")]
+            [Switch] $RemoveGroup,
+            [Parameter(HelpMessage="Task Install")]
+            [Switch] $Install,
+            [Parameter(HelpMessage="Task Update")]
+            [Switch] $Update,
+            [Parameter(HelpMessage="Task Uninstall")]
+            [Switch] $Uninstall
+        )
+
+        Show-PSPackage
+
+        If ($Import) {$Task = "Import"}
+        If ($Remove) {$Task ="Remove"}
+        If ($ImportGroup) {$Task ="Import-Group"}
+        If ($RemoveGroup) {$Task ="Remove-Group"}
+        If ($Install) {$Task ="Install"}        
+        If ($Update) {$Task ="Update"}
+        If ($Uninstall) {$Task ="Uninstall"}
+     
+        $PSPackages.PackageManager($Task)
+
+        Show-PSPackage
+}
+
+#---------------------------------------------------------------------------
+#   Show-PSPackagesProfiles
+#---------------------------------------------------------------------------
+Function Show-PSPackageProfile
+{
+    [CmdletBinding()]
+
+    [OutputType([System.Object])]
+
+    Param(
+    )
+
+    $PSPackages.Update()
+
+    Return $PSPackages.GroupProfiles | Format-Table
+}
+
+#---------------------------------------------------------------------------
+#   Add-Package
+#---------------------------------------------------------------------------
+Function Add-Package
+{    
+    [CmdletBinding()]
+
+    [OutputType([System.Object])]
+    
+    Param
+    (
+        [Parameter(Position=0, Mandatory=$True, ValueFromPipeline=$True,HelpMessage="String which determines the searched package")]
+        [System.String] $Package
+    )
+    
+    Return Get-Content $PSPackages.FindPackage($Package)
+}
+
+#---------------------------------------------------------------------------
+#   Show-PSPackages
+#---------------------------------------------------------------------------
+Function Show-PSPackage
+{
+    [CmdletBinding()]
+
+    [OutputType([System.Object])]
+
+    Param(
+    )
+
+    $PSPackages.Update()
+
+    Return $PSPackages.Packages | Format-Table @{
+        Label = "Task"
+        Expression = {$_.ColoredTask}}, Version, @{
+        Label = "Name"
+        Expression = {$_.ColoredName}}, Repository, Description
+}
+
+#---------------------------------------------------------------------------
+#   Show-PSPackagesTask
+#--------------------------------------------------------------------------
+Function Show-PSPackageTask
+{
+    [CmdletBinding()]
+
+    [OutputType([System.Object])]
+
+    Param(
+    )
+
+    Return $PSPackages.PackageTasks | ForEach-Object{[PSCustomObject]@{
+        Task = $_
+    }}
 }
 
 #-------------------------------------------------------------------------------
@@ -196,22 +324,20 @@ Class Profile
     }
 
     #---------------------------------------------------------------------------
+    #   Get-FilePathGroupProfilea
+    #---------------------------------------------------------------------------
+    [System.String] GetFilePathGroupProfiles()
+    {
+        Return $This.FilePathGroupProfiles
+    }
+
+    #---------------------------------------------------------------------------
     #   Update
     #---------------------------------------------------------------------------
     [Void] Update()
     {
         $This.GetGroupProfileFromFile()
         $This.GetPackages()
-    }
-
-    #---------------------------------------------------------------------------
-    #   ShowProfiles
-    #---------------------------------------------------------------------------
-    [System.Object] ShowGroupProfiles() 
-    {
-        $This.Update()
-
-        Return $This.GroupProfiles | Format-Table
     }
 
     #---------------------------------------------------------------------------
@@ -222,30 +348,6 @@ Class Profile
         $This.Update()
 
         Return $This.PackagesRaw | Format-Table 
-    }
-
-    #---------------------------------------------------------------------------
-    #   ShowPackageStatus
-    #---------------------------------------------------------------------------
-    [System.Object] ShowPackages() 
-    {
-        $This.Update()
-
-        Return $This.Packages | Format-Table @{
-            Label = "Task"
-            Expression = {$_.ColoredTask}}, Version, @{
-            Label = "Name"
-            Expression = {$_.ColoredName}}, Repository, Description
-    }
-
-    #---------------------------------------------------------------------------
-    #   ShowPackageTasks
-    #--------------------------------------------------------------------------
-    [System.Object] ShowTasks() 
-    {
-        Return $This.PackageTasks | ForEach-Object{[PSCustomObject]@{
-            Task = $_
-        }}
     }
 
     #---------------------------------------------------------------------------
@@ -281,14 +383,19 @@ Class Profile
     #---------------------------------------------------------------------------
     #   FindPackage
     #---------------------------------------------------------------------------
-    Hidden [Void] WritePackageFromFindModule(
+    Hidden [System.String] WritePackageFromFindModule(
         [System.String] $PackageName
     )
     {
         $Package = Find-Module -Name $PackageName
+
+        $FilePath = "$($This.PathConfig)\Package.$PackageName.txt" 
+
         If ($Package -ne $Null ) {
-        Out-File -FilePath  "$($This.PathConfig)\Package.$PackageName.txt" -InputObject ($Package | Select-Object -Property Name, Author, Version, PublishedDate, Repository, Description)
+        Out-File -FilePath  $FilePath -InputObject ($Package | Select-Object -Property Name, Author, Version, PublishedDate, Repository, Description)
         }
+
+        Return  $FilePath
     }
     #---------------------------------------------------------------------------
     #   FindPackage
@@ -297,15 +404,15 @@ Class Profile
     {
         $This.Update()
 
-        $This.Packages | Where-Object {$_.Repository -match "PSGallery" } | ForEach-Object { $This.FindPackage( $_.Name ) }
+        $This.Packages | Where-Object {$_.Repository -match "PSGallery" } | ForEach-Object { $This.WritePackageFromFindModule( $_.Name ) }
     }
 
     #---------------------------------------------------------------------------
     #   FindPackage
     #---------------------------------------------------------------------------
-    [Void] FindPackage($PackageName)
+    [System.String]  FindPackage($PackageName)
     {
-        $This.WritePackageFromFindModule($PackageName)
+        Return $This.WritePackageFromFindModule($PackageName)
     }
 
 # @ToDo: Virtual Terminal Sequences - Outsourcing in own class
@@ -362,7 +469,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   PackageManager
     #---------------------------------------------------------------------------
-    [System.Object] PackageManager(
+    [Void] PackageManager(
         [System.String] $Task) 
     {
         $This.Update()
@@ -402,8 +509,6 @@ Class Profile
             }
         }
         $This.ChangeManager( $Task, $Question, $This.GetArrayList( $Object))
-
-        Return $This.ShowPackages() 
     }
 
     #---------------------------------------------------------------------------
