@@ -76,7 +76,7 @@ Function Import-Package
         If ($Update) {$Task ="Update"}
         If ($Uninstall) {$Task ="Uninstall"}
      
-        $PSPackages.PackageManager($Task)
+        $PSPackages.PackageManager($Task, $VerbosePreference)
 
         Show-PSPackage
 }
@@ -98,8 +98,8 @@ Function Import-PackageCLI
             [Parameter(Position=2, Mandatory=$True, HelpMessage="Task, which should be performed")]
             [System.String] $Task
         )
-     
-        $PSPackages.PackageManagerCLI($Package, $Task)
+
+        $PSPackages.PackageManagerCLI($Package, $Task, $VerbosePreference)
 
         Show-PSPackage
 }
@@ -110,11 +110,12 @@ Function Import-PSScriptAnalyzer
 
     [OutputType([Void])]
 
-    Param()
+    Param(
+    )
 
     $PSScriptAnalyzer = "PSScriptAnalyzer"
     If (Get-Module | Where-Object { $_.Name -match $PSScriptAnalyzer}) {
-        Remove-Module -Name $PSScriptAnalyzer -Force:($True) -Verbose:($True)
+        Remove-Module -Name $PSScriptAnalyzer -Force:($True) -Verbose:($VerbosePreference)
     }
     Import-Module $PSScriptAnalyzer
 }
@@ -157,7 +158,7 @@ Function Add-Package
 Function Show-PSPackage
 {
     [CmdletBinding()]
-
+    
     [OutputType([System.Object])]
 
     Param(
@@ -205,7 +206,7 @@ Function Prompt
     $CheckAs = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 
     If ($PSPackages.ExistsImportedGroupProfiles()){
-        Write-Host $PSPackages.GetImportedGroupProfiles() -NoNewline -ForegroundColor Yellow
+        Write-Host "($($PSPackages.GetImportedGroupProfiles())) " -NoNewline -ForegroundColor Yellow
     }
     Write-Host "[" -NoNewline -ForegroundColor DarkCyan
     Write-Host (Get-Date -UFormat %R) -NoNewline -ForegroundColor DarkCyan
@@ -495,7 +496,8 @@ Class Profile
     #---------------------------------------------------------------------------
     [Void] PackageManagerCLI(
         [System.String] $Value,    
-        [System.String] $Task
+        [System.String] $Task,
+        [Bool] $Verbose
         )
     {
         $Object = New-Object PSCustomObject
@@ -531,14 +533,15 @@ Class Profile
         }
         
         $Options = $This.GetArrayList($Object)
-        $This.ChangePackages($Options.IndexOf($Value), $Options, $Task)
+        $This.ChangePackages($Options.IndexOf($Value), $Options, $Task, $Verbose)
     }
 
     #---------------------------------------------------------------------------
     #   PackageManager
     #---------------------------------------------------------------------------
     [Void] PackageManager(
-        [System.String] $Task) 
+        [System.String] $Task,
+        [Bool] $Verbose) 
     {
         $Question = ""; $Object = New-Object PSCustomObject
         Switch ($Task) {
@@ -581,7 +584,7 @@ Class Profile
                 Write-Warning "Task $Task is not valid."        
             }
         }
-        $This.ChangeManager( $Task, $Question, $This.GetArrayList( $Object))
+        $This.ChangeManager( $Task, $Question, $This.GetArrayList( $Object), $Verbose)
     }
 
     #---------------------------------------------------------------------------
@@ -623,7 +626,8 @@ Class Profile
     Hidden [Void] ChangeManager(
         [System.String] $Task,
         [System.String] $Question,
-        [System.Collections.ArrayList] $Options
+        [System.Collections.ArrayList] $Options,
+        [Bool] $Verbose
     )
     {
         If ($Options.Count -gt 0 )
@@ -633,7 +637,8 @@ Class Profile
                 $Abort = $This.ChangePackages(
                     $This.ChangeQuery($Question,$Options),
                     $Options, 
-                    $Task)
+                    $Task,
+                    $Verbose)
             } While ($Options.Count -gt 0 -and $Abort)
 
             If ($Abort) {Write-Warning "Completion of Task $Task." }
@@ -662,7 +667,8 @@ Class Profile
     Hidden [Bool] ChangePackages(
         [Int] $UserInput,
         [System.Collections.ArrayList] $Options,
-        [System.String] $Task
+        [System.String] $Task,
+        [Bool] $Verbose
     )
     {
         If ($Options.Count -eq $UserInput) {
@@ -700,24 +706,24 @@ Class Profile
                 $This.GetPackagesInstalled()
             }
             "Import" {
-                $This.ImportPackage($ChangePckg[$LoopIdx_Pckg])
+                $This.ImportPackage($ChangePckg[$LoopIdx_Pckg],$Verbose)
                 $This.GetPackagesImported()
                 Break
             }
             "Remove" {
-                $This.RemovePackage($ChangePckg[$LoopIdx_Pckg])
+                $This.RemovePackage($ChangePckg[$LoopIdx_Pckg],$Verbose)
                 $This.GetPackagesImported()
                 Break
             } 
             "Import-Group" {
-                $This.ManageGroupProfiles("Import", $ChangePckg[$LoopIdx_Pckg])
+                $This.ManageGroupProfiles("Import", $ChangePckg[$LoopIdx_Pckg],$Verbose)
                 Write-Host $ChangePckg[$LoopIdx_Pckg]
                 ($This.GroupProfiles | Where-Object  {$_.GroupProfile -match $ChangePckg[$LoopIdx_Pckg]}).Imported = $True
                 $This.GetPackagesImported()
                 Break
             }
             "Remove-Group" {
-                $This.ManageGroupProfiles("Remove", $ChangePckg[$LoopIdx_Pckg])
+                $This.ManageGroupProfiles("Remove", $ChangePckg[$LoopIdx_Pckg],$Verbose)
                 ($This.GroupProfiles | Where-Object {$_.GroupProfile -match $ChangePckg[$LoopIdx_Pckg]}).Imported = $False
                 $This.GetPackagesImported()
                 Break
@@ -732,19 +738,21 @@ Class Profile
     #   ImportPackage
     #---------------------------------------------------------------------------
     Hidden [Void] ImportPackage(
-        [System.String] $Package
+        [System.String] $Package,
+        [Bool] $Verbose
     )
     {
-        Import-Module -Name $Package -Verbose:($True)
+        Import-Module -Name $Package -Verbose:($Verbose)
     }
     
     Hidden [Void] RemovePackage(
-        [System.String] $Package
+        [System.String] $Package,
+        [Bool] $Verbose
     )
     {
         $LoadedModule = Get-Module;
         If ($LoadedModule | Where-Object { $_.Name -match $Package}) {
-            Remove-Module -Name $Package -Force:($True) -Verbose:($True)
+            Remove-Module -Name $Package -Force:($True) -Verbose:($Verbose)
         }
     }
 
@@ -753,7 +761,8 @@ Class Profile
     #---------------------------------------------------------------------------
     Hidden [Void] ManageGroupProfiles(
         [System.String] $Task,
-        [System.String[]] $GroupProfiles
+        [System.String[]] $GroupProfiles,
+        [Bool] $Verbose
     )
     {
         $GroupProfilesPackages = $This.GetGroupProfilesPackages($GroupProfiles).Packages
@@ -761,10 +770,10 @@ Class Profile
         # Loop through all elements with the defined tag
         ForEach ($Lop_Packages in $GroupProfilesPackages)
         {
-            $This.RemovePackage($Lop_Packages)
+            $This.RemovePackage($Lop_Packages, $Verbose)
 
             If ($Task -match "Import") {
-                $This.ImportPackage($Lop_Packages)
+                $This.ImportPackage($Lop_Packages, $Verbose)
             }
         }
     }
