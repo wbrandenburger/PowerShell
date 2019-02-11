@@ -16,12 +16,15 @@
 Configuration myChocoConfig
 {
    Import-DscResource -Module cChoco
+   
    Node "localhost"
    {  
       LocalConfigurationManager
       {
-          DebugMode = 'ForceModuleImport'
+         # https://docs.microsoft.com/en-us/powershell/dsc/managing-nodes/metaconfig
+         DebugMode = 'ForceModuleImport'
       }
+      
       cChocoInstaller installChoco
       {
         InstallDir = "C:\Choco"

@@ -207,23 +207,6 @@ Function Global:Prompt
 }
 
 #------------------------------------------------------------------------------
-#   Show-HostColors
-#------------------------------------------------------------------------------
-# @ToDo:Outsourcing of ColorsManagement in own class with the colors specified in MindManager
-Function Global:Show-HostColor
-{
-    $Colors = [Enum]::GetValues([System.ConsoleColor])
-    Foreach ($BgColor in $Colors)
-    {
-        Foreach ($FgColor in $Colors) 
-        { 
-            Write-Host "$FgColor|"  -ForegroundColor $FgColor -BackgroundColor $BgColor -NoNewLine 
-        }
-        Write-Host " on $BgColor"
-    }
-}
-
-#------------------------------------------------------------------------------
 #   Test-Verb
 #------------------------------------------------------------------------------
 Function Global:Test-Verb
@@ -415,7 +398,7 @@ Class Profile
         Return $This.WritePackageFromFindModule($PackageName)
     }
 
-# @ToDo: Virtual Terminal Sequences - Outsourcing in own class
+# @ToDo: Virtual Terminal Sequences - Outsourcing in own class ->UPDATE: Copi in PSColorization
     #---------------------------------------------------------------------------
     #   GetVTSequence
     #---------------------------------------------------------------------------
