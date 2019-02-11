@@ -64,6 +64,18 @@
 </Package>
 
 <Package>
+	<Name>ChocolateyProfile</Name>
+	<Version></Version>
+	<PublishedDate></PublishedDate>
+	<Deactivated>false</Deactivated>
+	<GroupProfile>SoftwareManagement</GroupProfile>
+	<Repository></Repository>
+	<GitHub></GitHub>
+	<Description>Tab completion for chocolatey
+	</Description>
+</Package>
+
+<Package>
 	<Name>PowerShellGet</Name>
 	<Version>2.0.4</Version>
 	<PublishedDate>15/01/2019 00:33:16</PublishedDate>
@@ -134,6 +146,16 @@
 </Package>
 
 <Package>
+	<Name>PSEnvironment</Name>
+	<Version></Version>
+	<PublishedDate></PublishedDate>
+	<Deactivated>false</Deactivated>
+	<GroupProfile>SoftwareManagement</GroupProfile>
+	<Repository>GitHub</Repository>
+	<Description>Module to make working with environment variables easier.</Description>
+</Package>
+
+<Package>
 	<Name>VirtualEnvWrapper</Name>
 	<Version></Version>
 	<PublishedDate></PublishedDate>
@@ -153,16 +175,6 @@
 	<Repository>PSGallery</Repository>
 	<GitHub></GitHub>
 	<Description>Visual Studio Setup PowerShell Module</Description>
-</Package>
-
-<Package>
-	<Name>PSEnvironment</Name>
-	<Version></Version>
-	<PublishedDate></PublishedDate>
-	<Deactivated>false</Deactivated>
-	<GroupProfile>SoftwareManagement</GroupProfile>
-	<Repository>GitHub</Repository>
-	<Description>Module to make working with environment variables easier.</Description>
 </Package>
 
 </PowerShell>

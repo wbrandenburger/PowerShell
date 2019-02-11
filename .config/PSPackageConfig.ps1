@@ -100,6 +100,14 @@ Configuration PSPackageMgmtConfig
         AutoUpgrade = $True
     }
 
+    PSPackageMgmt PkgNewtonSoft.JSON
+    {
+        Ensure      = "Present"
+        Name        = "newtonsoft.json"
+        Source      = "PSGallery"
+        AutoUpgrade = $True
+    }
+
 }
 
 PSPackageMgmtConfig

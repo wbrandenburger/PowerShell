@@ -10,33 +10,6 @@
 # =============================================================================
 
 # =============================================================================
-#    Define Global Variables
-# =============================================================================
-
-# @ToDo Add PSCommandLine to ProfilePackages.Xml
-
-# @ToDo Open recently used file with Papis YES Open-Profile especially - deprecated
-
-# @ToDo[I-Prty] Provide Cmdlets for ProfileManagement - Don't provide variable $Pro -> Only import ProfileManagement and PSCommandLine if its recommended
-
-    # Set Modules Path
-    $PSModulePath = [Environment]::GetEnvironmentVariable("PSModulePath")
-    $PSModulePath += ";$env:Home\Repositories"
-    [Environment]::SetEnvironmentVariable("PSModulePath", $PSModulePath)
-
-    $PSCommandLine = "PSCommandLine"
-    If (Get-Module | Where-Object { $_.Name -match $PSCommandLine}) {
-        Remove-Module -Name $PSCommandLine -Force:($True) -Verbose:($True)
-    }
-    Import-Module $PSCommandLine -Verbose
-
-    # Initialize object of class profile
-    $PSPackages = [Profile]::New($PSScriptRoot)
-
-    # Clear Variables
-    Remove-Variable -Name PSModulePath
-
-# =============================================================================
 #    PowerShell Cmdlets
 # =============================================================================
 
@@ -67,9 +40,9 @@ Function Open-ProfileXml
 }
 
 #---------------------------------------------------------------------------
-#   Start-PSPackageManager
+#   Import-Package
 #---------------------------------------------------------------------------
-Function Start-PSPackageManager
+Function Import-Package
 {
         [CmdletBinding()]
     
@@ -109,6 +82,43 @@ Function Start-PSPackageManager
 }
 
 #---------------------------------------------------------------------------
+#   Import-PackageCLI
+#---------------------------------------------------------------------------
+Function Import-PackageCLI
+{
+        [CmdletBinding(PositionalBinding=$True)]
+    
+        [OutputType([Void])]
+        
+        Param
+        (            
+            [Parameter(Position=1, Mandatory=$True, HelpMessage="Name of Package which should be get imported, removed, installed,...")]
+            [System.String] $Package,
+
+            [Parameter(Position=2, Mandatory=$True, HelpMessage="Task, which should be performed")]
+            [System.String] $Task
+        )
+     
+        $PSPackages.PackageManagerCLI($Package, $Task)
+
+        Show-PSPackage
+}
+
+Function Import-PSScriptAnalyzer 
+{
+    [CmdletBinding()]
+
+    [OutputType([Void])]
+
+    Param()
+
+    $PSScriptAnalyzer = "PSScriptAnalyzer"
+    If (Get-Module | Where-Object { $_.Name -match $PSScriptAnalyzer}) {
+        Remove-Module -Name $PSScriptAnalyzer -Force:($True) -Verbose:($True)
+    }
+    Import-Module $PSScriptAnalyzer
+}
+#---------------------------------------------------------------------------
 #   Show-PSPackagesProfiles
 #---------------------------------------------------------------------------
 Function Show-PSPackageProfile
@@ -119,8 +129,6 @@ Function Show-PSPackageProfile
 
     Param(
     )
-
-    $PSPackages.Update()
 
     Return $PSPackages.GroupProfiles | Format-Table
 }
@@ -153,9 +161,16 @@ Function Show-PSPackage
     [OutputType([System.Object])]
 
     Param(
+        [Parameter(HelpMessage="Switch, which determnines whether installed packages should get checked")]
+        [Switch] $Installed = $False
     )
 
-    $PSPackages.Update()
+    If ($Installed) {
+        $PSPackages.GetPackagesInstalled()
+    }
+    Else {
+        $PSPackages.GetPackagesImported()
+    }
 
     Return $PSPackages.Packages | Format-Table @{
         Label = "Task"
@@ -184,13 +199,14 @@ Function Show-PSPackageTask
 #-------------------------------------------------------------------------------
 #   Prompt
 #-------------------------------------------------------------------------------
-# @ToDo[I-Prty] Add the used GroupProfile to the prompt - GrouProfiles should manage these packages which are needed for completing specific tasks
-Function Global:Prompt 
+Function Prompt 
 {
     $User = [Security.Principal.WindowsIdentity]::GetCurrent();
     $CheckAs = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 
-
+    If ($PSPackages.ExistsImportedGroupProfiles()){
+        Write-Host $PSPackages.GetImportedGroupProfiles() -NoNewline -ForegroundColor Yellow
+    }
     Write-Host "[" -NoNewline -ForegroundColor DarkCyan
     Write-Host (Get-Date -UFormat %R) -NoNewline -ForegroundColor DarkCyan
     Write-Host "] " -NoNewline -ForegroundColor DarkCyan
@@ -209,7 +225,7 @@ Function Global:Prompt
 #------------------------------------------------------------------------------
 #   Test-Verb
 #------------------------------------------------------------------------------
-Function Global:Test-Verb
+Function Test-Verb
 {
     [CmdletBinding(PositionalBinding=$True)]
     
@@ -287,6 +303,8 @@ Class Profile
         $This.PathConfig = Join-Path -Path $Path_Home -ChildPath ".config"
         $This.FilePathGroupProfiles = Join-Path -Path $Path_Home -ChildPath ".config\ProfilePackages.xml"
 
+        $This.GetGroupProfileFromFile()
+
         $This.PackageTasks = [System.Collections.ArrayList]::New( @(
             "Install",
             "Uninstall",
@@ -317,19 +335,16 @@ Class Profile
     #---------------------------------------------------------------------------
     #   Update
     #---------------------------------------------------------------------------
-    [Void] Update()
+    [Void] New()
     {
         $This.GetGroupProfileFromFile()
-        $This.GetPackages()
-    }
+    }  
 
     #---------------------------------------------------------------------------
     #   ShowRaw
     #---------------------------------------------------------------------------
     [System.Object] ShowRaw() 
     {
-        $This.Update()
-
         Return $This.PackagesRaw | Format-Table 
     }
 
@@ -385,8 +400,6 @@ Class Profile
     #---------------------------------------------------------------------------
     [Void] FindPackage()
     {
-        $This.Update()
-
         $This.Packages | Where-Object {$_.Repository -match "PSGallery" } | ForEach-Object { $This.WritePackageFromFindModule( $_.Name ) }
     }
 
@@ -413,11 +426,11 @@ Class Profile
     #---------------------------------------------------------------------------
     #  GetPackageStatus()
     #---------------------------------------------------------------------------
-    Hidden [Void] GetPackages()  
+    Hidden [Void] GetPackagesInstalled()  
     {
         # Get installed Module
         $PckgsInst = Get-InstalledModule
-        $PckgsIprt = Get-Module
+        $PckgsImport = Get-Module
 
         # Loop through all elements with the defined tag
         $This.Packages =  $This.PackagesRaw | Where-Object { $_.Deactivated -match "false"} | ForEach-Object {
@@ -434,14 +447,42 @@ Class Profile
 
                 $ColoredTask = $This.GetVTSequence($Task, $Color)
                 
-                If ($PckgsIprt.Name -contains $_.Name) {
+                If ($PckgsImport.Name -contains $_.Name) {
                     $Color = 32;}
 
                 $ColoredName = $This.GetVTSequence($_.Name, $Color)
 
                 [PSCustomObject]@{
                     Name = $_.Name; Version = $Version; Task = $Task
-                    Session = ($PckgsIprt.Name -contains $_.Name)
+                    Session = ($PckgsImport.Name -contains $_.Name)
+                    ColoredTask = $ColoredTask 
+                    ColoredName = $ColoredName
+                    Repository = $_.Repository; Description = $_.Description
+                }
+            }
+    }
+
+    #---------------------------------------------------------------------------
+    #  GetPackageStatus()
+    #---------------------------------------------------------------------------
+    Hidden [Void] GetPackagesImported()  
+    {
+        # Get installed Module
+        $PckgsImport = Get-Module
+
+        # Loop through all elements with the defined tag
+        $This.Packages =  $This.PackagesRaw | Where-Object { $_.Deactivated -match "false"} | ForEach-Object {
+                $Name = $_.Name; $Task = $Null; $Color = 0;
+                $Version = ($PckgsInst | Where-Object {$_.Name -eq $Name}).Version
+
+                If ($PckgsImport.Name -contains $_.Name) {
+                    $Color = 32;}
+
+                $ColoredName = $This.GetVTSequence($_.Name, $Color)
+
+                [PSCustomObject]@{
+                    Name = $_.Name; Version = $Version; Task = $Task
+                    Session = ($PckgsImport.Name -contains $_.Name)
                     ColoredTask = $ColoredTask 
                     ColoredName = $ColoredName
                     Repository = $_.Repository; Description = $_.Description
@@ -452,38 +493,87 @@ Class Profile
     #---------------------------------------------------------------------------
     #   PackageManager
     #---------------------------------------------------------------------------
+    [Void] PackageManagerCLI(
+        [System.String] $Value,    
+        [System.String] $Task
+        )
+    {
+        $Object = New-Object PSCustomObject
+        Switch ($Task) {
+            "Install" {
+                $This.GetPackagesInstalled()
+                $Object = ($This.Packages | Where-Object {$_.Task -match $Task}).Name
+            }
+            "Uninstall" {
+                $This.GetPackagesInstalled()
+                $Object = ($This.Packages | Where-Object {$_.Repository -match "PSGallery"}).Name
+            }
+            "Update" {
+                $This.GetPackagesInstalled()
+                $Object = ($This.Packages | Where-Object {$_.Task -match $Task}).Name
+            }                     
+            "Import" {
+                $This.GetPackagesImported()
+                $Object = $This.Packages.Name
+            }
+            "Remove" {
+                $This.GetPackagesImported()
+                $Object = $This.Packages.Name
+            }
+            "Import-Group" {
+                $This.GetPackagesImported()
+                $Object = $This.GroupProfiles.GroupProfile
+            }
+            "Remove-Group" {
+                $This.GetPackagesImported()
+                $Object = $This.GroupProfiles.GroupProfile
+            }
+        }
+        
+        $Options = $This.GetArrayList($Object)
+        $This.ChangePackages($Options.IndexOf($Value), $Options, $Task)
+    }
+
+    #---------------------------------------------------------------------------
+    #   PackageManager
+    #---------------------------------------------------------------------------
     [Void] PackageManager(
         [System.String] $Task) 
     {
-        $This.Update()
-
         $Question = ""; $Object = New-Object PSCustomObject
         Switch ($Task) {
             "Install" {
+                $This.GetPackagesInstalled()
                 $Question = "Which packages should be get installed?"
                 $Object = ($This.Packages | Where-Object {$_.Task -match $Task}).Name
             }
             "Uninstall" {
+                $This.GetPackagesInstalled()
                 $Question = "Which packages should be get uninstalled?"
                 $Object = ($This.Packages | Where-Object {$_.Repository -match "PSGallery"}).Name
             }
             "Update" {
+                $This.GetPackagesInstalled()
                 $Question = "Which packages should be get updated?"
                 $Object = ($This.Packages | Where-Object {$_.Task -match $Task}).Name
             }                     
             "Import" {
+                $This.GetPackagesImported()
                 $Question = "Which packages should be get imported?"
                 $Object = $This.Packages.Name
             }
             "Remove" {
+                $This.GetPackagesImported()
                 $Question = "Which packages should be get removed?"
                 $Object = $This.Packages.Name
             }
             "Import-Group" {
+                $This.GetPackagesImported()
                 $Question = "Which group profile should be get imported?"
                 $Object = $This.GroupProfiles.GroupProfile
             }
             "Remove-Group" {
+                $This.GetPackagesImported()
                 $Question = "Which group profile should be get removed?"
                 $Object = $This.GroupProfiles.GroupProfile
             }
@@ -507,6 +597,27 @@ Class Profile
     }
 
     #---------------------------------------------------------------------------
+    #   ExistsImportedGroupProfiles
+    #--------------------------------------------------------------------------- 
+    [Bool] ExistsImportedGroupProfiles()
+    {   
+        $Bool_Out = $False
+        If ($This.GroupProfiles.Imported -contains $True) {
+            $Bool_Out = $True
+        }   
+        
+        Return $Bool_Out
+    } 
+
+    #---------------------------------------------------------------------------
+    #   GetImportedGroupProfiles
+    #--------------------------------------------------------------------------- 
+    [System.String] GetImportedGroupProfiles()
+    {   
+        Return ($This.GroupProfiles | Where-Object {$_.Imported -match "True"}).GroupProfile 
+    } 
+
+    #---------------------------------------------------------------------------
     #   ChangeManager
     #---------------------------------------------------------------------------
     Hidden [Void] ChangeManager(
@@ -523,7 +634,6 @@ Class Profile
                     $This.ChangeQuery($Question,$Options),
                     $Options, 
                     $Task)
-                $This.Update();
             } While ($Options.Count -gt 0 -and $Abort)
 
             If ($Abort) {Write-Warning "Completion of Task $Task." }
@@ -574,32 +684,42 @@ Class Profile
             "Install" {
                 Start-Process PowerShell -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command Find-Module -Name $($ChangePckg[$LoopIdx_Pckg]) | Install-Module -Scope AllUsers -Verbose -Force"
                 $Options.Remove($ChangePckg[$LoopIdx_Pckg])
+                $This.GetPackagesInstalled()
                 Break
             }
             "Uninstall" {
                 Start-Process PowerShell -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command Uninstall-Module -Name $($ChangePckg[$LoopIdx_Pckg]) -Verbose -Force" 
                 $Options.Remove($ChangePckg[$LoopIdx_Pckg])
+                $This.GetPackagesInstalled()
                 Break
             }
             "Update" { 
                 Update-Module $ChangePckg[$LoopIdx_Pckg]
                 Break
                 $Options.Remove($ChangePckg[$LoopIdx_Pckg])
+                $This.GetPackagesInstalled()
             }
             "Import" {
                 $This.ImportPackage($ChangePckg[$LoopIdx_Pckg])
+                $This.GetPackagesImported()
                 Break
             }
             "Remove" {
                 $This.RemovePackage($ChangePckg[$LoopIdx_Pckg])
+                $This.GetPackagesImported()
                 Break
             } 
             "Import-Group" {
                 $This.ManageGroupProfiles("Import", $ChangePckg[$LoopIdx_Pckg])
+                Write-Host $ChangePckg[$LoopIdx_Pckg]
+                ($This.GroupProfiles | Where-Object  {$_.GroupProfile -match $ChangePckg[$LoopIdx_Pckg]}).Imported = $True
+                $This.GetPackagesImported()
                 Break
             }
             "Remove-Group" {
                 $This.ManageGroupProfiles("Remove", $ChangePckg[$LoopIdx_Pckg])
+                ($This.GroupProfiles | Where-Object {$_.GroupProfile -match $ChangePckg[$LoopIdx_Pckg]}).Imported = $False
+                $This.GetPackagesImported()
                 Break
             }              
             }     
@@ -697,6 +817,7 @@ Class Profile
             [PSCustomObject] @{
                                 GroupProfile = $_
                                 Packages = $Array
+                                Imported = $False
                             }
                         }
 
@@ -725,3 +846,30 @@ Class Profile
         }
     }
 }
+
+# =============================================================================
+#    Define Global Variables
+# =============================================================================
+
+# @ToDo Add PSCommandLine to ProfilePackages.Xml
+
+# @ToDo Open recently used file with Papis YES Open-Profile especially - deprecated
+
+    # Set Modules Path
+    $PSModulePath = [Environment]::GetEnvironmentVariable("PSModulePath")
+    $PSModulePath += ";$env:Home\PSPackages"
+    [Environment]::SetEnvironmentVariable("PSModulePath", $PSModulePath)
+
+    $PSCommandLine = "PSCommandLine"
+    If (Get-Module | Where-Object { $_.Name -match $PSCommandLine}) {
+        Remove-Module -Name $PSCommandLine -Force:($True) -Verbose:($True)
+    }
+    Import-Module $PSCommandLine 
+
+    # Initialize object of class profile
+    $PSPackages = [Profile]::New($PSScriptRoot)
+
+    Import-PackageCLI -Package "SoftwareManagement" -Task "Import-Group"
+
+    # Clear Variables
+    Remove-Variable -Name PSModulePath
