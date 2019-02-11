@@ -320,7 +320,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   Get-FilePathProfile
     #---------------------------------------------------------------------------
-    [System.String] GetFilePathProfile()
+    Hidden [System.String] GetFilePathProfile()
     {
         Return $This.FilePathProfile
     }
@@ -328,7 +328,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   Get-FilePathGroupProfilea
     #---------------------------------------------------------------------------
-    [System.String] GetFilePathGroupProfiles()
+    Hidden [System.String] GetFilePathGroupProfiles()
     {
         Return $This.FilePathGroupProfiles
     }
@@ -336,7 +336,7 @@ Class Profile
     #---------------------------------------------------------------------------
     #   Update
     #---------------------------------------------------------------------------
-    [Void] New()
+    Hidden [Void] New()
     {
         $This.GetGroupProfileFromFile()
     }  
@@ -378,7 +378,6 @@ Class Profile
             [PSCustomObject] @{ Packages = $_ }}
     }
 
-# @ToDo[I-Prty]: FindPackage - Write directly information like version, publishedDate into file profiles
     #---------------------------------------------------------------------------
     #   FindPackage
     #---------------------------------------------------------------------------
