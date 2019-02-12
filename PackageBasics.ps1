@@ -84,4 +84,4 @@ Configuration PackageBasics
 
 PackageBasics
 
-Start-DscConfiguration  -Path ".\PackageBasics"  -wait -verbose -force
+Start-DscConfiguration  -Path ".\PackageBasics"  -Wait -Verbose -Force

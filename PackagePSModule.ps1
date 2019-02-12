@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Configuration PSPackageMgmtConfig
+Configuration PackagePSModule
 {
 
-    Import-DscResource -Module PSPackageManager
+    Import-DscResource -Module PSModule
 
     Node "localhost"
 
@@ -27,7 +27,7 @@ Configuration PSPackageMgmtConfig
     }
 
 
-    PSPackageMgmt PkgcChoco
+    PSPackageInstaller installcChoco
     {
         Ensure      = "Present"
         Name        = "cChoco"
@@ -35,7 +35,7 @@ Configuration PSPackageMgmtConfig
         AutoUpgrade = $True
     }
 
-    PSPackageMgmt PkgPackageManagement
+    PSPackageInstaller installPackageManagement
     {
         Ensure      = "Present"
         Name        = "PackageManagement"
@@ -43,7 +43,7 @@ Configuration PSPackageMgmtConfig
         AutoUpgrade = $True
     }
 
-    PSPackageMgmt PkgPester
+    PSPackageInstaller installPester
     {
         Ensure      = "Present"
         Name        = "Pester"
@@ -51,7 +51,7 @@ Configuration PSPackageMgmtConfig
         AutoUpgrade = $True
     }
 
-    PSPackageMgmt PkgPoshGit
+    PSPackageInstaller installposhgit
     {
         Ensure      = "Present"
         Name        = "posh-git"
@@ -59,16 +59,24 @@ Configuration PSPackageMgmtConfig
         AutoUpgrade = $True
     }
 
-    PSPackageMgmt PkgPowerShellGet
+    PSPackageInstaller installPowerShellForGitHub
+    {
+        Ensure      = "Present"
+        Name        = "PowerShellForGitHub"
+        Source      = "PSGallery"
+        AutoUpgrade = $True
+    }
+
+    PSPackageInstaller installPowerShellGet
     {
         Ensure      = "Present"
         Name        = "PowerShellGet"
         Source      = "PSGallery"
-        DependsOn   = "[PSPackageMgmt]PkgPackageManagement"
+        DependsOn   = "[PSPackageInstaller]InstallPackageManagement"
         AutoUpgrade = $True
     }
 
-    PSPackageMgmt PkgPowerShellYaml
+    PSPackageInstaller installPowerShellYaml
     {
         Ensure      = "Present"
         Name        = "powershell-yaml"
@@ -76,15 +84,7 @@ Configuration PSPackageMgmtConfig
         AutoUpgrade = $True
     }
 
-    PSPackageMgmt PkgPSConsoleTheme
-    {
-        Ensure      = "Present"
-        Name        = "PSConsoleTheme"
-        Source      = "PSGallery"
-        AutoUpgrade = $False
-    }
-
-    PSPackageMgmt PkgPSReadLine
+    PSPackageInstaller installPSReadLine
     {
         Ensure      = "Present"
         Name        = "PSReadLine"
@@ -92,24 +92,15 @@ Configuration PSPackageMgmtConfig
         AutoUpgrade = $True
     }
 
-    PSPackageMgmt PkgVSSetup
+    PSPackageInstaller installVSSetup
     {
         Ensure      = "Present"
         Name        = "VSsetup"
         Source      = "PSGallery"
         AutoUpgrade = $True
     }
-
-    PSPackageMgmt PkgNewtonSoft.JSON
-    {
-        Ensure      = "Present"
-        Name        = "newtonsoft.json"
-        Source      = "PSGallery"
-        AutoUpgrade = $True
-    }
-
 }
 
-PSPackageMgmtConfig
+PackagePSModule
 
-Start-DscConfiguration .\.config -Wait -Verbose -Force
+Start-DscConfiguration ".\PackagePSModule" -Wait -Verbose -Force

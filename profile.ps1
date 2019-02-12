@@ -13,6 +13,21 @@
 #    PowerShell Cmdlets
 # =============================================================================
 
+# @ToDo Choco Install - Add copy Tab-Completion folder
+
+# @ToDo TestPath and create Folder
+    # If(Test-Path -Path $PathVcPkg ) {
+    #     Write-Verbose "Path $PathVcPkg exists." 
+    # }
+    # Else {
+    #     Write-Verbose "Path $PathVcPkg does not exists."
+        
+    #     # New-Item -Path  $env:Repositories -Name $VcPkg -ItemType Directory
+    #     # If(Test-Path -Path $PathVcPkg ) {
+    #     #     Write-Verbose "Directory $PathVcPkg created." 
+    #     # }
+    # }
+
 #-------------------------------------------------------------------------------
 #   Start-Profile 
 #-------------------------------------------------------------------------------
@@ -74,19 +89,21 @@ Function Import-Package
             [Switch] $Uninstall
         )
 
-        Show-PSPackage
+        
 
-        If ($Import) {$Task = "Import"}
-        If ($Remove) {$Task ="Remove"}
-        If ($ImportGroup) {$Task ="Import-Group"}
-        If ($RemoveGroup) {$Task ="Remove-Group"}
-        If ($Install) {$Task ="Install"}        
-        If ($Update) {$Task ="Update"}
-        If ($Uninstall) {$Task ="Uninstall"}
+        If ($Import) {$Task = "Import"; $Install = $False}
+        If ($Remove) {$Task ="Remove"; $Install = $False}
+        If ($ImportGroup) {$Task ="Import-Group"; $Install = $False}
+        If ($RemoveGroup) {$Task ="Remove-Group"; $Install = $False}
+        If ($Install) {$Task ="Install"; $Install = $True}        
+        If ($Update) {$Task ="Update"; $Install = $True}
+        If ($Uninstall) {$Task ="Uninstall"; $Install = $True}
      
+        Show-Package -Install:($Install)
+
         $PSPackages.PackageManager($Task, $VerbosePreference)
 
-        Show-PSPackage
+        Show-Package -Install:($Install)
 }
 
 #---------------------------------------------------------------------------
@@ -109,7 +126,7 @@ Function Import-PackageCLI
 
         $PSPackages.PackageManagerCLI($Package, $Task, $VerbosePreference)
 
-        Show-PSPackage
+        Show-Package
 }
 #---------------------------------------------------------------------------
 #   Import-PSScriptAnalyzer 
@@ -130,9 +147,9 @@ Function Import-PSScriptAnalyzer
     Import-Module $PSScriptAnalyzer
 }
 #---------------------------------------------------------------------------
-#   Show-PSPackagesProfiles
+#   Show-PackageProfile
 #---------------------------------------------------------------------------
-Function Show-PSPackageProfile
+Function Show-PackageProfile
 {
     [CmdletBinding()]
 
@@ -163,9 +180,9 @@ Function Add-Package
 }
 
 #---------------------------------------------------------------------------
-#   Show-PSPackages
+#   Show-Package
 #---------------------------------------------------------------------------
-Function Show-PSPackage
+Function Show-Package
 {
     [CmdletBinding()]
     
@@ -173,10 +190,10 @@ Function Show-PSPackage
 
     Param(
         [Parameter(HelpMessage="Switch, which determnines whether installed packages should get checked")]
-        [Switch] $Installed = $False
+        [Switch] $Install = $False
     )
 
-    If ($Installed) {
+    If ($Install) {
         $PSPackages.GetPackagesInstalled()
     }
     Else {
@@ -191,9 +208,9 @@ Function Show-PSPackage
 }
 
 #---------------------------------------------------------------------------
-#   Show-PSPackagesTask
+#   Show-PackageTask
 #--------------------------------------------------------------------------
-Function Show-PSPackageTask
+Function Show-PackageTask
 {
     [CmdletBinding()]
 
@@ -712,7 +729,7 @@ Class Profile
         {
             Switch ($Task) {
             "Install" {
-                Start-Process PowerShell -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command Find-Module -Name $($ChangePckg[$LoopIdx_Pckg]) | Install-Module -Scope AllUsers -Verbose -Force"
+                Start-Process PowerShell -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command Find-Module -Name $($ChangePckg[$LoopIdx_Pckg]) | Install-Module -Scope AllUsers -AllowClobber -Verbose -Force"
                 $Options.Remove($ChangePckg[$LoopIdx_Pckg])
                 $This.GetPackagesInstalled()
                 Break
@@ -741,7 +758,6 @@ Class Profile
             } 
             "Import-Group" {
                 $This.ManageGroupProfiles("Import", $ChangePckg[$LoopIdx_Pckg],$Verbose)
-                Write-Host $ChangePckg[$LoopIdx_Pckg]
                 ($This.GroupProfiles | Where-Object  {$_.GroupProfile -match $ChangePckg[$LoopIdx_Pckg]}).Imported = $True
                 $This.GetPackagesImported()
                 Break
@@ -890,7 +906,7 @@ Class Profile
 
     # Set Modules Path
     $PSModulePath = [Environment]::GetEnvironmentVariable("PSModulePath")
-    $PSModulePath += ";$env:Home\PSPackages"
+    $PSModulePath += ";$env:PoshSharedModule"
     [Environment]::SetEnvironmentVariable("PSModulePath", $PSModulePath)
 
     $PSCommandLine = "PSCommandLine"

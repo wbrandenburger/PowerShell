@@ -88,4 +88,4 @@ Configuration PackageProgramming
 
 PackageProgramming
 
-Start-DscConfiguration -Path ".\PackageProgramming" -wait -verbose -force
+Start-DscConfiguration -Path ".\PackageProgramming" -Wait -Verbose -Force
