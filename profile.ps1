@@ -902,7 +902,14 @@ Class Profile
     # Initialize object of class profile
     $PSPackages = [Profile]::New($PSScriptRoot)
 
-    Import-PackageCLI -Package "SoftwareManagement" -Task "Import-Group"
+    $User = [Security.Principal.WindowsIdentity]::GetCurrent();
+    $CheckAs = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+    
+    $Package = "Usability"
+    If ($CheckAs){
+        $Package = "SoftwareManagement"    
+    }
+    Import-PackageCLI -Package $Package -Task "Import-Group" # -Verbose
 
     # Clear Variables
     Remove-Variable -Name PSModulePath

@@ -44,7 +44,7 @@
 	<Deactivated>false</Deactivated>
 	<GroupProfile>Git</GroupProfile>
 	<GroupProfile>SoftwareManagement</GroupProfile>
-	<GroupProfile>Programming</GroupProfile>
+	<GroupProfile>Usability</GroupProfile>
 	<Repository>PSGallery</Repository>
 	<GitHub>https://github.com/dahlbyk/posh-git"</GitHub>
 	<Description>Provides prompt with Git status summary information and tab completion for Git commands, parameters, remotes and branch names.
@@ -57,6 +57,7 @@
 	<PublishedDate></PublishedDate>
 	<Deactivated>false</Deactivated>
 	<GroupProfile>SoftwareManagement</GroupProfile>
+	<GroupProfile>Usability</GroupProfile>
 	<Repository>vcpkg</Repository>
 	<GitHub></GitHub>
 	<Description>Tab completion for vcpkg
@@ -69,6 +70,7 @@
 	<PublishedDate></PublishedDate>
 	<Deactivated>false</Deactivated>
 	<GroupProfile>SoftwareManagement</GroupProfile>
+	<GroupProfile>Usability</GroupProfile>
 	<Repository></Repository>
 	<GitHub></GitHub>
 	<Description>Tab completion for chocolatey
