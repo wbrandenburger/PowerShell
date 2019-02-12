@@ -23,7 +23,7 @@ Function Start-Profile
     (
     )
 
-    Invoke-Expression -Command $PSPackages.GetFilePathProfile()
+    . $PSPackages.GetFilePathProfile()
 }
 
 #-------------------------------------------------------------------------------
@@ -37,6 +37,14 @@ Function Open-ProfileXml
     )
 
     Start-Process $PSPackages.GetFilePathGroupProfiles()
+}
+
+#-------------------------------------------------------------------------------
+#   PackageUpdater()
+#-------------------------------------------------------------------------------
+Function PackageUpdater
+{
+    . (Join-Path $PSPackages.GetPathLocal() "PackageBasics.ps1")
 }
 
 #---------------------------------------------------------------------------
@@ -103,7 +111,9 @@ Function Import-PackageCLI
 
         Show-PSPackage
 }
-
+#---------------------------------------------------------------------------
+#   Import-PSScriptAnalyzer 
+#---------------------------------------------------------------------------
 Function Import-PSScriptAnalyzer 
 {
     [CmdletBinding()]
@@ -326,7 +336,7 @@ Class Profile
     }
 
     #---------------------------------------------------------------------------
-    #   Get-FilePathGroupProfilea
+    #   Get-FilePathGroupProfiles
     #---------------------------------------------------------------------------
     Hidden [System.String] GetFilePathGroupProfiles()
     {
@@ -423,6 +433,21 @@ Class Profile
         Return "$([Char]27)[${Color}m$Value$([Char]27)[0m"
     }
 
+    #---------------------------------------------------------------------------
+    #  GetPathLocal()
+    #---------------------------------------------------------------------------
+    [System.String] GetPathLocal()
+    {
+        Return $This.PathLocal
+    }
+
+    #---------------------------------------------------------------------------
+    #  GetPathConfig()
+    #---------------------------------------------------------------------------
+    [System.String] GetPathConfig()
+    {
+        Return $This.PathConfig;
+    }
     #---------------------------------------------------------------------------
     #  GetPackageStatus()
     #---------------------------------------------------------------------------

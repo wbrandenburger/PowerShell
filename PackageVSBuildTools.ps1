@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Configuration myChocoConfig
+Configuration PackagVSBuildTools
 {
    Import-DscResource -Module cChoco
    
@@ -25,21 +25,39 @@ Configuration myChocoConfig
          DebugMode = 'ForceModuleImport'
       }
       
-      cChocoInstaller installChoco
+      cChocoPackageInstallerSet installvcredistxxxx
       {
-        InstallDir = "C:\Choco"
-}
-      cChocoPackageInstallerSet installSomeStuff
-      {
-         Ensure = 'Present'
+         Ensure = "Present"
          Name = @(
-			"7zip"
+         "vcredist2008"
+         "vcredist2010"
+         "vcredist2013"
+         "vcredist2017"
 		   )
-         DependsOn = "[cChocoInstaller]installChoco"
       }
+
+      cChocoPackageInstaller installvisualstudio2017buildtools
+      {
+         Ensure = "Present"
+         Name = "visualstudio2017buildtools"
+      }
+
+      cChocoPackageInstaller installwindowssdk10
+      {
+         Ensure = "Present"
+         Name = "windows-sdk-10.1"
+         AutoUpgrade = $True
+      }
+
+      cChocoPackageInstaller installwindowssdk8
+      {
+         Ensure = "Absent"
+         Name = "windows-sdk-8.1"
+      }
+
    }
 }
 
-myChocoConfig
+PackageVSBuildTools
 
-Start-DscConfiguration .\.config -wait -verbose -force
+Start-DscConfiguration  -Path ".\PackageVSBuildTools"  -wait -verbose -force
