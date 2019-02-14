@@ -903,12 +903,6 @@ Class Profile
 # @ToDo Add PSCommandLine to ProfilePackages.Xml
 
 # @ToDo Open recently used file with Papis YES Open-Profile especially - deprecated
-
-    # Set Modules Path
-    $PSModulePath = [Environment]::GetEnvironmentVariable("PSModulePath")
-    $PSModulePath += ";$env:PoshSharedModule"
-    [Environment]::SetEnvironmentVariable("PSModulePath", $PSModulePath)
-
     $PSCommandLine = "PSCommandLine"
     If (Get-Module | Where-Object { $_.Name -match $PSCommandLine}) {
         Remove-Module -Name $PSCommandLine -Force:($True) -Verbose:($True)
@@ -928,4 +922,3 @@ Class Profile
     Import-PackageCLI -Package $Package -Task "Import-Group" # -Verbose
 
     # Clear Variables
-    Remove-Variable -Name PSModulePath
