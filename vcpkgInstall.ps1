@@ -1,15 +1,22 @@
 # @ToDo VCPKG DSC RESOURCE
 # https://github.com/Microsoft/vcpkg
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$True, ConfirmImpact="Medium")]
 
 [OutputType([Void])]
 
 Param()
 
+If (-not $PSCmdlet.ShouldProcess("Should vcpkg get built and environment varibles get cahnged?")){
+    return
+}
+
 $User = [Security.Principal.WindowsIdentity]::GetCurrent();
 $CheckAs = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole(     [Security.Principal.WindowsBuiltinRole]::Administrator)
 If (-not $CheckAs){
     Write-Error "Installing of vcpkg needs administrative access to system."
+
+    Start-Process -FilePath PowerShell.exe -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command . $PSCommandPath" 
+
     Return
 }
 

@@ -33,14 +33,16 @@
 #-------------------------------------------------------------------------------
 Function Update-PSSession
 {
-
+    [CmdletBinding(SupportsShouldProcess=$True, ConfirmImpact="None")]
     Param
     (
     )
 
-    Start-Process -FilePath RefreshEnv.cmd -Wait -NoNewWindow
+    If ($PSCmdlet.ShouldProcess("Refresh environment and start a new powershell session?")) {
+        Start-Process -FilePath RefreshEnv.cmd -Wait -NoNewWindow
 
-    Start-Process -FilePath PowerShell.exe -Wait -NoNewWindow
+        Start-Process -FilePath PowerShell.exe -Wait -NoNewWindow
+    }
 }
 
 # #-------------------------------------------------------------------------------
@@ -69,7 +71,7 @@ Function Open-ProfileXml
     (
     )
 
-    Start-Process FilePath $PSPackages.GetFilePathGroupProfiles()
+    Start-Process FilePath $PSPackages.GetFilePathGroupProfiles() -NoNewWindow
 }
 
 #-------------------------------------------------------------------------------
@@ -102,6 +104,7 @@ Function New-PSFunction
     Param
     (
         [Parameter(Position=1, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a powershell cmdlet")]
+        [Alias("i")]
         [System.String] $Name
     )
 
@@ -110,7 +113,31 @@ Function New-PSFunction
         $NewPSFunctionFullPath = (Join-Path -Path $Env:LOCAL_PS -ChildPath "$Name.ps1")
         Copy-Item -Path $LocalPSFunctionFullPath -Destination $NewPSFunctionFullPath -Verbose -Force
 
-        Start-Process -FilePath "$NewPSFunctionFullPath"
+        Start-Process -FilePath "$NewPSFunctionFullPath" -NoNewWindow
+    }
+}
+
+#-------------------------------------------------------------------------------
+#   Open-VSProject
+#-------------------------------------------------------------------------------
+Function Open-VSProject
+{
+    [CmdletBinding(PositionalBinding=$True)]
+
+    [OutputType([Void])]
+
+    Param
+    (
+        [Parameter(Position=1, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Path, which contains a project folder")]
+        [Alias("i")]
+        [System.String[]] $Path
+    )
+
+    Process {
+        If ($Path.Length -le 1) {
+            Start-Process -FilePath Code -ArgumentList "--new-window  $Path" -NoNewWindow
+        }
+# @ToDo Opening Multirootfolders --add <dir>
     }
 }
 
@@ -125,12 +152,13 @@ Function New-DocFile
 
     Param (
         [Parameter(Position=$True, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a documentation file")]
+        [Alias("i")]
         [System.String] $Name 
     )
 
     Process {
         $LocalDocFileFullPath = (Join-Path -Path $Env:LOCAL_PS -ChildPath "Templates\DocFile.md")
-        $NewDocFileFullPath = (Join-Path -Path $Env:SHARED_BIB -ChildPath "$Name.md")
+        $NewDocFileFullPath = (Join-Path -Path $Env:SHARED_BIB -ChildPath "Doc\$Name.md")
         Copy-Item -Path $LocalDocFileFullPath -Destination $NewDocFileFullPath -Verbose -Force
 
         Start-Process -FilePath "$NewDocFileFullPath"

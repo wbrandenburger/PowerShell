@@ -1,12 +1,14 @@
 # https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_environment_variables?view=powershell-6
 
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$True, ConfirmImpact="Medium")]
     
-[OutputType()]
+[OutputType([Void])]
 
 Param()
 
-Write-Host $PSCommandPath
+If (-not $PSCmdlet.ShouldProcess("Should environment variables get changed?")){
+    return
+}
 
 $User = [Security.Principal.WindowsIdentity]::GetCurrent();
 $CheckAs = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole(     [Security.Principal.WindowsBuiltinRole]::Administrator)
