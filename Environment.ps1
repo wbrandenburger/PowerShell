@@ -6,22 +6,28 @@
 
 Param()
 
+Write-Host $PSCommandPath
+
 $User = [Security.Principal.WindowsIdentity]::GetCurrent();
 $CheckAs = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole(     [Security.Principal.WindowsBuiltinRole]::Administrator)
 If (-not $CheckAs){
-    Write-Error "Installing of vcpkg needs administrative access to system."
+    Write-Warning "Changes to environment need administrative rights to system."
+
+    Start-Process -FilePath PowerShell.exe -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command . $PSCommandPath" 
     Return
 }
 
 $LocalRoot = "A:"
+$LocalHome = Join-Path -Path $LocalRoot -ChildPath "Documents"
 $SharedPrefix = "A:\OneDrive"
 $SharedRoot = Join-Path -Path $SharedPrefix -ChildPath "Projects"
 
 $EnvVarUser = [System.Collections.Hashtable]::New()
 [Void] $EnvVarUser.Add("LOCAL_ROOT", $LocalRoot)
 [Void] $EnvVarUser.Add("LOCAL_REPO", (Join-Path -Path $LocalRoot -ChildPath "Repositories"))
-[Void] $EnvVarUser.Add("LOCAL_HOME", (Join-Path -Path $LocalRoot -ChildPath "Documents"))
+[Void] $EnvVarUser.Add("LOCAL_HOME", $LocalHome)
 [Void] $EnvVarUser.Add("LOCAL_BIN", (Join-Path -Path $LocalRoot -ChildPath "System")) # @ToDo
+[Void] $EnvVarUser.Add("LOCAL_PS", (Join-Path -Path $LocalHome -ChildPath "WindowsPowerShell"))
 
 [Void] $EnvVarUser.Add("SHARED_BIB", (Join-Path -Path $SharedPrefix -ChildPath "Libraries"))
 [Void] $EnvVarUser.Add("SHARED_TEMP", (Join-Path -Path $SharedPrefix -ChildPath "Download"))

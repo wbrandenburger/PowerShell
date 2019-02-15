@@ -29,29 +29,135 @@
     # }
 
 #-------------------------------------------------------------------------------
-#   Start-Profile 
+#   Update-PSSession
 #-------------------------------------------------------------------------------
-Function Start-Profile 
+Function Update-PSSession
 {
 
     Param
     (
     )
 
-    . $PSPackages.GetFilePathProfile()
+    Start-Process -FilePath RefreshEnv.cmd -Wait -NoNewWindow
+
+    Start-Process -FilePath PowerShell.exe -Wait -NoNewWindow
 }
+
+# #-------------------------------------------------------------------------------
+# #   Start-Profile 
+# #-------------------------------------------------------------------------------
+# Function Open-Profile 
+# {
+
+#     Param
+#     (
+#     )
+        
+#     Start-Process -FilePath $PSPackages.GetFilePathProfile()
+# }
 
 #-------------------------------------------------------------------------------
 #   Open-ProfileXml
 #-------------------------------------------------------------------------------
 Function Open-ProfileXml
 {
+    [CmdletBinding()]
+
+    [OutputType([Void])]
 
     Param
     (
     )
 
-    Start-Process $PSPackages.GetFilePathGroupProfiles()
+    Start-Process FilePath $PSPackages.GetFilePathGroupProfiles()
+}
+
+#-------------------------------------------------------------------------------
+#   Set-Environment
+#-------------------------------------------------------------------------------
+Function Set-Environment
+{
+    [CmdletBinding(SupportsShouldProcess=$True, ConfirmImpact="None", PositionalBinding=$True)]
+    
+    [OutputType([Void])]
+
+    Param
+    (
+    )
+
+    If ($PSCmdlet.ShouldProcess("Should environment variables get changed?")){
+    . "$Env:LOCAL_PS\Environment.ps1"
+    }
+}
+
+#-------------------------------------------------------------------------------
+#   New-PSFunction
+#-------------------------------------------------------------------------------
+Function New-PSFunction
+{
+    [CmdletBinding(SupportsShouldProcess=$True, ConfirmImpact="None",PositionalBinding=$True)]
+
+    [OutputType([Void])]
+
+    Param
+    (
+        [Parameter(Position=1, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a powershell cmdlet")]
+        [System.String] $Name
+    )
+
+    Process {
+        $LocalPSFunctionFullPath = (Join-Path -Path $Env:LOCAL_PS -ChildPath "Templates\PSFunction.ps1")
+        $NewPSFunctionFullPath = (Join-Path -Path $Env:LOCAL_PS -ChildPath "$Name.ps1")
+        Copy-Item -Path $LocalPSFunctionFullPath -Destination $NewPSFunctionFullPath -Verbose -Force
+
+        Start-Process -FilePath "$NewPSFunctionFullPath"
+    }
+}
+
+#-------------------------------------------------------------------------------
+#   New-DocFile
+#-------------------------------------------------------------------------------
+Function New-DocFile
+{
+    [CmdletBinding(SupportsShouldProcess=$True, ConfirmImpact="None",PositionalBinding=$True)]
+
+    [OutputType([Void])]
+
+    Param (
+        [Parameter(Position=$True, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a documentation file")]
+        [System.String] $Name 
+    )
+
+    Process {
+        $LocalDocFileFullPath = (Join-Path -Path $Env:LOCAL_PS -ChildPath "Templates\DocFile.md")
+        $NewDocFileFullPath = (Join-Path -Path $Env:SHARED_BIB -ChildPath "$Name.md")
+        Copy-Item -Path $LocalDocFileFullPath -Destination $NewDocFileFullPath -Verbose -Force
+
+        Start-Process -FilePath "$NewDocFileFullPath"
+    }
+}
+
+#-------------------------------------------------------------------------------
+#   Update-PSGit
+#-------------------------------------------------------------------------------
+Function Update-PSGit
+{
+    [CmdletBinding(SupportsShouldProcess=$True, ConfirmImpact="None",PositionalBinding=$True)]
+
+    [OutputType([Void])]
+
+    Param (
+        [Parameter(Position=$True, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a documentation file")]
+        [Alias("m")]
+        [System.String] $Message 
+    )
+
+    Process {
+        If ($PSCmdlet.ShouldProcess("Push changes of local powershell workspace to remote repository?")) {
+            Start-Process -FilePath sh.exe -ArgumentList "GitAddCommitPush.sh $Env:LOCAL_PS $Message" -Wait -NoNewWindow
+        }
+    }
+
 }
 
 #-------------------------------------------------------------------------------
