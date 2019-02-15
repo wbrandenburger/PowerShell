@@ -151,9 +151,12 @@ Function New-DocFile
     [OutputType([Void])]
 
     Param (
-        [Parameter(Position=$True, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a documentation file")]
+        [Parameter(Position=1, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a documentation file")]
         [Alias("i")]
-        [System.String] $Name 
+        [System.String] $Name,
+
+        [Parameter(Mandatory=$False, ValueFromPipeline=$False, HelpMessage="Additional creation of a folder containing supplementary files")]
+        [Switch] $Supplements
     )
 
     Process {
@@ -162,6 +165,9 @@ Function New-DocFile
         Copy-Item -Path $LocalDocFileFullPath -Destination $NewDocFileFullPath -Verbose -Force
 
         Start-Process -FilePath "$NewDocFileFullPath"
+
+# @ToDo: Add creation of folder if (Project-...)
+
     }
 }
 
@@ -175,7 +181,7 @@ Function Update-PSGit
     [OutputType([Void])]
 
     Param (
-        [Parameter(Position=$True, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a documentation file")]
+        [Parameter(Position=1, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Name of file, which contains a documentation file")]
         [Alias("m")]
         [System.String] $Message 
     )
