@@ -156,20 +156,39 @@ Function New-DocFile
         [System.String] $Name,
 
         [Parameter(Mandatory=$False, ValueFromPipeline=$False, HelpMessage="Additional creation of a folder containing supplementary files")]
-        [Switch] $Supplements
+        [Switch] $Supplements,
+
+        [Parameter(Mandatory=$False, ValueFromPipeline=$False, HelpMessage="Additional creation of a tempory file for working in multiple desktops")]
+        [Switch] $Temp
     )
 
     Process {
-        $LocalDocFileFullPath = (Join-Path -Path $Env:LOCAL_PS -ChildPath "Templates\DocFile.md")
-        $NewDocFileFullPath = (Join-Path -Path $Env:SHARED_BIB -ChildPath "Doc\$Name.md")
-        Copy-Item -Path $LocalDocFileFullPath -Destination $NewDocFileFullPath -Verbose -Force
+        $LocalDocFilePath =     (Join-Path -Path $Env:LOCAL_PS -ChildPath "Templates\DocFile.md")
+        $NewDocFolderPath =     (Join-Path -Path $Env:SHARED_BIB -ChildPath "Doc\$Name")
+        $NewDocFilePath =       (Join-Path -Path $Env:SHARED_BIB -ChildPath "Doc\$Name.md")
+        $NewDocFileTmpPath =    (Join-Path -Path $Env:SHARED_BIB -ChildPath "Doc\$Name.tmp.md")
 
-        Start-Process -FilePath "$NewDocFileFullPath"
+        If (Test-Path -Path $NewDocFilePath ) {
+            Write-Warning "File $NewDocFilePath exists in destination, skip copying template."
+        }
+        Else {
+            Copy-Item -Path $LocalDocFilePath -Destination $NewDocFilePath -Verbose
+            Write-Host "File $NewDocFilePath created." -ForegroundColor Green
+        }
 
-# @ToDo: Add creation of folder if (Project-...)
+        If ($Supplements) {
+            New-Item -Path $NewDocFolderPath -ItemType "Directory"
+        }
+        
+        If ($Temp) {
+            New-Item -Path $NewDocFileTmpPath -Verbose
+        }
 
+        Start-Process -FilePath "$NewDocFilePath"
     }
 }
+
+
 
 #-------------------------------------------------------------------------------
 #   Update-PSGit

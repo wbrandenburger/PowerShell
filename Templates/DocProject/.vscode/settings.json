@@ -1,0 +1,12 @@
+{
+
+    // =====================================
+    //  Markdown
+    // =====================================
+    "markdown-pdf.emoji": false,
+    "markdown-pdf.highlightStyle": "atelier-dune-dark.css",
+    "markdown.extension.toc.orderedList": true,
+    "markdown.preview.openMarkdownLinks": "inEditor",
+
+    "markdown.extension.toc.levels": "1..3"
+}
