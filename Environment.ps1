@@ -33,6 +33,8 @@ $EnvVarUser = [System.Collections.Hashtable]::New()
 
 [Void] $EnvVarUser.Add("SHARED_BIB", (Join-Path -Path $SharedPrefix -ChildPath "Libraries"))
 [Void] $EnvVarUser.Add("SHARED_TEMP", (Join-Path -Path $SharedPrefix -ChildPath "Download"))
+[Void] $EnvVarUser.Add("SHARED_WORK", (Join-Path -Path $SharedPrefix -ChildPath "Workspace"))
+
 [Void] $EnvVarUser.Add("SHARED_ROOT", $SharedRoot)
 [Void] $EnvVarUser.Add("SHARED_CONFIG", (Join-Path -Path $SharedRoot -ChildPath ".config"))
 [Void] $EnvVarUser.Add("SHARED_PSPKG", (Join-Path -Path $SharedRoot -ChildPath "PSPackages")) # @ToDo

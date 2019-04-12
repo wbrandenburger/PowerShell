@@ -79,6 +79,22 @@ Configuration PackageBasics
          chocoParams = "/assoc=1	/ini=%APPDATA%\IrfanView"
          DependsOn = "[cChocoInstaller]installChoco"
       }
+
+      cChocoPackageInstaller installinksacpe
+      {
+         Ensure = "Present"
+         Name = "inkscape"
+         AutoUpgrade = $True
+         DependsOn = "[cChocoInstaller]installChoco"
+      }
+
+      cChocoPackageInstaller installqpdf
+      {
+         Ensure = "Present"
+         Name = "qpdf"
+         AutoUpgrade = $True
+         DependsOn = "[cChocoInstaller]installChoco"
+      }
    }
 }
 

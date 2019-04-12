@@ -15,7 +15,9 @@
 
 # @ToDo Choco Install - Add copy Tab-Completion folder
 
-# @ToDo TestPath and create Folder
+# @Note[Regex] "([^\\]*)\.[^\.]*$" Get Filename with multiple dot without extension
+# @Note[Regex] "([^\\]*)$" Get Filename with multiple dot
+# @Note[Regex] "\\.+\\" Get the content between directory and Filename
     # If(Test-Path -Path $PathVcPkg ) {
     #     Write-Verbose "Path $PathVcPkg exists." 
     # }
@@ -27,6 +29,52 @@
     #     #     Write-Verbose "Directory $PathVcPkg created." 
     #     # }
     # }
+
+
+Function Move-TempToProject 
+{
+    
+    [CmdletBinding(PositionalBinding=$True, ConfirmImpact="Medium", SupportsShouldProcess=$True)]
+    
+    [OutputType([Void])]
+    
+    Param (
+        [Parameter(Position=1, HelpMessage="Name of the Project, where the file shall be moved")]
+        [System.String] $Project,
+
+        [Parameter(HelpMessage="Folder literature in the project")]
+        [Switch] $Bib,
+
+        [Parameter(HelpMessage="Folder Images in the project")]
+        [Switch] $Img
+    )
+    
+    Process {
+
+        Write-Host (Get-Clipboard -Format Text)
+        If ($Bib) {
+            $Folder = "Literature"
+        }
+
+        If ($Img) {
+            $Folder = "Images"
+        } 
+        
+        $File = (Get-ChildItem -Path $env:SHARED_TEMP | Sort-Object -Property LastWriteTime -Descend)[0].Name
+        $FilePath = Join-Path -Path $env:SHARED_TEMP -ChildPath $File
+
+        $DestinationPath = Join-Path -Path $env:SHARED_WORK -ChildPath "$Project"
+        If( -not (Test-Path $DestinationPath)) {
+            Write-Error "Project $Project does not exist. Specify exisiting project."
+        }
+
+        $Destination = Join-Path -Path $DestinationPath -ChildPath "$Folder\$File"
+
+        If ($PSCmdlet.ShouldProcess("Should the file be moved?")) {
+            Move-Item -Path $FilePath -Destination $Destination -Verbose:$VerbosePreference -Force
+        }
+    }
+}
 
 #-------------------------------------------------------------------------------
 #   Update-PSSession
@@ -122,22 +170,29 @@ Function New-PSFunction
 #-------------------------------------------------------------------------------
 Function Open-VSProject
 {
-    [CmdletBinding(PositionalBinding=$True)]
+    [CmdletBinding()]
 
     [OutputType([Void])]
 
     Param
     (
-        [Parameter(Position=1, Mandatory=$True, ValueFromPipeline=$True, HelpMessage="Path, which contains a project folder")]
-        [Alias("i")]
-        [System.String[]] $Path
+        [Parameter(Mandatory=$False, ValueFromPipeline=$True, HelpMessage="Path, which contains a project folder")]
+        [System.String] $Path = $Null,
+
+        [Parameter(Mandatory=$False, ValueFromPipeline=$True, HelpMessage="Workspace, which contains a project folder")]
+        [System.String] $Project = $Null
     )
 
     Process {
-        If ($Path.Length -le 1) {
+
+        If ($Project) {
+            $Path = Join-Path -Path $env:SHARED_WORK -ChildPath $Project
+        }
+
+        If ($Path) {
             Start-Process -FilePath Code -ArgumentList "--new-window  $Path" -NoNewWindow
         }
-# @ToDo Opening Multirootfolders --add <dir>
+# @Question Do I need opening multirootfolders --add <dir>
     }
 }
 

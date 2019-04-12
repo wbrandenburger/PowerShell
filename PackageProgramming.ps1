@@ -32,6 +32,14 @@ Configuration PackageProgramming
          AutoUpgrade = $True
       }
 
+      cChocoPackageInstaller installcmake
+      {
+         Ensure = "Present"
+         Name = "jre8"
+         chocoParams = "/exclude:32"
+         AutoUpgrade = $True
+      }     
+
       cChocoPackageInstaller installgit
       {
          Ensure = "Present"
