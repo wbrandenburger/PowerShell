@@ -1,7 +1,0 @@
-# DocFile
-
-## References
-
-### Literature
-
-### Links

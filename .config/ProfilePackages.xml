@@ -79,8 +79,8 @@
 
 <Package>
 	<Name>PowerShellForGitHub</Name>
-	<Version>0.6.4</Version>
-	<PublishedDate>16/01/2019 20:57:04</PublishedDate>
+	<Version>0.8.0</Version>
+	<PublishedDate>15/04/2019 16:06:55</PublishedDate>
 	<Deactivated>false</Deactivated>
 	<GroupProfile>SoftwareManagement</GroupProfile>
 	<GroupProfile>Programming</GroupProfile>
@@ -113,6 +113,18 @@
 	<Repository>PSGallery</Repository>
 	<GitHub>https://github.com/cloudbase/powershell-yaml</GitHub>
 	<Description>Powershell module for serializing and deserializing Yaml.
+	</Description>
+</Package>
+
+<Package>
+	<Name>PSIni</Name>
+	<Version>3.1.2</Version>
+	<PublishedDate>24/04/2019 08:45:08</PublishedDate>
+	<Deactivated>false</Deactivated>
+	<GroupProfile>Usability</GroupProfile>
+	<Repository>PSGallery</Repository>
+	<GitHub>http://lipkau.github.io/PsIni</GitHub>
+	<Description>Convert hashtable to INI file and back. @ http://lipkau.github.io/PsIni/.
 	</Description>
 </Package>
 
@@ -160,14 +172,14 @@
 </Package>
 
 <Package>
-	<Name>VirtualEnvWrapper</Name>
+	<Name>PSVirtualEnv</Name>
 	<Version></Version>
 	<PublishedDate></PublishedDate>
 	<Deactivated>false</Deactivated>	
-	<GroupProfile>Programming</GroupProfile>
+	<GroupProfile>Usability</GroupProfile>
 	<Repository>GitHub</Repository>
-	<GitHub>https://github.com/regisf/virtualenvwrapper-powershell</GitHub>
-	<Description>A mimic of the VirtualEnvWrapper project but with Powershell</Description>
+	<GitHub></GitHub>
+	<Description>This Module includes wrappers for creating and deleting virtual environments in python</Description>
 </Package>
 
 <Package>

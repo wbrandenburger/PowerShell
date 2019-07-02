@@ -15,7 +15,7 @@
 
 # @ToDo Choco Install - Add copy Tab-Completion folder
 
-# @Note[Regex] "([^\\]*)\.[^\.]*$" Get Filename with multiple dot without extension
+# @Note[Regex] "([^\\]*)\.[^\.]*$" Get Filename with multiple dot without extensionq
 # @Note[Regex] "([^\\]*)$" Get Filename with multiple dot
 # @Note[Regex] "\\.+\\" Get the content between directory and Filename
     # If(Test-Path -Path $PathVcPkg ) {
@@ -30,6 +30,28 @@
     #     # }
     # }
 
+
+function ConvertTo-ArrayList ( [PSCustomObject] $CustomObject, [System.String] $Property) {
+
+        #$ObjectProperties = $CustomObject.PSObject.Properties
+    
+        #$IntermediateHashtable = @{}
+    
+        #foreach ( $Property in $ObjectProperties ) {
+    
+        #    $IntermediateHashtable."$($Property.Name)" = $Property.Value
+    
+        #}
+    
+        #$ArrayList = [System.Collections.ArrayList]$IntermediateHashtable
+        $array_list = [System.Collections.ArrayList]::New()
+        foreach ($bla in $CustomObject.Name) {
+            [Void] $array_list.Add($bla)
+        }
+        
+        return $array_list
+    
+}
 
 Function Move-TempToProject 
 {
@@ -92,6 +114,8 @@ Function Update-PSSession
         Start-Process -FilePath PowerShell.exe -Wait -NoNewWindow
     }
 }
+
+Set-Alias -Name refresh -Value Update-PSSession
 
 # #-------------------------------------------------------------------------------
 # #   Start-Profile 
@@ -446,15 +470,19 @@ Function Prompt
     $User = [Security.Principal.WindowsIdentity]::GetCurrent();
     $CheckAs = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 
-    If ($PSPackages.ExistsImportedGroupProfiles()){
-        Write-Host "($($PSPackages.GetImportedGroupProfiles())) " -NoNewline -ForegroundColor Yellow
-    }
+    # If ($PSPackages.ExistsImportedGroupProfiles()){
+    #     Write-Host "($($PSPackages.GetImportedGroupProfiles())) " -NoNewline -ForegroundColor Yellow
+    # }
+
     Write-Host "[" -NoNewline -ForegroundColor DarkCyan
     Write-Host (Get-Date -UFormat %R) -NoNewline -ForegroundColor DarkCyan
     Write-Host "] " -NoNewline -ForegroundColor DarkCyan
 	If ($CheckAs) { 
-        Write-Host "(Admin) " -NoNewline -ForegroundColor DarkRed
-    } 
+        Write-Host "(Admin) " -NoNewline -ForegroundColor Red
+    }
+    If ($Env:VIRTUAL_ENV){        
+        Write-Host "(venv-$(Split-Path $Env:VIRTUAL_ENV -leaf)) " -NoNewline -ForegroundColor DarkRed
+    }
     Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor DarkGreen 
     
     Write-Host " " -NoNewline
@@ -1116,13 +1144,17 @@ Class Profile
 
 # @ToDo Add PSCommandLine to ProfilePackages.Xml
 
-# @ToDo Open recently used file with Papis YES Open-Profile especially - deprecated
-    $PSCommandLine = "PSCommandLine"
-    If (Get-Module | Where-Object { $_.Name -match $PSCommandLine}) {
-        Remove-Module -Name $PSCommandLine -Force:($True) -Verbose:($True)
-    }
-    Import-Module $PSCommandLine 
+# @ToDo Open recently used file with Papis YES Open-Profile especially - 
 
+# $PSCommandLine = "PSCommandLine"
+#     If (Get-Module | Where-Object { $_.Name -match $PSCommandLine}) {
+#         Remove-Module -Name $PSCommandLine -Force:($True) -Verbose:($True)
+#     }
+#     Import-Module $PSCommandLine 
+
+    #. "install-psmodule.bat"
+    # Clear-Host
+    . (Join-Path -Path $PSScriptRoot -ChildPath "Repository-Tools.ps1")
     # Initialize object of class profile
     $PSPackages = [Profile]::New($PSScriptRoot)
 
