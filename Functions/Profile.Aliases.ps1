@@ -20,7 +20,7 @@
     [PSCustomObject] @{Name="mkpsm"; Value="Import-PSModule"; Tag="Module"}
     [PSCustomObject] @{Name="rmpsm"; Value="Remove-PSModule"; Tag="Module"}
     [PSCustomObject] @{Name="webpsm"; Value="Start-PSModuleWeb"; Tag="Module"}
-    
+
     # aliases for functions to manage projects
     [PSCustomObject] @{Name="cdproj"; Value="Set-LocationProject"; Tag="Project"},
     [PSCustomObject] @{Name="lsproj"; Value="Get-Project"; Tag="Project"},
@@ -47,8 +47,8 @@
 
         Param(
             [Parameter(Position=1)]
-            [ValidateSet("Project", "Repository", "Common")]
-            [System.String[]] $Tag = @("Project", "Repository", "Common")
+            [ValidateSet("Project", "Repository", "Common", "Module")]
+            [System.String[]] $Tag = @("Project", "Repository", "Common", "Module")
         )
 
         Process {
