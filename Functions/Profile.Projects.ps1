@@ -40,7 +40,7 @@ function Get-Project {
         return $content
     }
     
-    return  $content | Format-Table -Property Name, Path
+    return  $content | Format-Table -Property Name, Path, Description
 }
 
 #   function -------------------------------------------------------------------
@@ -83,7 +83,7 @@ function Set-LocationProject {
     $projects = Get-Project -Unformated
 
     if (-not (Test-Project -Project $projects -Name $Name)) {
-        return $projects | Format-Table -Property Name, Path
+        return $projects | Format-Table -Property Name, Path, Description
     }
 
     $project = $projects | Where-Object -Property Name -EQ -Value $Name
@@ -92,7 +92,7 @@ function Set-LocationProject {
     if (Test-Path -Path $localDir) { Set-Location -Path  $localDir }
     else { 
         Write-FormatedError -Message "Path of project is not valid."
-        return $projects | Format-Table -Property Name, Path
+        return $projects | Format-Table -Property Name, Path, Description
     }
 
     return $Null
@@ -114,7 +114,7 @@ function Start-ProjectVSCode {
     $projects = Get-Project -Unformated
 
     if (-not (Test-Project -Project $projects -Name $Name)) {
-        return $projects | Format-Table -Property Name, Path
+        return $projects | Format-Table -Property Name, Path, Description
     }
 
     $project = $projects | Where-Object -Property Name -EQ -Value $Name
@@ -123,6 +123,6 @@ function Start-ProjectVSCode {
     if (Test-Path -Path $localDir) { . code $localDir  }
     else { 
         Write-FormatedError -Message "Path of project is not valid."
-        return $projects | Format-Table -Property Name, Path
+        return $projects | Format-Table -Property Name, Path, Description
     }
 }
