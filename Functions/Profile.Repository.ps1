@@ -5,7 +5,7 @@
 #   settings -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 $Script:RepositoryFile = $Null
-
+$Env:RepositoryFileBackUp = $Null
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 function Set-RepositoryConfiguration{
@@ -22,7 +22,7 @@ function Set-RepositoryConfiguration{
     Process {
 
         $Script:RepositoryFile = $File
-
+        $Env:RepositoryFileBackUp = $File
     }
 }
 
@@ -182,12 +182,11 @@ function Start-RepositoryCollection {
             return Get-Repository
         }
 
-        $Env:RepositoryFileBackUp = $Script:RepositoryFile
         $repositoryFile = Select-Repository $Name Repository-Config-File
         if ($repositoryFile -and (Test-Path -Path $repositoryFile)) {
             $Script:RepositoryFile = $repositoryFile 
 
-            Write-FormatedSuccess -Message "Finished activating repository collection '$Name'." -Space
+            Write-FormatedSuccess -Message "Activated repository collection '$Name'." -Space
 
             return Get-Repository
         }
@@ -214,7 +213,7 @@ function Stop-RepositoryCollection {
     Process{
         if ($Env:RepositoryFileBackUp) {
             $Script:RepositoryFile = $Env:RepositoryFileBackUp
-            Write-FormatedSuccess -Message "Finished deactivating repository collection '$Name'." -Space
+            Write-FormatedSuccess -Message "Deactivated repository collection '$Name'." -Space
         }
         else {
             Write-FormatedError -Message "There is no repository collection activated." -Space
