@@ -8,23 +8,23 @@
     # define aliases for specific function
     [PSCustomObject[]] $Script:PSAlias = @(
 
+    # aliases for functions to manage projects
+    [PSCustomObject] @{Name="cdx"; Value="Set-LocationProject"; Tag="Project"},
+    [PSCustomObject] @{Name="exx"; Value="Start-ProjectExplorer"; Tag="Project"},
+    [PSCustomObject] @{Name="lsx"; Value="Get-Project"; Tag="Project"},
+    [PSCustomObject] @{Name="vsx"; Value="Start-ProjectVSCode"; Tag="Project"},
+
     # aliases for functions to manage repositories
-    [PSCustomObject] @{Name="cdrep"; Value="Set-LocationRepository"; Tag="Repository" }
-    [PSCustomObject] @{Name="cppsrep"; Value="Copy-PSModuleFromRepository"; Tag="Repository"}
-    [PSCustomObject] @{Name="webrep"; Value="Start-RepositoryWeb"; Tag="Repository"}
-    [PSCustomObject] @{Name="lsrep"; Value="Get-Repository"; Tag="Repository"}
-    [PSCustomObject] @{Name="vsrep"; Value="Start-RepositoryVSCode"; Tag="Repository"}
-        
+    [PSCustomObject] @{Name="lsgit"; Value="Get-Repository"; Tag="Repository"}
+    [PSCustomObject] @{Name="webgit"; Value="Start-RepositoryWeb"; Tag="Repository"}
+    
     # aliases for functions to manage modules
     [PSCustomObject] @{Name="lspsm"; Value="Get-PSModule"; Tag="Module"}
     [PSCustomObject] @{Name="mkpsm"; Value="Import-PSModule"; Tag="Module"}
     [PSCustomObject] @{Name="rmpsm"; Value="Remove-PSModule"; Tag="Module"}
     [PSCustomObject] @{Name="webpsm"; Value="Start-PSModuleWeb"; Tag="Module"}
+    [PSCustomObject] @{Name="cppsm"; Value="Copy-PSModuleFromRepository"; Tag="Module"}
 
-    # aliases for functions to manage projects
-    [PSCustomObject] @{Name="cdproj"; Value="Set-LocationProject"; Tag="Project"},
-    [PSCustomObject] @{Name="lsproj"; Value="Get-Project"; Tag="Project"},
-    [PSCustomObject] @{Name="vsproj"; Value="Start-ProjectVSCode"; Tag="Project"},
 
     # aliases for common functions
     [PSCustomObject] @{Name="psalias"; Value="Get-PSAlias"; Tag="Common"},

@@ -18,10 +18,9 @@ function Update-PSConfig {
     
         Set-ProjectConfiguration -File ($PSConfig |Select-Object -ExpandProperty "project-config-file")
 
-        Set-PSModuleConfiguration -File ($PSConfig |Select-Object -ExpandProperty "powershell-module-config-file") -Profile ($PSConfig |Select-Object -ExpandProperty "powershell-module-import-file")
+        Set-PSModuleConfiguration -File ($PSConfig |Select-Object -ExpandProperty "powershell-module-config-file") -Profile ($PSConfig |Select-Object -ExpandProperty "powershell-module-import-file") -PSModulePath ($PSConfig | Select-Object -ExpandProperty "powershell-module-path")
 
-        Set-RepositoryConfiguration -File ($PSConfig |Select-Object -ExpandProperty "repository-config-file") -PSModulePath ($PSConfig | Select-Object -ExpandProperty "powershell-module-path")
-
+        Set-RepositoryConfiguration -File ($PSConfig |Select-Object -ExpandProperty "repository-config-file") 
     }
 }
 
