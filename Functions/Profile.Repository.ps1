@@ -5,7 +5,6 @@
 #   settings -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 $Script:RepositoryFile = $Null
-$Script:RepositoryPSModulePath = $Null
 
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -66,7 +65,7 @@ function Format-Repository {
 
     Process {
 
-        return $Data | Format-Table -Property Name, Alias @{ Label="Fork"; Expression = {if($_.Fork){$True}else{$Null} }}, Path, GitHub
+        return $Data | Format-Table -Property Name, Alias, @{ Label="Fork"; Expression = {if($_.Fork){$True}else{$Null} }}, Path, @{ Label="GitHub"; Expression = {if($_.repository -eq "Collection"){"Collection"} else {$_.Github} }}
 
     }
 }
@@ -147,13 +146,64 @@ function Start-RepositoryWeb {
         [System.String] $Name
     )
 
-    $selection = Select-Repository $Name GitHub
+    Process {
 
-    if ($selection) { Start-Process -FilePath $selection }
-    else { 
-        Write-FormatedError -Message "No valid url was found."
-        return Get-Repository
+        $selection = Select-Repository $Name GitHub
+
+        if ($selection) { Start-Process -FilePath $selection }
+        else { 
+            Write-FormatedError -Message "No valid url was found."
+            return Get-Repository
+        }
+
+        return $Null
+
     }
+}
 
-    return $Null
+#   function -------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+function Start-RepositoryCollection {
+    
+    [CmdletBinding(PositionalBinding=$True)]
+    
+    [OutputType([PSCustomObject])]
+
+    Param(
+        [Parameter(Position=1, Mandatory=$True)]
+        [System.String] $Name
+    )
+
+    Process{ 
+
+        $repositorySpecies = Select-Repository $Name Repository
+        if (-not ($repositorySpecies -eq "Collection")){
+            Write-FormatedError -Message "User specification is not a collection of repositories."
+            return Get-Repository
+        }
+
+        $Env:RepositoryFileBackUp = $Script:RepositoryFile
+        $Script:RepositoryFile = Select-Repository $Name Repository-Config-File
+
+        return $Null
+
+    }
+}
+
+#   function -------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+function Stop-RepositoryCollection {
+
+    [CmdletBinding(PositionalBinding=$True)]
+    
+    [OutputType([Void])]
+
+    Param(
+    )
+
+    Process{
+        if ($Env:RepositoryFileBackUp) {
+            $Script:RepositoryFile = $Env:RepositoryFileBackUp
+        }
+    }
 }

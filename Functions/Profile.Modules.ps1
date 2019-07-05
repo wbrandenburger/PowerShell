@@ -202,15 +202,19 @@ function Start-PSModuleWeb {
         [System.String] $Name
     )
 
-    $selection = @((Select-PSModule $Name GitHub), (Select-PSModule $Name PSGallery))
+    Process {
 
-    if ($selection) { $selection | ForEach-Object{ Start-Process -FilePath $_ }}
-    else { 
-        Write-FormatedError -Message "No valid url was found."
-        return Get-PSModule
+        $selection = @((Select-PSModule $Name GitHub), (Select-PSModule $Name PSGallery))
+
+        if ($selection) { $selection | ForEach-Object{ Start-Process -FilePath $_ }}
+        else { 
+            Write-FormatedError -Message "No valid url was found."
+            return Get-PSModule
+        }
+
+        return $Null
+        
     }
-
-    return $Null
 }
 
 #   function -------------------------------------------------------------------
