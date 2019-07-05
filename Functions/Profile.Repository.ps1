@@ -183,7 +183,17 @@ function Start-RepositoryCollection {
         }
 
         $Env:RepositoryFileBackUp = $Script:RepositoryFile
-        $Script:RepositoryFile = Select-Repository $Name Repository-Config-File
+        $repositoryFile = Select-Repository $Name Repository-Config-File
+        if ($repositoryFile -and (Test-Path -Path $repositoryFile)) {
+            $Script:RepositoryFile = $repositoryFile 
+
+            Write-FormatedSuccess -Message "Finished activating repository collection '$Name'." -Space
+
+            return Get-Repository
+        }
+        else{
+            Write-FormatedError -Message "Repository collection path does not exist." -Space
+        }
 
         return $Null
 
@@ -204,6 +214,10 @@ function Stop-RepositoryCollection {
     Process{
         if ($Env:RepositoryFileBackUp) {
             $Script:RepositoryFile = $Env:RepositoryFileBackUp
+            Write-FormatedSuccess -Message "Finished deactivating repository collection '$Name'." -Space
+        }
+        else {
+            Write-FormatedError -Message "There is no repository collection activated." -Space
         }
     }
 }
