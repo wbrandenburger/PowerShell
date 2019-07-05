@@ -17,6 +17,8 @@
     # aliases for functions to manage repositories
     [PSCustomObject] @{Name="lsgit"; Value="Get-Repository"; Tag="Repository"}
     [PSCustomObject] @{Name="webgit"; Value="Start-RepositoryWeb"; Tag="Repository"}
+    [PSCustomObject] @{Name="rungitc"; Value="Start-RepositoryCollection"; Tag="Repository"}
+    [PSCustomObject] @{Name="stgitc"; Value="Stop-RepositoryCollection"; Tag="Repository"}
     
     # aliases for functions to manage modules
     [PSCustomObject] @{Name="lspsm"; Value="Get-PSModule"; Tag="Module"}

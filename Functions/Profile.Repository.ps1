@@ -176,6 +176,10 @@ function Start-RepositoryCollection {
 
     Process{ 
 
+        if (-not ($Script:RepositoryFile -eq $Env:RepositoryFileBackUp)){
+            Stop-RepositoryCollection
+        }
+
         $repositorySpecies = Select-Repository $Name Repository
         if (-not ($repositorySpecies -eq "Collection")){
             Write-FormatedError -Message "User specification is not a collection of repositories."
@@ -213,7 +217,7 @@ function Stop-RepositoryCollection {
     Process{
         if ($Env:RepositoryFileBackUp) {
             $Script:RepositoryFile = $Env:RepositoryFileBackUp
-            Write-FormatedSuccess -Message "Deactivated repository collection '$Name'." -Space
+            Write-FormatedSuccess -Message "Deactivated repository collection." -Space
         }
         else {
             Write-FormatedError -Message "There is no repository collection activated." -Space
