@@ -10,11 +10,16 @@ function Update-PSConfig {
 
     [OutputType([Void])]
 
-    Param ()
+    Param (
+
+        [Parameter(Position=1, Mandatory=$True)]
+        [System.String] $File
+
+    )
 
     Process {
 
-        $PSConfig =  Get-Content (Join-Path -Path $PSScriptRoot -ChildPath ".config\profile.config.json") | ConvertFrom-Json
+        $PSConfig =  Get-Content $File | ConvertFrom-Json
 
         # module configuration
         $moduleConfigFile = $PSConfig | Select-Object -ExpandProperty "powershell-module-config-file"

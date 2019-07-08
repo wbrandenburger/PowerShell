@@ -11,7 +11,7 @@
     }
 
     # set variables which are necessary for repository tools
-    Update-PSConfig
+    Update-PSConfig -File (Join-Path -Path $PSScriptRoot -ChildPath ".config\profile.config.json" )
 
 #   aliases --------------------------------------------------------------------
 # ------------------------------------------------------------------------------
