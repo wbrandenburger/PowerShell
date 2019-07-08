@@ -319,7 +319,7 @@ function Copy-PSModuleFromRepository {
                 if (Test-Path  -Path  $localModulePath){
                     Remove-Item -Path  $localModulePath -Recurse -Force
                 }
-                Write-FormatedProcess -Message "Begin to copy moduel to '$localModulePath'."
+                Write-FormatedProcess -Message "Begin to copy module to '$localModulePath'."
                 Copy-Item -Path $modulePath -Destination $localModulePath -Recurse -Force
                 Write-FormatedSuccess -Message "Module copied to '$localModulePath'."
             }
