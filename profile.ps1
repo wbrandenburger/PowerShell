@@ -10,17 +10,36 @@ function Update-PSConfig {
 
     [OutputType([Void])]
 
-    Param()
+    Param ()
 
     Process {
 
         $PSConfig =  Get-Content (Join-Path -Path $PSScriptRoot -ChildPath ".config\profile.config.json") | ConvertFrom-Json
-    
-        Set-ProjectConfiguration -File ($PSConfig |Select-Object -ExpandProperty "project-config-file")
 
-        Set-PSModuleConfiguration -File ($PSConfig |Select-Object -ExpandProperty "powershell-module-config-file") -Profile ($PSConfig |Select-Object -ExpandProperty "powershell-module-import-file") -PSModulePath ($PSConfig | Select-Object -ExpandProperty "powershell-module-path")
+        # module configuration
+        $moduleConfigFile = $PSConfig | Select-Object -ExpandProperty "powershell-module-config-file"
+        $PSProfile = $PSConfig | Select-Object -ExpandProperty "powershell-module-import-file"
+        $PSModulePath = $PSConfig | Select-Object -ExpandProperty "powershell-module-path"
 
-        Set-RepositoryConfiguration -File ($PSConfig |Select-Object -ExpandProperty "repository-config-file") 
+        Set-PSModuleConfiguration -File $moduleConfigFile -Profile $PSProfile -PSModulePath $PSModulePath 
+
+        # repository configuration
+        $repositoryConfigFile = $PSConfig | Select-Object -ExpandProperty "repository-config-file"
+
+        Set-RepositoryConfiguration -File $repositoryConfigFile
+        
+        # workspace configuration
+        $workspaceConfigFile = $PSConfig | Select-Object -ExpandProperty "workspace-config-file"
+
+        # project configuration
+        $projectConfigFile = $PSConfig | Select-Object -ExpandProperty "project-config-file"
+        $projectFiles = @(
+            [PSCustomObject] @{Path=$moduleConfigFile; Tag="Module"}
+            [PSCustomObject] @{Path=$repositoryConfigFile; Tag="Repository"}
+            [PSCustomObject] @{Path=$workspaceConfigFile; Tag="Workspace"}
+        )
+
+        Set-ProjectConfiguration -File $projectConfigFile -Files $projectFiles
     }
 }
 

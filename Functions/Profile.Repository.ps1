@@ -6,6 +6,7 @@
 # ------------------------------------------------------------------------------
 $Script:RepositoryFile = $Null
 $Env:RepositoryFileBackUp = $Null
+
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 function Set-RepositoryConfiguration{
@@ -14,7 +15,7 @@ function Set-RepositoryConfiguration{
 
     [OutputType([Void])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $File
     )
@@ -34,7 +35,7 @@ function Get-Repository {
 
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter()]
         [Switch] $Unformated
     )
@@ -58,7 +59,7 @@ function Format-Repository {
     
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [PSCustomObject] $Data
     )
@@ -78,7 +79,7 @@ function Test-Repository {
 
     [OutputType([Boolean])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [PSCustomObject] $data,
 
@@ -104,7 +105,7 @@ function Select-Repository {
     
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name,
 
@@ -112,7 +113,7 @@ function Select-Repository {
         [System.String] $Property
     )
 
-    Process{ 
+    Process { 
 
         $data = Get-Repository -Unformated
         if (-not (Test-Repository $data $Name)) {
@@ -141,7 +142,7 @@ function Start-RepositoryWeb {
     
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter(Position=1)]
         [System.String] $Name
     )
@@ -169,12 +170,12 @@ function Start-RepositoryCollection {
     
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )
 
-    Process{ 
+    Process {  
 
         if (-not ($Script:RepositoryFile -eq $Env:RepositoryFileBackUp)){
             Stop-RepositoryCollection
@@ -188,7 +189,8 @@ function Start-RepositoryCollection {
 
         $repositoryFile = Select-Repository $Name Repository-Config-File
         if ($repositoryFile -and (Test-Path -Path $repositoryFile)) {
-            $Script:RepositoryFile = $repositoryFile 
+            $Script:RepositoryFile = $repositoryFile
+            $Script:ProjectFiles += @{Path=$repositoryFile; Tag=$Name}
 
             Write-FormatedSuccess -Message "Activated repository collection '$Name'." -Space
 
@@ -211,12 +213,13 @@ function Stop-RepositoryCollection {
     
     [OutputType([Void])]
 
-    Param(
-    )
+    Param ()
 
-    Process{
+    Process {
         if ($Env:RepositoryFileBackUp) {
+            $Script:ProjectFiles = $Script:ProjectFiles | Where-Object {$_.Path  -ne $Script:RepositoryFile}
             $Script:RepositoryFile = $Env:RepositoryFileBackUp
+             
             Write-FormatedSuccess -Message "Deactivated repository collection." -Space
         }
         else {

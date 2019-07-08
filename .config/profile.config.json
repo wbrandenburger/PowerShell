@@ -2,6 +2,7 @@
     {
         "project-config-file": "A:\\.config\\project.config.json",
         "repository-config-file": "A:\\.config\\repository.config.json",
+        "workspace-config-file": "A:\\.config\\workspace.config.json",
         "powershell-module-config-file": "A:\\.config\\powershell-module.config.json",
         "powershell-module-import-file": "A:\\.config\\powershell-module.import.json",
         "powershell-module-path": [

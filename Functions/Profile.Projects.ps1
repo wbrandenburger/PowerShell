@@ -4,7 +4,8 @@
 
 #   settings -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-$Script:ProjectFile = $Null
+$Script:ProjectConfigFile = $Null
+$Script:ProjectFiles = $Null
 
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -14,12 +15,16 @@ function Set-ProjectConfiguration{
 
     [OutputType([Void])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
-        [System.String] $File
+        [System.String] $File,
+
+        [Parameter(Position=2, Mandatory=$True)]
+        [PSCustomObject[]] $Files
     )
 
-    $Script:ProjectFile = $File
+    $Script:ProjectConfigFile = $File
+    $SCript:ProjectFiles = $Files
 }
 
 #   function -------------------------------------------------------------------
@@ -30,18 +35,33 @@ function Get-Project {
 
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter()]
         [Switch] $Unformated
     )
 
     Process {
 
-        $data = Get-Content $Script:ProjectFile | ConvertFrom-Json
+        # $data = Get-Content $Script:ProjectConfigFile | ConvertFrom-Json
+        # if ($Unformated) {
+        #     return $data
+        # }
+        
+        # return Format-Project $data
+
+        $data = @()
+        $Script:ProjectFiles | ForEach-Object{
+            $fileData = Get-Content $_.Path | ConvertFrom-Json
+            $fileData | Add-Member -MemberType NoteProperty -Name "Tag" -Value $_.Tag
+            $data += $fileData | Select-Object -Property Name, Alias, Tag, Path, Description
+        }
+
+        Out-File -FilePath $Script:ProjectConfigFile -InputObject (ConvertTo-Json $data)
+
         if ($Unformated) {
             return $data
         }
-        
+
         return Format-Project $data
     }
 }
@@ -54,14 +74,14 @@ function Format-Project {
     
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [PSCustomObject] $Data
     )
 
     Process {
 
-        return $Data | Format-Table -Property Name, Alias, Description, Path
+        return $Data | Format-Table -Property Name, Alias, Tag, Description, Path
 
     }
 }
@@ -75,7 +95,7 @@ function Test-Project {
 
     [OutputType([Boolean])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [PSCustomObject] $Data,
 
@@ -101,7 +121,7 @@ function Select-Project {
     
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name,
 
@@ -138,7 +158,7 @@ function Set-LocationProject {
     
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )
@@ -193,7 +213,7 @@ function Start-ProjectExplorer {
     
     [OutputType([PSCustomObject])]
 
-    Param(
+    Param (
         [Parameter(Position=1)]
         [System.String] $Name
     )
@@ -210,6 +230,3 @@ function Start-ProjectExplorer {
     
     return $Null
 }
-
-
-
