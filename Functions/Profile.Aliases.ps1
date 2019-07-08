@@ -11,7 +11,7 @@
     # aliases for functions to manage projects
     [PSCustomObject] @{Name="cdx"; Value="Set-LocationProject"; Tag="Project"},
     [PSCustomObject] @{Name="exx"; Value="Start-ProjectExplorer"; Tag="Project"},
-    [PSCustomObject] @{Name="lsx"; Value="Get-Project"; Tag="Project"},
+    [PSCustomObject] @{Name="lsx"; Value="Get-ChildItemProject"; Tag="Project"},
     [PSCustomObject] @{Name="vsx"; Value="Start-ProjectVSCode"; Tag="Project"},
 
     # aliases for functions to manage repositories

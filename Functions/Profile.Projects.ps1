@@ -36,18 +36,12 @@ function Get-Project {
     [OutputType([PSCustomObject])]
 
     Param (
+
         [Parameter()]
         [Switch] $Unformated
     )
 
     Process {
-
-        # $data = Get-Content $Script:ProjectConfigFile | ConvertFrom-Json
-        # if ($Unformated) {
-        #     return $data
-        # }
-        
-        # return Format-Project $data
 
         $data = @()
         $Script:ProjectFiles | ForEach-Object{
@@ -147,6 +141,42 @@ function Select-Project {
         }
 
         return $selection
+    }
+}
+
+#   function -------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+function Get-ChildItemProject {
+    
+    [CmdletBinding(PositionalBinding=$True)]
+    
+    [OutputType([PSCustomObject])]
+
+    Param (
+        [Parameter(Position=1)]
+        [System.String] $Name,
+
+        [Parameter()]
+        [Switch] $All
+    )
+
+    Process{ 
+        
+        if ($All){
+            return Get-Project
+        }
+        
+        $selection = Select-Project $Name Path
+
+        if ($selection -and (Test-Path -Path $selection)) { 
+            Get-ChildItem -Path $selection 
+        }
+        else { 
+            Write-FormatedError -Message "Path of project is not valid."
+            return Get-Project
+        }
+
+        return $Null
     }
 }
 
