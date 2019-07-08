@@ -1,0 +1,78 @@
+[
+    {
+        "Name": "cdx",
+        "Value": "Set-LocationProject", 
+        "Tag": "Project"
+    },
+    {
+        "Name": "exx", 
+        "Value": "Start-ProjectExplorer", 
+        "Tag": "Project"
+    },
+    {
+        "Name": "lsx", 
+        "Value": "Get-ChildItemProject", 
+        "Tag": "Project"
+    },
+    {
+        "Name": "vsx", 
+        "Value": "Start-ProjectVSCode",
+        "Tag": "Project"
+    },
+    {
+        "Name": "lsgit", 
+        "Value": "Get-Repository", 
+        "Tag": "Repository"
+    },
+    {
+        "Name": "webgit", 
+        "Value": "Start-RepositoryWeb", 
+        "Tag": "Repository"
+    },
+    {
+        "Name": "rungitc", 
+        "Value": "Start-RepositoryCollection", 
+        "Tag": "Repository"
+    },
+    {
+        "Name": "stgitc", 
+        "Value": "Stop-RepositoryCollection", 
+        "Tag": "Repository"
+    },
+    {
+        "Name": "lspsm", 
+        "Value": "Get-PSModule", 
+        "Tag": "Module"
+    },
+    {
+        "Name": "mkpsm", 
+        "Value": "Import-PSModule", 
+        "Tag": "Module"
+    },
+    {
+        "Name": "rmpsm", 
+        "Value": "Remove-PSModule", 
+        "Tag": "Module"
+    },
+    {
+        "Name": "webpsm", 
+        "Value": "Start-PSModuleWeb", 
+        "Tag": "Module"
+    },
+    {
+        "Name": "cppsm", 
+        "Value": "Copy-PSModuleFromRepository", 
+        "Tag": "Module"
+    },
+    {
+        "Name": "psalias", 
+        "Value": "Get-PSAlias", 
+        "Tag": "Common"
+    },
+    {
+        "Name": "refreshps", 
+        "Value": "Restart-PSSession",
+        "Tag": "Common"
+    }
+]
+    

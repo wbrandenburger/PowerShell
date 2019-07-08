@@ -2,47 +2,6 @@
 #   Profile.ps1 ----------------------------------------------------------------
 # ==============================================================================
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Update-PSConfig {
-
-    [CmdletBinding()]
-
-    [OutputType([Void])]
-
-    Param ()
-
-    Process {
-
-        $PSConfig =  Get-Content (Join-Path -Path $PSScriptRoot -ChildPath ".config\profile.config.json") | ConvertFrom-Json
-
-        # module configuration
-        $moduleConfigFile = $PSConfig | Select-Object -ExpandProperty "powershell-module-config-file"
-        $PSProfile = $PSConfig | Select-Object -ExpandProperty "powershell-module-import-file"
-        $PSModulePath = $PSConfig | Select-Object -ExpandProperty "powershell-module-path"
-
-        Set-PSModuleConfiguration -File $moduleConfigFile -Profile $PSProfile -PSModulePath $PSModulePath 
-
-        # repository configuration
-        $repositoryConfigFile = $PSConfig | Select-Object -ExpandProperty "repository-config-file"
-
-        Set-RepositoryConfiguration -File $repositoryConfigFile
-        
-        # workspace configuration
-        $workspaceConfigFile = $PSConfig | Select-Object -ExpandProperty "workspace-config-file"
-
-        # project configuration
-        $projectConfigFile = $PSConfig | Select-Object -ExpandProperty "project-config-file"
-        $projectFiles = @(
-            [PSCustomObject] @{Path=$moduleConfigFile; Tag="Module"}
-            [PSCustomObject] @{Path=$repositoryConfigFile; Tag="Repository"}
-            [PSCustomObject] @{Path=$workspaceConfigFile; Tag="Workspace"}
-        )
-
-        Set-ProjectConfiguration -File $projectConfigFile -Files $projectFiles
-    }
-}
-
 #   settings -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
@@ -53,6 +12,16 @@ function Update-PSConfig {
 
     # set variables which are necessary for repository tools
     Update-PSConfig
+
+#   aliases --------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+    # define aliases for specific function
+    $Script:PSAlias = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath ".config\profile.alias.json") | ConvertFrom-Json
+    
+    $Script:PSAlias | ForEach-Object {
+        Set-Alias -Name $_.Name -Value $_.Value
+    }
 
 #   import ---------------------------------------------------------------------
 # ------------------------------------------------------------------------------
