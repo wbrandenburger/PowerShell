@@ -46,7 +46,7 @@ function Get-Project {
         $data = @()
         $Script:ProjectFiles | ForEach-Object{
             $fileData = Get-Content $_.Path | ConvertFrom-Json
-            $fileData | Add-Member -MemberType NoteProperty -Name "Tag" -Value $_.Tag
+            $fileData | Add-Member -MemberType NoteProperty -Name "tag" -Value $_.Tag
             $data += $fileData | Select-Object -Property Name, Alias, Tag, Path, Description
         }
 
@@ -165,9 +165,9 @@ function Get-ChildItemProject {
         if ($All){
             return Get-Project
         }
-        
-        $selection = Select-Project $Name Path
 
+        $selection = Select-Project $Name Path
+        
         if ($selection -and (Test-Path -Path $selection)) { 
             Get-ChildItem -Path $selection 
         }
