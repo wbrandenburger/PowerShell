@@ -168,11 +168,19 @@ function Get-ChildItemProject {
 
         $selection = Select-Project $Name Path
         
-        if ($selection -and (Test-Path -Path $selection)) { 
-            Get-ChildItem -Path $selection 
+        if ($selection){
+            $selection | ForEach-Object {
+                if (Test-Path -Path $_) {
+                    Get-ChildItem -Path $_
+                } 
+                else { 
+                    Write-FormatedError -Message "Path of project is not valid."
+                    return Get-Project
+                }
+            }
         }
         else { 
-            Write-FormatedError -Message "Path of project is not valid."
+            Write-FormatedError -Message "Poperty $Name has no content."
             return Get-Project
         }
 
@@ -197,11 +205,20 @@ function Set-LocationProject {
 
         $selection = Select-Project $Name Path
 
-        if ($selection -and (Test-Path -Path $selection)) { 
-            Set-Location -Path $selection 
+        if ($selection){
+            $selection | ForEach-Object {
+                if (Test-Path -Path $_) {
+                    Set-Location -Path $_
+                    continue
+                } 
+                else { 
+                    Write-FormatedError -Message "Path of project is not valid."
+                    return Get-Project
+                }
+            }
         }
         else { 
-            Write-FormatedError -Message "Path of project is not valid."
+            Write-FormatedError -Message "Poperty $Name has no content."
             return Get-Project
         }
 
@@ -223,12 +240,22 @@ function Start-ProjectVSCode {
     )
 
     $selection = Select-Project $Name Path
-    
-    if ($selection -and (Test-Path -Path $selection)) { 
-        code $selection 
+
+    if ($selection){
+        $idx = $True
+        $selection | ForEach-Object {
+            if (Test-Path -Path $_) {
+                if ($idx){ code $_; $idx = $False }
+                else{ code -add $_ }
+            } 
+            else { 
+                Write-FormatedError -Message "Path of project is not valid."
+                return Get-Project
+            }
+        }
     }
     else { 
-        Write-FormatedError -Message "Path of project is not valid."
+        Write-FormatedError -Message "Poperty $Name has no content."
         return Get-Project
     }
     
@@ -250,11 +277,19 @@ function Start-ProjectExplorer {
 
     $selection = Select-Project $Name Path
     
-    if ($selection -and (Test-Path -Path $selection)) { 
-        explorer $selection 
+    if ($selection){
+        $selection | ForEach-Object {
+            if (Test-Path -Path $_) {
+                Explorer $_
+            } 
+            else { 
+                Write-FormatedError -Message "Path of project is not valid."
+                return Get-Project
+            }
+        }
     }
     else { 
-        Write-FormatedError -Message "Path of project is not valid."
+        Write-FormatedError -Message "Poperty $Name has no content."
         return Get-Project
     }
     
