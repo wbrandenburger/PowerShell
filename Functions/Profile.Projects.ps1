@@ -190,6 +190,42 @@ function Get-ChildItemProject {
 
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+function Get-LocationProject {
+    
+    [CmdletBinding(PositionalBinding=$True)]
+    
+    [OutputType([PSCustomObject])]
+
+    Param (
+        [Parameter(Position=1, Mandatory=$True)]
+        [System.String] $Name
+    )
+
+    Process{ 
+
+        $selection = Select-Project $Name Path
+
+        if ($selection){
+            $selection | ForEach-Object {
+                if (-not (Test-Path -Path $_)) {
+                    Write-FormatedError -Message "Path $_ of project is not valid."
+                    return Get-Project
+                }
+            }
+
+            return $selection
+        }
+        else { 
+            Write-FormatedError -Message "Poperty $Name has no content."
+            return Get-Project
+        }
+
+        return $Null
+    }
+}
+
+#   function -------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function Set-LocationProject {
     
     [CmdletBinding(PositionalBinding=$True)]
@@ -245,7 +281,7 @@ function Start-ProjectVSCode {
         $idx = $True
         $selection | ForEach-Object {
             if (Test-Path -Path $_) {
-                if ($idx){ code $_; $idx = $False }
+                if ($idx){ code --disable-gpu $_; $idx = $False }
                 else{ code -add $_ }
             } 
             else { 

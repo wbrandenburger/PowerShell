@@ -10,6 +10,11 @@
         "Tag": "Project"
     },
     {
+        "Name": "dirx", 
+        "Value": "Get-LocationProject", 
+        "Tag": "Project"
+    },
+    {
         "Name": "lsx", 
         "Value": "Get-ChildItemProject", 
         "Tag": "Project"
