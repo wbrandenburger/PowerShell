@@ -282,7 +282,7 @@ function Start-ProjectVSCode {
         $selection | ForEach-Object {
             if (Test-Path -Path $_) {
                 if ($idx){ code --disable-gpu $_; $idx = $False }
-                else{ code -add $_ }
+                else{ code --add $_ }
             } 
             else { 
                 Write-FormatedError -Message "Path of project is not valid."
