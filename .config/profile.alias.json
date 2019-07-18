@@ -25,57 +25,57 @@
         "Tag": "Project"
     },
     {
-        "Name": "lsgit", 
+        "Name": "gitls", 
         "Value": "Get-Repository", 
         "Tag": "Repository"
     },
     {
-        "Name": "webgit", 
+        "Name": "gitie", 
         "Value": "Start-RepositoryWeb", 
         "Tag": "Repository"
     },
     {
-        "Name": "rungitc", 
+        "Name": "gitrunc", 
         "Value": "Start-RepositoryCollection", 
         "Tag": "Repository"
     },
     {
-        "Name": "stgitc", 
+        "Name": "gitstc", 
         "Value": "Stop-RepositoryCollection", 
         "Tag": "Repository"
     },
     {
-        "Name": "lspsm", 
+        "Name": "psmls", 
         "Value": "Get-PSModule", 
         "Tag": "Module"
     },
     {
-        "Name": "mkpsm", 
+        "Name": "psmmk", 
         "Value": "Import-PSModule", 
         "Tag": "Module"
     },
     {
-        "Name": "rmpsm", 
+        "Name": "psmrm", 
         "Value": "Remove-PSModule", 
         "Tag": "Module"
     },
     {
-        "Name": "webpsm", 
+        "Name": "psmie", 
         "Value": "Start-PSModuleWeb", 
         "Tag": "Module"
     },
     {
-        "Name": "cppsm", 
+        "Name": "psmcp", 
         "Value": "Copy-PSModuleFromRepository", 
         "Tag": "Module"
     },
     {
-        "Name": "psalias", 
+        "Name": "aliasx", 
         "Value": "Get-PSAlias", 
         "Tag": "Common"
     },
     {
-        "Name": "refreshps", 
+        "Name": "refreshx", 
         "Value": "Restart-PSSession",
         "Tag": "Common"
     }

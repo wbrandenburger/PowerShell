@@ -144,12 +144,19 @@ function Start-RepositoryWeb {
 
     Param (
         [Parameter(Position=1)]
-        [System.String] $Name
+        [System.String] $Name,
+
+        [Parameter()]
+        [Switch] $Fork
     )
 
     Process {
 
-        $selection = Select-Repository $Name GitHub
+        $property = "GitHub"
+        if ($Fork) {
+            $property = "Fork"
+        }
+        $selection = Select-Repository $Name $property
 
         if ($selection) { Start-Process -FilePath $selection }
         else { 
