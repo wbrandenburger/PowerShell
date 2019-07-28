@@ -152,7 +152,6 @@ function Get-PapisConfiguration {
     }
 }
 
-
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 function Get-ActivePapisEnv {
@@ -169,9 +168,9 @@ function Get-ActivePapisEnv {
 
     Process {
 
-        if ( $Env:PAPIS_LIBRARY) { 
+        if ( $Env:PSPROFILE_PAPIS_LIBRARY) { 
             if ($Name) {
-                return $Env:PAPIS_LIBRARY
+                return $Env:PSPROFILE_PAPIS_LIBRARY
             }
             else{
                 return $True
@@ -240,7 +239,7 @@ function Start-PapisLibrary {
                 Set-PapisLibrary -Name $Name
             }
             
-            [System.Environment]::SetEnvironmentVariable("PAPIS_LIBRARY",   $selection, "process")
+            [System.Environment]::SetEnvironmentVariable("PSPROFILE_PAPIS_LIBRARY", $selection, "process")
 
             Start-VirtualEnv -Name "bib" -Silent
         }
@@ -269,7 +268,7 @@ function Stop-PapisLibrary {
 
         if ( Get-ActivePapisEnv ) { 
 
-            [System.Environment]::SetEnvironmentVariable("PAPIS_LIBRARY", "", "process")
+            [System.Environment]::SetEnvironmentVariable("PSPROFILE_PAPIS_LIBRARY", "", "process")
 
             Stop-VirtualEnv -Silent
 

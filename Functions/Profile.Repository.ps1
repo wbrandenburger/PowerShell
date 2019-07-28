@@ -171,6 +171,37 @@ function Start-RepositoryWeb {
 
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+function Get-ActiveRepositoryCollection {
+    
+    [CmdletBinding()]
+    
+    [OutputType([Boolean])]
+
+    Param (
+
+        [Parameter()]
+        [Switch] $Name
+    )
+
+    Process {
+
+        if ( $Env:PSPROFILE_REPOSITORY_COLLECTION) { 
+            if ($Name) {
+                return $Env:PSPROFILE_REPOSITORY_COLLECTION
+            }
+            else{
+                return $True
+            }
+
+        }
+        else { 
+            return $False
+        }
+    }
+}
+
+#   function -------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function Start-RepositoryCollection {
     
     [CmdletBinding(PositionalBinding=$True)]
@@ -184,7 +215,7 @@ function Start-RepositoryCollection {
 
     Process {  
 
-        if (-not ($Script:RepositoryFile -eq $Env:RepositoryFileBackUp)){
+        if (-not ($Script:RepositoryFile -eq  $Env:RepositoryFileBackUp)){
             Stop-RepositoryCollection
         }
 
@@ -196,6 +227,8 @@ function Start-RepositoryCollection {
 
         $repositoryFile = Select-Repository $Name Repository-Config-File
         if ($repositoryFile -and (Test-Path -Path $repositoryFile)) {
+            [System.Environment]::SetEnvironmentVariable("PSPROFILE_REPOSITORY_COLLECTION", (Select-Repository $Name Alias), "process")
+
             $Script:RepositoryFile = $repositoryFile
             $Script:ProjectFiles += @{Path=$repositoryFile; Tag=$Name}
 
@@ -223,10 +256,12 @@ function Stop-RepositoryCollection {
     Param ()
 
     Process {
-        if ($Env:RepositoryFileBackUp) {
+        if (Get-ActiveRepositoryCollection) {
             $Script:ProjectFiles = $Script:ProjectFiles | Where-Object {$_.Path  -ne $Script:RepositoryFile}
             $Script:RepositoryFile = $Env:RepositoryFileBackUp
              
+            [System.Environment]::SetEnvironmentVariable("PSPROFILE_REPOSITORY_COLLECTION", "", "process")
+
             Write-FormatedSuccess -Message "Deactivated repository collection." -Space
         }
         else {
