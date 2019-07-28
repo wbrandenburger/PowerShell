@@ -1,81 +1,121 @@
 [
     {
-        "Name": "cdx",
+        "Name": "cd-ws",
         "Value": "Set-LocationProject", 
         "Tag": "Project"
     },
     {
-        "Name": "exx", 
+        "Name": "ex-ws", 
         "Value": "Start-ProjectExplorer", 
         "Tag": "Project"
     },
     {
-        "Name": "dirx", 
+        "Name": "dir-ws", 
         "Value": "Get-LocationProject", 
         "Tag": "Project"
     },
     {
-        "Name": "lsx", 
+        "Name": "ls-ws", 
         "Value": "Get-ChildItemProject", 
         "Tag": "Project"
     },
     {
-        "Name": "vsx", 
+        "Name": "vs-ws", 
         "Value": "Start-ProjectVSCode",
         "Tag": "Project"
     },
     {
-        "Name": "gitls", 
+        "Name": "ls-git", 
         "Value": "Get-Repository", 
         "Tag": "Repository"
     },
     {
-        "Name": "gitie", 
+        "Name": "ie-git", 
         "Value": "Start-RepositoryWeb", 
         "Tag": "Repository"
     },
     {
-        "Name": "gitrunc", 
+        "Name": "start-git", 
         "Value": "Start-RepositoryCollection", 
         "Tag": "Repository"
     },
     {
-        "Name": "gitstc", 
+        "Name": "stop-git", 
         "Value": "Stop-RepositoryCollection", 
         "Tag": "Repository"
     },
     {
-        "Name": "psmls", 
+        "Name": "ls-psm", 
         "Value": "Get-PSModule", 
         "Tag": "Module"
     },
     {
-        "Name": "psmmk", 
+        "Name": "mk-psm", 
         "Value": "Import-PSModule", 
         "Tag": "Module"
     },
     {
-        "Name": "psmrm", 
+        "Name": "rm-psm", 
         "Value": "Remove-PSModule", 
         "Tag": "Module"
     },
     {
-        "Name": "psmie", 
+        "Name": "ie-psm", 
         "Value": "Start-PSModuleWeb", 
         "Tag": "Module"
     },
     {
-        "Name": "psmcp", 
+        "Name": "cp-psm", 
         "Value": "Copy-PSModuleFromRepository", 
         "Tag": "Module"
     },
     {
-        "Name": "aliasx", 
-        "Value": "Get-PSAlias", 
+        "Name": "ls-papis",
+        "Value": "Get-Papis",
+        "Tag": "Papis"
+    },
+    {
+        "Name": "ex-papis",
+        "Value": "Start-PapisExplorer",
+        "Tag": "Papis"
+    },
+    {
+        "Name": "vs-papis",
+        "Value": "Start-PapisVSCode",
+        "Tag": "Papis"
+    },
+    {
+        "Name": "clear-papis",
+        "Value": "Clear-PapisLibrary",
+        "Tag": "Papis"
+    },
+    {
+        "Name": "ie-papis",
+        "Value": "Start-PapisWeb",
+        "Tag": "Papis"
+    },
+    {
+        "Name": "open-papis",
+        "Value": "Open-PapisDocument",
+        "Tag": "Papis"
+    },
+    {
+        "Name": "start-papis",
+        "Value": "Start-PapisLibrary",
+        "Tag": "Papis"
+    },
+    {
+        "Name": "stop-papis", 
+        "Value": "Stop-PapisLibrary", 
+        "Tag": "Papis"
+    },
+    {
+        "Name": "ls-alias", 
+        "Value": "Get-PSAlias",
         "Tag": "Common"
     },
     {
-        "Name": "refreshx", 
+        "Name": "start-shell", 
         "Value": "Restart-PSSession",
         "Tag": "Common"
     }

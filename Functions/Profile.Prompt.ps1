@@ -23,7 +23,11 @@ Function Prompt
 
     # displays running virtual environment
     If ($Env:VIRTUAL_ENV){        
-        Write-Host "(venv-$(Split-Path $Env:VIRTUAL_ENV -leaf)) " -NoNewline -ForegroundColor DarkRed
+        Write-Host "VirtualEnv[$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor DarkRed
+        if ($Env:PAPIS_LIBRARY){
+            Write-Host "[$Env:PAPIS_LIBRARY]"-NoNewline -ForegroundColor DarkMagenta
+        }
+        Write-Host " " -NoNewline
     }
 
     # displays location

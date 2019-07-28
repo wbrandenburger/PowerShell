@@ -33,15 +33,22 @@ function Update-PSConfig {
 
         Set-RepositoryConfiguration -File $repositoryConfigFile
         
+        # papis-configuration
+        $papisConfigFile = $PSConfig | Select-Object - -ExpandProperty "papis-config-file"
+
+        Set-PapisConfiguration -File $papisConfigFile
+
         # workspace configuration
         $workspaceConfigFile = $PSConfig | Select-Object -ExpandProperty "workspace-config-file"
 
         # project configuration
         $projectConfigFile = $PSConfig | Select-Object -ExpandProperty "project-config-file"
+
         $projectFiles = @(
             [PSCustomObject] @{Path=$moduleConfigFile; Tag="Module"}
             [PSCustomObject] @{Path=$repositoryConfigFile; Tag="Repository"}
             [PSCustomObject] @{Path=$workspaceConfigFile; Tag="Workspace"}
+            [PSCustomObject] @{Path=$papisConfigFile; Tag="Papis"}
         )
 
         Set-ProjectConfiguration -File $projectConfigFile -Files $projectFiles
@@ -58,8 +65,8 @@ function Update-PSConfig {
 
         Param(
             [Parameter(Position=1)]
-            [ValidateSet("Project", "Repository", "Common", "Module")]
-            [System.String[]] $Tag = @("Project", "Repository", "Common", "Module")
+            [ValidateSet("Project", "Repository", "Common", "Module", "Papis")]
+            [System.String[]] $Tag = @("Project", "Repository", "Common", "Module", "Papis")
         )
 
         Process {
@@ -74,6 +81,6 @@ function Update-PSConfig {
                 }
             }
             
-            return $PSAliasTag | Format-Table
+            return $PSAliasTag | Sort-Object -Property Name |Format-Table
         }
     }
