@@ -220,6 +220,9 @@ function Start-PapisLibrary {
         [Parameter(Position=1)]
         [System.String] $Name,
 
+        [Parameter(Position=2)]
+        [System.String] $VirtualEnv,
+
         [Parameter()]
         [Switch] $Silent
     )
@@ -241,7 +244,11 @@ function Start-PapisLibrary {
             
             [System.Environment]::SetEnvironmentVariable("PSPROFILE_PAPIS_LIBRARY", $selection, "process")
 
-            Start-VirtualEnv -Name "bib" -Silent
+            if (-not $VirtualEnv){
+                $VirtualEnv = Select-Papis $Name virtualenv
+            }
+            Start-VirtualEnv -Name $VirtualEnv -Silent
+            
         }
         else { 
             Write-FormatedError -Message "No corresponding papis library was found."
