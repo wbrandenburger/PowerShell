@@ -470,7 +470,7 @@ function Clear-PapisLibrary {
 
     Process{ 
 
-        Invoke-PapisFunctions -Name $Name -Command "clear" -Query $Query
+        Invoke-PapisFunctions -Name $Name -Command "clear"
 
         return $Null
     }
