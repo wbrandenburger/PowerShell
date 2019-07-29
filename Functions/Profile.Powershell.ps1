@@ -8,7 +8,7 @@ function Update-PSConfig {
 
     [CmdletBinding()]
 
-    [OutputType([Void])]
+    [OutputType([System.String[]])]
 
     Param (
 
@@ -52,6 +52,12 @@ function Update-PSConfig {
         )
 
         Set-ProjectConfiguration -File $projectConfigFile -Files $projectFiles
+
+        # additional powershell functions
+        $powershellFunctions = $PSConfig | Select-Object -ExpandProperty "powershell-functions"
+
+        return $powershellFunctions
+
     }
 }
 
