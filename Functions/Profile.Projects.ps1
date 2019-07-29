@@ -240,12 +240,12 @@ function Set-LocationProject {
     Process{ 
 
         $selection = Select-Project $Name Path
-
+ 
         if ($selection){
             $selection | ForEach-Object {
                 if (Test-Path -Path $_) {
                     Set-Location -Path $_
-                    continue
+                    return $Null
                 } 
                 else { 
                     Write-FormatedError -Message "Path of project is not valid."
@@ -278,17 +278,16 @@ function Start-ProjectVSCode {
     $selection = Select-Project $Name Path
 
     if ($selection){
-        $idx = $True
+
         $selection | ForEach-Object {
-            if (Test-Path -Path $_) {
-                if ($idx){ code --disable-gpu $_; $idx = $False }
-                else{ code --add $_ }
-            } 
-            else { 
+            if (-not (Test-Path -Path $_)) {
                 Write-FormatedError -Message "Path of project is not valid."
                 return Get-Project
             }
         }
+
+        code --new-window --disable-gpu $selection
+        
     }
     else { 
         Write-FormatedError -Message "Poperty $Name has no content."
