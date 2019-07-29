@@ -159,7 +159,7 @@ function Start-RepositoryWeb {
         $selection = Select-Repository $Name $property
 
         if ($selection) { Start-Process -FilePath $selection }
-        else { 
+        else {
             Write-FormatedError -Message "No valid url was found."
             return Get-Repository
         }
@@ -210,7 +210,10 @@ function Start-RepositoryCollection {
 
     Param (
         [Parameter(Position=1, Mandatory=$True)]
-        [System.String] $Name
+        [System.String] $Name,
+       
+        [Parameter()]
+        [Switch] $Silent
     )
 
     Process {  
@@ -232,9 +235,11 @@ function Start-RepositoryCollection {
             $Script:RepositoryFile = $repositoryFile
             $Script:ProjectFiles += @{Path=$repositoryFile; Tag=$Name}
 
-            Write-FormatedSuccess -Message "Activated repository collection '$Name'." -Space
+            if (-not $Silent){
+                Write-FormatedSuccess -Message "Activated repository collection '$Name'." -Space
 
-            return Get-Repository
+                return Get-Repository
+            }
         }
         else{
             Write-FormatedError -Message "Repository collection path does not exist." -Space
@@ -253,7 +258,12 @@ function Stop-RepositoryCollection {
     
     [OutputType([Void])]
 
-    Param ()
+    Param (
+
+        [Parameter()]
+        [Switch] $Silent
+    
+    )
 
     Process {
         if (Get-ActiveRepositoryCollection) {
@@ -262,10 +272,14 @@ function Stop-RepositoryCollection {
              
             [System.Environment]::SetEnvironmentVariable("PSPROFILE_REPOSITORY_COLLECTION", "", "process")
 
-            Write-FormatedSuccess -Message "Deactivated repository collection." -Space
+            if (-not $Silent){
+                Write-FormatedSuccess -Message "Deactivated repository collection." -Space
+            }
         }
         else {
             Write-FormatedError -Message "There is no repository collection activated." -Space
         }
+
+        return $Null
     }
 }
