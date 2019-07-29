@@ -347,36 +347,36 @@ function Invoke-PapisFunctions {
 
         Start-PapisLibrary -Name $Name
 
-        if (-not $activePapisEnv) {
+        if (Get-ActivePapisEnv) {
             Write-FormatedProcess -Message "Search in papis library '$(Get-ActivePapisEnv -Name)'."
-        }
-
-        switch ($Command){
-            "browse" {
-                papis browse "$Query"
-                break
+        
+            switch ($Command){
+                "browse" {
+                    papis browse "$Query"
+                    break
+                }
+                "clear" {
+                    papis --clear-cache
+                    papis list
+                    break
+                }
+                "edit" {
+                    papis edit "$Query"
+                    break
+                }
+                "explorer" {
+                    papis open --dir "$Query"
+                    break
+                }
+                "open" {
+                    papis open "$Query"
+                    break
+                }   
             }
-            "clear" {
-                papis --clear-cache
-                papis list
-                break
+                       
+            if (-not $activePapisEnv) {
+                Stop-PapisLibrary
             }
-            "edit" {
-                papis edit "$Query"
-                break
-            }
-            "explorer" {
-                papis open --dir "$Query"
-                break
-            }
-            "open" {
-                papis open "$Query"
-                break
-            }   
-        }
-
-        if (-not $activePapisEnv) {
-            Stop-PapisLibrary
         }
 
         return $Null
