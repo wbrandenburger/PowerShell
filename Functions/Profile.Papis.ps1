@@ -345,7 +345,7 @@ function Invoke-PapisFunctions {
  
         $activePapisEnv = Get-ActivePapisEnv
 
-        Start-PapisLibrary -Name $Name
+        Start-PapisLibrary -Name $Name -VirtualEnv $Env:VIRTUAL_ENV
 
         if (Get-ActivePapisEnv) {
             Write-FormatedProcess -Message "Search in papis library '$(Get-ActivePapisEnv -Name)'."
