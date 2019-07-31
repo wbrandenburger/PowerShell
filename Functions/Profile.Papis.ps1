@@ -7,6 +7,22 @@
 $Script:PapisFile = $Null
 $Script:ConfigPapis = $Null
 
+#   ValidateSet ----------------------------------------------------------------
+# ------------------------------------------------------------------------------
+Class PapisLibrary : System.Management.Automation.IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+        return [String[]] ((Get-Papis -Unformated | Select-Object -ExpandProperty Alias) + "")
+    }
+}
+
+#   ValidateSet ----------------------------------------------------------------
+# ------------------------------------------------------------------------------
+Class VirtualEnv: System.Management.Automation.IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+        return [String[]] ((Get-VirtualEnv | Select-Object -ExpandProperty Name) + "")
+    }
+}
+
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 function Set-PapisConfiguration{
@@ -168,9 +184,9 @@ function Get-ActivePapisEnv {
 
     Process {
 
-        if ( $Env:PSPROFILE_PAPIS_LIBRARY) { 
+        if ( $Env:PAPIS_LIBRARY) { 
             if ($Name) {
-                return $Env:PSPROFILE_PAPIS_LIBRARY
+                return $Env:PAPIS_LIBRARY
             }
             else{
                 return $True
@@ -217,9 +233,12 @@ function Start-PapisLibrary {
     [OutputType([Void])]
 
     Param (
+
+        [ValidateSet([PapisLibrary])]
         [Parameter(Position=1)]
         [System.String] $Name,
 
+        [ValidateSet([VirtualEnv])]
         [Parameter(Position=2)]
         [System.String] $VirtualEnv,
 
@@ -231,18 +250,20 @@ function Start-PapisLibrary {
 
         Get-PapisConfiguration 
         if (-not $Name) {
-            $Name = Get-CurrentPapisEnv -NoRead
+            if ($Env:PAPIS_LIBRARY){
+                $Name = $Env:PAPIS_LIBRARY
+            }
+            else {
+                $Name = Get-CurrentPapisEnv -NoRead
+            }
+            
         }
         $selection = Select-Papis $Name papis
 
         
         if ($selection) { 
             
-            if (-not ( (Get-ActivePapisEnv -Name) -match $selection)){      
-                Set-PapisLibrary -Name $Name
-            }
-            
-            [System.Environment]::SetEnvironmentVariable("PSPROFILE_PAPIS_LIBRARY", $selection, "process")
+            [System.Environment]::SetEnvironmentVariable("PAPIS_LIBRARY", $selection, "process")
 
             if (-not $VirtualEnv){
                 $VirtualEnv = Select-Papis $Name virtualenv
@@ -275,7 +296,7 @@ function Stop-PapisLibrary {
 
         if ( Get-ActivePapisEnv ) { 
 
-            [System.Environment]::SetEnvironmentVariable("PSPROFILE_PAPIS_LIBRARY", "", "process")
+            [System.Environment]::SetEnvironmentVariable("PAPIS_LIBRARY", "", "process")
 
             Stop-VirtualEnv -Silent
 
@@ -299,6 +320,8 @@ function Set-PapisLibrary {
     [OutputType([Void])]
 
     Param (
+
+        [ValidateSet([PapisLibrary])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )
@@ -357,7 +380,7 @@ function Invoke-PapisFunctions {
                 }
                 "clear" {
                     papis --clear-cache
-                    papis list
+                    papis list | Out-Null
                     break
                 }
                 "edit" {
@@ -392,6 +415,8 @@ function Start-PapisExplorer {
     [OutputType([Void])]
 
     Param (
+
+        [ValidateSet([PapisLibrary])]
         [Parameter()]
         [System.String] $Name,
 
@@ -416,6 +441,8 @@ function Start-PapisVSCode {
     [OutputType([Void])]
 
     Param (
+
+        [ValidateSet([PapisLibrary])]
         [Parameter()]
         [System.String] $Name,
 
@@ -440,6 +467,8 @@ function Start-PapisWeb {
     [OutputType([Void])]
 
     Param (
+
+        [ValidateSet([PapisLibrary])]
         [Parameter()]
         [System.String] $Name,
 
@@ -464,6 +493,8 @@ function Clear-PapisLibrary {
     [OutputType([Void])]
 
     Param (
+
+        [ValidateSet([PapisLibrary])]
         [Parameter(Position=1)]
         [System.String] $Name
     )
@@ -485,6 +516,8 @@ function Open-PapisDocument {
     [OutputType([Void])]
 
     Param (
+
+        [ValidateSet([PapisLibrary])]
         [Parameter()]
         [System.String] $Name,
 

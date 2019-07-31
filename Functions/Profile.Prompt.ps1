@@ -21,23 +21,22 @@ Function Prompt
         Write-Host "(Admin) " -NoNewline -ForegroundColor Red
     }
 
-    # displays running virtual environment
-    If ($Env:VIRTUAL_ENV){        
-        Write-Host "VirtualEnv" -NoNewline -ForegroundColor DarkRed
-        Write-Host "[$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor DarkMagenta
-        if ($Env:PSPROFILE_PAPIS_LIBRARY){
-            Write-Host "[$Env:PSPROFILE_PAPIS_LIBRARY]"-NoNewline -ForegroundColor DarkMagenta
+    # displays running virtual environment, papis libraries and repository collection
+    If ($Env:VIRTUAL_ENV -or $Env:PAPIS_LIBRARY -or $Env:PSPROFILE_REPOSITORY_COLLECTION) {
+        Write-Host "Workspace" -NoNewline -ForegroundColor Yellow
+        If ($Env:VIRTUAL_ENV){        
+            
+            Write-Host "[$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor DarkYellow
         }
-        Write-Host " " -NoNewline
+        if ($Env:PAPIS_LIBRARY){
+            Write-Host "[$Env:PAPIS_LIBRARY]"-NoNewline -ForegroundColor DarkYellow
+        }
+        If ($Env:PSPROFILE_REPOSITORY_COLLECTION){
+            Write-Host "[$Env:PSPROFILE_REPOSITORY_COLLECTION]" -NoNewline -ForegroundColor DarkYellow
+        }
     }
-
-    # displays repository collection
-    If ($Env:PSPROFILE_REPOSITORY_COLLECTION){
-        Write-Host "Workspace" -NoNewline -ForegroundColor DarkRed
-        Write-Host "[$Env:PSPROFILE_REPOSITORY_COLLECTION]" -NoNewline -ForegroundColor DarkMagenta
-        Write-Host " " -NoNewline
-    }
-
+    Write-Host " " -NoNewline
+    
     # displays location
     Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor DarkGreen 
     Write-Host " " -NoNewline
