@@ -7,17 +7,17 @@
 $Script:PapisFile = $Null
 $Script:ConfigPapis = $Null
 
-#   ValidateSet ----------------------------------------------------------------
+#   Class ----------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-Class PapisLibrary : System.Management.Automation.IValidateSetValuesGenerator {
+Class ValidatePapisLibrary : System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
         return [String[]] ((Get-Papis -Unformated | Select-Object -ExpandProperty Alias) + "")
     }
 }
 
-#   ValidateSet ----------------------------------------------------------------
+#   Class ----------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-Class VirtualEnv: System.Management.Automation.IValidateSetValuesGenerator {
+Class ValidateVirtualEnv: System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
         return [String[]] ((Get-VirtualEnv | Select-Object -ExpandProperty Name) + "")
     }
@@ -234,11 +234,11 @@ function Start-PapisLibrary {
 
     Param (
 
-        [ValidateSet([PapisLibrary])]
+        [ValidateSet([ValidatePapisLibrary])]
         [Parameter(Position=1)]
         [System.String] $Name,
 
-        [ValidateSet([VirtualEnv])]
+        [ValidateSet([ValidateVirtualEnv])]
         [Parameter(Position=2)]
         [System.String] $VirtualEnv,
 
@@ -321,7 +321,7 @@ function Set-PapisLibrary {
 
     Param (
 
-        [ValidateSet([PapisLibrary])]
+        [ValidateSet([ValidatePapisLibrary])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )
@@ -341,195 +341,5 @@ function Set-PapisLibrary {
         }
 
         return $Null
-    }
-}
-
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Invoke-PapisFunctions {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([Void])]
-
-    Param (
-        [Parameter()]
-        [System.String] $Name,
-
-        [Parameter()]
-        [System.String] $Command,
-
-        [Parameter()]
-        [System.String] $Query
-    )
-
-    Process{ 
- 
-        $activePapisEnv = Get-ActivePapisEnv
-
-        Start-PapisLibrary -Name $Name -VirtualEnv $Env:VIRTUAL_ENV
-
-        if (Get-ActivePapisEnv) {
-            Write-FormatedProcess -Message "Search in papis library '$(Get-ActivePapisEnv -Name)'."
-        
-            switch ($Command){
-                "browse" {
-                    papis browse "$Query"
-                    break
-                }
-                "clear" {
-                    papis --clear-cache
-                    papis list | Out-Null
-                    break
-                }
-                "edit" {
-                    papis edit "$Query"
-                    break
-                }
-                "explorer" {
-                    papis open --dir "$Query"
-                    break
-                }
-                "open" {
-                    papis open "$Query"
-                    break
-                }   
-            }
-                       
-            if (-not $activePapisEnv) {
-                Stop-PapisLibrary
-            }
-        }
-
-        return $Null
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Start-PapisExplorer {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([Void])]
-
-    Param (
-
-        [ValidateSet([PapisLibrary])]
-        [Parameter()]
-        [System.String] $Name,
-
-        [Parameter(Position=1)]
-        [System.String] $Query
-    )
-
-    Process{ 
-        
-        Invoke-PapisFunctions -Name $Name -Command "explorer" -Query $Query
-
-        return $Null
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Start-PapisVSCode {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([Void])]
-
-    Param (
-
-        [ValidateSet([PapisLibrary])]
-        [Parameter()]
-        [System.String] $Name,
-
-        [Parameter(Position=1)]
-        [System.String] $Query
-    )
-
-    Process{ 
- 
-        Invoke-PapisFunctions -Name $Name -Command "edit" -Query $Query
-
-        return $Null
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Start-PapisWeb {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([Void])]
-
-    Param (
-
-        [ValidateSet([PapisLibrary])]
-        [Parameter()]
-        [System.String] $Name,
-
-        [Parameter(Position=1)]
-        [System.String] $Query
-    )
-
-    Process{ 
-
-        Invoke-PapisFunctions -Name $Name -Command "browse" -Query $Query
-
-        return $Null
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Clear-PapisLibrary {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([Void])]
-
-    Param (
-
-        [ValidateSet([PapisLibrary])]
-        [Parameter(Position=1)]
-        [System.String] $Name
-    )
-
-    Process{ 
-
-        Invoke-PapisFunctions -Name $Name -Command "clear"
-
-        return $Null
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Open-PapisDocument {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([Void])]
-
-    Param (
-
-        [ValidateSet([PapisLibrary])]
-        [Parameter()]
-        [System.String] $Name,
-
-        [Parameter(Position=1)]
-        [System.String] $Query
-    )
-
-    Process{ 
-
-        Invoke-PapisFunctions -Name $Name -Command "open" -Query $Query
-
-        return $Null
-
     }
 }

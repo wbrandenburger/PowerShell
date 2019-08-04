@@ -75,31 +75,6 @@
         "Tag": "Papis"
     },
     {
-        "Name": "ex-papis",
-        "Value": "Start-PapisExplorer",
-        "Tag": "Papis"
-    },
-    {
-        "Name": "vs-papis",
-        "Value": "Start-PapisVSCode",
-        "Tag": "Papis"
-    },
-    {
-        "Name": "clear-papis",
-        "Value": "Clear-PapisLibrary",
-        "Tag": "Papis"
-    },
-    {
-        "Name": "ie-papis",
-        "Value": "Start-PapisWeb",
-        "Tag": "Papis"
-    },
-    {
-        "Name": "open-papis",
-        "Value": "Open-PapisDocument",
-        "Tag": "Papis"
-    },
-    {
         "Name": "start-papis",
         "Value": "Start-PapisLibrary",
         "Tag": "Papis"
