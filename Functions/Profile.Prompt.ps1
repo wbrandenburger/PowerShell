@@ -26,13 +26,13 @@ Function Prompt
         Write-Host "Active" -NoNewline -ForegroundColor DarkGreen
         If ($Env:VIRTUAL_ENV){        
             
-            Write-Host "[venv-$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor Magenta
+            Write-Host "[venv-$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor Cyan
         }
         if ($Env:PAPIS_LIBRARY){
-            Write-Host "[$Env:PAPIS_LIBRARY]"-NoNewline -ForegroundColor Magenta
+            Write-Host "[$Env:PAPIS_LIBRARY]"-NoNewline -ForegroundColor Cyan
         }
         If ($Env:PSPROFILE_REPOSITORY_COLLECTION){
-            Write-Host "[$Env:PSPROFILE_REPOSITORY_COLLECTION]" -NoNewline -ForegroundColor Magenta
+            Write-Host "[$Env:PSPROFILE_REPOSITORY_COLLECTION]" -NoNewline -ForegroundColor Cyan
         }
     }
     Write-Host " " -NoNewline
