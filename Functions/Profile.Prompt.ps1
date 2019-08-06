@@ -23,22 +23,22 @@ Function Prompt
 
     # displays running virtual environment, papis libraries and repository collection
     If ($Env:VIRTUAL_ENV -or $Env:PAPIS_LIBRARY -or $Env:PSPROFILE_REPOSITORY_COLLECTION) {
-        Write-Host "Workspace" -NoNewline -ForegroundColor Yellow
+        Write-Host "Active" -NoNewline -ForegroundColor DarkGreen
         If ($Env:VIRTUAL_ENV){        
             
-            Write-Host "[$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor DarkYellow
+            Write-Host "[venv-$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor Magenta
         }
         if ($Env:PAPIS_LIBRARY){
-            Write-Host "[$Env:PAPIS_LIBRARY]"-NoNewline -ForegroundColor DarkYellow
+            Write-Host "[$Env:PAPIS_LIBRARY]"-NoNewline -ForegroundColor Magenta
         }
         If ($Env:PSPROFILE_REPOSITORY_COLLECTION){
-            Write-Host "[$Env:PSPROFILE_REPOSITORY_COLLECTION]" -NoNewline -ForegroundColor DarkYellow
+            Write-Host "[$Env:PSPROFILE_REPOSITORY_COLLECTION]" -NoNewline -ForegroundColor Magenta
         }
     }
     Write-Host " " -NoNewline
     
     # displays location
-    Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor DarkGreen 
+    Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor Gray 
     Write-Host " " -NoNewline
 
     # displays git status
