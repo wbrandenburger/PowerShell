@@ -7,6 +7,15 @@
 $Script:RepositoryFile = $Null
 $Env:RepositoryFileBackUp = $Null
 
+#   Class ----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+Class ValidateRepositoryAlias : System.Management.Automation.IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+        return [String[]] ((Get-Repository -Unformated | Select-Object -ExpandProperty alias) + "")
+    }
+}
+
+
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 function Set-RepositoryConfiguration{
@@ -143,6 +152,7 @@ function Start-RepositoryWeb {
     [OutputType([PSCustomObject])]
 
     Param (
+        [ValidateSet([ValidateRepositoryAlias])]
         [Parameter(Position=1)]
         [System.String] $Name,
 
@@ -209,6 +219,7 @@ function Start-RepositoryCollection {
     [OutputType([PSCustomObject])]
 
     Param (
+        [ValidateSet([ValidatePSModuleAlias])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name,
        

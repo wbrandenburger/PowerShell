@@ -22,14 +22,14 @@ Function Prompt
     }
 
     # displays running virtual environment, papis libraries and repository collection
-    If ($Env:VIRTUAL_ENV -or $Env:PAPIS_LIBRARY -or $Env:PSPROFILE_REPOSITORY_COLLECTION) {
+    If ($Env:VIRTUAL_ENV -or $Env:PAPIS_LIB -or $Env:PSPROFILE_REPOSITORY_COLLECTION) {
         Write-Host "Active" -NoNewline -ForegroundColor DarkGreen
         If ($Env:VIRTUAL_ENV){        
             
             Write-Host "[venv-$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor Cyan
         }
-        if ($Env:PAPIS_LIBRARY){
-            Write-Host "[$Env:PAPIS_LIBRARY]"-NoNewline -ForegroundColor Cyan
+        if ($Env:PAPIS_LIB){
+            Write-Host "[$Env:PAPIS_LIB]"-NoNewline -ForegroundColor Cyan
         }
         If ($Env:PSPROFILE_REPOSITORY_COLLECTION){
             Write-Host "[$Env:PSPROFILE_REPOSITORY_COLLECTION]" -NoNewline -ForegroundColor Cyan

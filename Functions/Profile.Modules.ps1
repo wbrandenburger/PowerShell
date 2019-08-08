@@ -8,6 +8,14 @@ $Script:ModuleFile = $Null
 $Script:ModuleProfile = $Null
 $Script:ModulePSPath = $Null
 
+#   Class ----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+Class ValidatePSModuleAlias : System.Management.Automation.IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+        return [String[]] ((Get-PSModule -Unformated | Select-Object -ExpandProperty alias) + "")
+    }
+}
+
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 function Set-PSModuleConfiguration{
@@ -198,6 +206,7 @@ function Start-PSModuleWeb {
     [OutputType([PSCustomObject])]
 
     Param(
+        [ValidateSet([ValidatePSModuleAlias])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )
@@ -300,6 +309,7 @@ function Copy-PSModuleFromRepository {
     [OutputType([PSCustomObject])]
 
     Param(
+        [ValidateSet([ValidatePSModuleAlias])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )

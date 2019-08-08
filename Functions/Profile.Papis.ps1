@@ -9,7 +9,7 @@ $Script:ConfigPapis = $Null
 
 #   Class ----------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-Class ValidatePapisLibrary : System.Management.Automation.IValidateSetValuesGenerator {
+Class ValidatePapisLibraryAlias: System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
         return [String[]] ((Get-Papis -Unformated | Select-Object -ExpandProperty Alias) + "")
     }
@@ -184,9 +184,9 @@ function Get-ActivePapisEnv {
 
     Process {
 
-        if ( $Env:PAPIS_LIBRARY) { 
+        if ( $Env:PAPIS_LIB) { 
             if ($Name) {
-                return $Env:PAPIS_LIBRARY
+                return $Env:PAPIS_LIB
             }
             else{
                 return $True
@@ -234,7 +234,7 @@ function Start-PapisLibrary {
 
     Param (
 
-        [ValidateSet([ValidatePapisLibrary])]
+        [ValidateSet([ValidatePapisLibraryAlias])]
         [Parameter(Position=1)]
         [System.String] $Name,
 
@@ -250,8 +250,8 @@ function Start-PapisLibrary {
 
         Get-PapisConfiguration 
         if (-not $Name) {
-            if ($Env:PAPIS_LIBRARY){
-                $Name = $Env:PAPIS_LIBRARY
+            if ($Env:PAPIS_LIB){
+                $Name = $Env:PAPIS_LIB
             }
             else {
                 $Name = Get-CurrentPapisEnv -NoRead
@@ -263,7 +263,7 @@ function Start-PapisLibrary {
         
         if ($selection) { 
             
-            [System.Environment]::SetEnvironmentVariable("PAPIS_LIBRARY", $selection, "process")
+            [System.Environment]::SetEnvironmentVariable("PAPIS_LIB", $selection, "process")
 
             if (-not $VirtualEnv){
                 $VirtualEnv = Select-Papis $Name virtualenv
@@ -296,7 +296,7 @@ function Stop-PapisLibrary {
 
         if ( Get-ActivePapisEnv ) { 
 
-            [System.Environment]::SetEnvironmentVariable("PAPIS_LIBRARY", "", "process")
+            [System.Environment]::SetEnvironmentVariable("PAPIS_LIB", "", "process")
 
             Stop-VirtualEnv -Silent
 
@@ -321,7 +321,7 @@ function Set-PapisLibrary {
 
     Param (
 
-        [ValidateSet([ValidatePapisLibrary])]
+        [ValidateSet([ValidatePapisLibraryAlias])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )

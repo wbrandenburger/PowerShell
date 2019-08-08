@@ -7,6 +7,14 @@
 $Script:ProjectConfigFile = $Null
 $Script:ProjectFiles = $Null
 
+#   Class ----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+Class ValidateProjectAlias : System.Management.Automation.IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+        return [String[]] ((Get-Project -Unformated | Select-Object -ExpandProperty alias) + "")
+    }
+}
+
 #   function -------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 function Set-ProjectConfiguration{
@@ -153,16 +161,14 @@ function Get-ChildItemProject {
     [OutputType([PSCustomObject])]
 
     Param (
+        [ValidateSet([ValidateProjectAlias])]
         [Parameter(Position=1)]
-        [System.String] $Name,
-
-        [Parameter()]
-        [Switch] $All
+        [System.String] $Name
     )
 
     Process{ 
         
-        if ($All){
+        if (-not $Name){
             return Get-Project
         }
 
@@ -197,6 +203,7 @@ function Get-LocationProject {
     [OutputType([PSCustomObject])]
 
     Param (
+        [ValidateSet([ValidateProjectAlias])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )
@@ -233,6 +240,7 @@ function Set-LocationProject {
     [OutputType([PSCustomObject])]
 
     Param (
+        [ValidateSet([ValidateProjectAlias])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name
     )
@@ -271,6 +279,7 @@ function Start-ProjectVSCode {
     [OutputType([PSCustomObject])]
 
     Param(
+        [ValidateSet([ValidateProjectAlias])]
         [Parameter(Position=1)]
         [System.String] $Name
     )
@@ -306,6 +315,7 @@ function Start-ProjectExplorer {
     [OutputType([PSCustomObject])]
 
     Param (
+        [ValidateSet([ValidateProjectAlias])]
         [Parameter(Position=1)]
         [System.String] $Name
     )
