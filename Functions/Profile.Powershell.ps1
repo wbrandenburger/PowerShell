@@ -45,7 +45,7 @@ function Update-PSConfig {
         $projectConfigFile = $PSConfig | Select-Object -ExpandProperty "project-config-file"
 
         $projectFiles = @(
-            [PSCustomObject] @{Path=$moduleConfigFile; Tag="Module"}
+            [PSCustomObject] @{Path=$moduleConfigFile; Tag="PSModule"}
             [PSCustomObject] @{Path=$repositoryConfigFile; Tag="Repository"}
             [PSCustomObject] @{Path=$workspaceConfigFile; Tag="Workspace"}
             [PSCustomObject] @{Path=$papisConfigFile; Tag="Papis"}
@@ -71,7 +71,7 @@ function Update-PSConfig {
 
         Param(
             [Parameter(Position=1)]
-            [ValidateSet("Project", "Repository", "Common", "Module", "Papis")]
+            [ValidateSet("Project", "Repository", "Common", "PSModule", "Papis")]
             [System.String[]] $Tag = @("Project", "Repository", "Common", "Module", "Papis")
         )
 
