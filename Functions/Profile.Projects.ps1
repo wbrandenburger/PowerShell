@@ -1,29 +1,47 @@
-# ==============================================================================
-#   Profile.Projects.ps1 -------------------------------------------------------
-# ==============================================================================
+# ============================================================================
+#   Profile.Projects.ps1 -----------------------------------------------------
+# ============================================================================
 
-#   settings -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   settings -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 $Script:ProjectConfigFile = $Null
 $Script:ProjectFiles = $Null
 
-#   Class ----------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   settings -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+$Script:FormatProperty = @{
+    "Project" = "Name", "Alias", "Type", "Description", "Path"
+    "Papis" = "Name", "Alias", "Path", "Description"
+    "PSModule" = "Name", "Alias", "Repository", "Path"
+    "Repository" = "Name", "Alias", @{ Label="Fork"; Expression = {if($_.Fork){$True}else{$Null} }}, "Path", @{ Label="GitHub"; Expression = {if($_.repository -eq "Collection"){"Collection"} else {$_.Github} }}
+}
+
+#   validation ---------------------------------------------------------------
+# ----------------------------------------------------------------------------
 Class ValidateProjectAlias : System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
-        return [String[]] ((Get-Project -Unformated | Select-Object -ExpandProperty alias) + "")
+        return [String[]] ((Get-Project | Select-Object -ExpandProperty alias) + "")
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   validation ---------------------------------------------------------------
+# ----------------------------------------------------------------------------
+Class ValidateProfileType: System.Management.Automation.IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+        return [String[]] ((Get-Project | Select-Object -ExpandProperty type -Unique) + "project")
+    }
+}
+
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Set-ProjectConfiguration{
 
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding=$True)]
 
     [OutputType([Void])]
 
     Param (
+
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $File,
 
@@ -35,8 +53,8 @@ function Set-ProjectConfiguration{
     $SCript:ProjectFiles = $Files
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Get-Project {
 
     [CmdletBinding()]
@@ -45,31 +63,75 @@ function Get-Project {
 
     Param (
 
+        [Parameter(Position=1)]
+        [System.String] $Name="Project"
+
+    )
+
+    Process {
+
+        if ($Name -eq "Project") {
+            $data = @()
+            $Script:ProjectFiles | ForEach-Object{
+                $fileData = Get-Content $_ | ConvertFrom-Json
+                $data += $fileData | Select-Object -Property $Script:FormatProperty.Project
+            }
+
+            Out-File -FilePath $Script:ProjectConfigFile -InputObject (ConvertTo-Json $data)
+        }
+        else {
+            switch ($Name){
+                "Papis" {
+                    $data = Get-Content $Script:PapisFile | ConvertFrom-Json
+                    break
+                }
+                "PSModule" {
+                    $data = Get-Content $Script:ModuleFile | ConvertFrom-Json
+                    break
+                }
+                "Repository" {
+                    $data = Get-Content $Script:RepositoryFile | ConvertFrom-Json
+                    break
+                }
+            }
+        }
+
+        return $data
+    }
+}
+
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Get-ProfileProject{
+
+    [CmdletBinding(PositionalBinding=$True)]
+
+    [OutputType([PSCustomObject])]
+
+    Param (
+        
+        [ValidateSet([ValidateProfileType])]
+        [Parameter(Position=1)]
+        [System.String] $Name="Project",
+
         [Parameter()]
         [Switch] $Unformated
     )
 
     Process {
 
-        $data = @()
-        $Script:ProjectFiles | ForEach-Object{
-            $fileData = Get-Content $_.Path | ConvertFrom-Json
-            $fileData | Add-Member -MemberType NoteProperty -Name "tag" -Value $_.Tag
-            $data += $fileData | Select-Object -Property Name, Alias, Tag, Path, Description
-        }
-
-        Out-File -FilePath $Script:ProjectConfigFile -InputObject (ConvertTo-Json $data)
+        $data = Get-Project -Name $Name
 
         if ($Unformated) {
             return $data
         }
 
-        return Format-Project $data
+        return Format-Project $Name $data
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Format-Project {
     
     [CmdletBinding(PositionalBinding=$True)]
@@ -77,20 +139,24 @@ function Format-Project {
     [OutputType([PSCustomObject])]
 
     Param (
+
+        [ValidateSet([ValidateProfileType])]
         [Parameter(Position=1, Mandatory=$True)]
+        [System.String] $Name="Project",
+
+        [Parameter(Position=2, Mandatory=$True)]
         [PSCustomObject] $Data
     )
 
     Process {
 
-        return $Data | Format-Table -Property Name, Alias, Tag, Description, Path
+        return $Data | Format-Table -Property $Script:FormatProperty.($Name)
 
     }
 }
 
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Test-Project {
 
     [CmdletBinding(PositionalBinding=$True)]
@@ -115,8 +181,37 @@ function Test-Project {
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Get-ProjectType {
+
+    [CmdletBinding(PositionalBinding=$True)]
+    
+    [OutputType([PSCustomObject])]
+
+    Param(
+        [Parameter(Position=1, Mandatory=$True)]
+        [System.String] $Name
+    )
+
+    $data = Get-Project
+    if (-not (Test-Project $data $Name)) {
+        Write-FormatedError -Message "No entry with user specification was found."
+        return $Null
+    }
+
+    $datum = $data | Where-Object {$_.Name -eq $Name -or $_.Alias -eq $Name}
+
+    if ($datum.Type) {
+        return $datum | Select-Object -ExpandProperty Type
+    }
+    else {
+       return $Null
+    }
+}
+
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Select-Project {
     
     [CmdletBinding(PositionalBinding=$True)]
@@ -128,12 +223,16 @@ function Select-Project {
         [System.String] $Name,
 
         [Parameter(Position=2, Mandatory=$True)]
-        [System.String] $Property
+        [System.String] $Property,
+
+        [ValidateSet([ValidateProfileType])]
+        [Parameter(Position=3)]
+        [System.String] $Type="Project"
     )
 
     Process{ 
 
-        $data = Get-Project -Unformated
+        $data = Get-Project $Type
         if (-not (Test-Project $data $Name)) {
             Write-FormatedError -Message "No entry with user specification was found."
             return $Null
@@ -152,28 +251,30 @@ function Select-Project {
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Get-ChildItemProject {
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Get-ProjectChildItem {
     
     [CmdletBinding(PositionalBinding=$True)]
     
     [OutputType([PSCustomObject])]
 
     Param (
+
         [ValidateSet([ValidateProjectAlias])]
         [Parameter(Position=1)]
         [System.String] $Name
+
     )
 
     Process{ 
         
         if (-not $Name){
-            return Get-Project
+            return Get-ProfileProject
         }
 
         $selection = Select-Project $Name Path
-        
+
         if ($selection){
             $selection | ForEach-Object {
                 if (Test-Path -Path $_) {
@@ -181,22 +282,22 @@ function Get-ChildItemProject {
                 } 
                 else { 
                     Write-FormatedError -Message "Path of project is not valid."
-                    return Get-Project
+                    return Get-ProfileProject
                 }
             }
         }
         else { 
             Write-FormatedError -Message "Poperty $Name has no content."
-            return Get-Project
+            return Get-ProfileProject
         }
 
         return $Null
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Get-LocationProject {
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Get-ProjectLocation {
     
     [CmdletBinding(PositionalBinding=$True)]
     
@@ -216,7 +317,7 @@ function Get-LocationProject {
             $selection | ForEach-Object {
                 if (-not (Test-Path -Path $_)) {
                     Write-FormatedError -Message "Path $_ of project is not valid."
-                    return Get-Project
+                    return Get-ProfileProject
                 }
             }
 
@@ -224,16 +325,16 @@ function Get-LocationProject {
         }
         else { 
             Write-FormatedError -Message "Poperty $Name has no content."
-            return Get-Project
+            return Get-ProfileProject
         }
 
         return $Null
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Set-LocationProject {
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Set-ProjectLocation {
     
     [CmdletBinding(PositionalBinding=$True)]
     
@@ -257,22 +358,22 @@ function Set-LocationProject {
                 } 
                 else { 
                     Write-FormatedError -Message "Path of project is not valid."
-                    return Get-Project
+                    return Get-ProfileProject
                 }
             }
         }
         else { 
             Write-FormatedError -Message "Poperty $Name has no content."
-            return Get-Project
+            return Get-ProfileProject
         }
 
         return $Null
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Start-ProjectVSCode {
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Open-ProjectWorkspace {
     
     [CmdletBinding(PositionalBinding=$True)]
     
@@ -291,7 +392,7 @@ function Start-ProjectVSCode {
         $selection | ForEach-Object {
             if (-not (Test-Path -Path $_)) {
                 Write-FormatedError -Message "Path of project is not valid."
-                return Get-Project
+                return Get-ProfileProject
             }
         }
 
@@ -300,15 +401,15 @@ function Start-ProjectVSCode {
     }
     else { 
         Write-FormatedError -Message "Poperty $Name has no content."
-        return Get-Project
+        return Get-ProfileProject
     }
     
     return $Null
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Start-ProjectExplorer {
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Open-ProjectFileExplorer {
     
     [CmdletBinding(PositionalBinding=$True)]
     
@@ -329,14 +430,62 @@ function Start-ProjectExplorer {
             } 
             else { 
                 Write-FormatedError -Message "Path of project is not valid."
-                return Get-Project
+                return Get-ProfileProject
             }
         }
     }
     else { 
         Write-FormatedError -Message "Poperty $Name has no content."
-        return Get-Project
+        return Get-ProfileProject
     }
     
     return $Null
+}
+
+
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Open-ProjectBrowser {
+    
+    [CmdletBinding(PositionalBinding=$True)]
+    
+    [OutputType([PSCustomObject])]
+
+    Param (
+
+        [ValidateSet([ValidateProjectAlias])]
+        [Parameter(Position=1)]
+        [System.String] $Name,
+
+        [Parameter()]
+        [Switch] $Fork
+    )
+
+    Process {
+        
+        $type = Get-ProjectType $Name
+
+        if (-not ($type -in @("Repository", "PSModule"))) {
+            Write-FormatedError -Message "Project does not have the type for this operation."
+            return Get-ProfileProject
+        }
+
+        $property = "GitHub"
+        if ($type -eq "Repository"){
+            if ($Fork) {
+                $property = "Fork"
+            }
+        }
+
+        $selection = Select-Project -Name $Name -Property $property -Type $type
+        
+        if ($selection) { Start-Process -FilePath $selection }
+        else {
+            Write-FormatedError -Message "No valid url was found."
+            return Get-ProfileProject
+        }
+
+        return $Null
+
+    }
 }

@@ -1,68 +1,43 @@
 [
     {
-        "Name": "cd-ws",
-        "Value": "Set-LocationProject", 
+        "Name": "cdx",
+        "Value": "Set-ProjectLocation", 
         "Tag": "Project"
     },
     {
-        "Name": "ex-ws", 
-        "Value": "Start-ProjectExplorer", 
+        "Name": "exx", 
+        "Value": "Open-ProjectFileExplorer", 
         "Tag": "Project"
     },
     {
-        "Name": "dir-ws", 
-        "Value": "Get-LocationProject", 
+        "Name": "dirx", 
+        "Value": "Get-ProjectLocation", 
         "Tag": "Project"
     },
     {
-        "Name": "ls-ws", 
-        "Value": "Get-ChildItemProject", 
+        "Name": "lsx", 
+        "Value": "Get-ProjectChildItem", 
         "Tag": "Project"
     },
     {
-        "Name": "vs-ws", 
-        "Value": "Start-ProjectVSCode",
+        "Name": "vsx", 
+        "Value": "Open-ProjectWorkspace",
         "Tag": "Project"
     },
     {
-        "Name": "ls-git", 
-        "Value": "Get-Repository", 
-        "Tag": "Repository"
+        "Name": "fox", 
+        "Value": "Open-ProjectBrowser",
+        "Tag": "Project"
     },
     {
-        "Name": "ie-git", 
-        "Value": "Start-RepositoryWeb", 
-        "Tag": "Repository"
-    },
-    {
-        "Name": "start-git", 
+        "Name": "repx", 
         "Value": "Start-RepositoryCollection", 
         "Tag": "Repository"
     },
     {
-        "Name": "stop-git", 
+        "Name": "stop-rep", 
         "Value": "Stop-RepositoryCollection", 
         "Tag": "Repository"
-    },
-    {
-        "Name": "ls-psm", 
-        "Value": "Get-PSModule", 
-        "Tag": "Module"
-    },
-    {
-        "Name": "mk-psm", 
-        "Value": "Import-PSModule", 
-        "Tag": "Module"
-    },
-    {
-        "Name": "rm-psm", 
-        "Value": "Remove-PSModule", 
-        "Tag": "Module"
-    },
-    {
-        "Name": "ie-psm", 
-        "Value": "Start-PSModuleWeb", 
-        "Tag": "Module"
     },
     {
         "Name": "cp-psm", 
@@ -70,12 +45,7 @@
         "Tag": "Module"
     },
     {
-        "Name": "ls-papis",
-        "Value": "Get-Papis",
-        "Tag": "Papis"
-    },
-    {
-        "Name": "start-papis",
+        "Name": "papisx",
         "Value": "Start-PapisLibrary",
         "Tag": "Papis"
     },
@@ -90,7 +60,7 @@
         "Tag": "Common"
     },
     {
-        "Name": "start-shell", 
+        "Name": "clear", 
         "Value": "Restart-PSSession",
         "Tag": "Common"
     }

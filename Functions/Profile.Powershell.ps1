@@ -1,9 +1,9 @@
-# ==============================================================================
-#   Profile.PowerShell.ps1 -----------------------------------------------------
-# ==============================================================================
+# ============================================================================
+#   Profile.PowerShell.ps1 ---------------------------------------------------
+# ============================================================================
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Update-PSConfig {
 
     [CmdletBinding()]
@@ -45,10 +45,10 @@ function Update-PSConfig {
         $projectConfigFile = $PSConfig | Select-Object -ExpandProperty "project-config-file"
 
         $projectFiles = @(
-            [PSCustomObject] @{Path=$moduleConfigFile; Tag="PSModule"}
-            [PSCustomObject] @{Path=$repositoryConfigFile; Tag="Repository"}
-            [PSCustomObject] @{Path=$workspaceConfigFile; Tag="Workspace"}
-            [PSCustomObject] @{Path=$papisConfigFile; Tag="Papis"}
+            $moduleConfigFile
+            $repositoryConfigFile
+            $workspaceConfigFile
+            $papisConfigFile
         )
 
         Set-ProjectConfiguration -File $projectConfigFile -Files $projectFiles
@@ -61,8 +61,8 @@ function Update-PSConfig {
     }
 }
 
-#   functions ------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   functions ----------------------------------------------------------------
+# ----------------------------------------------------------------------------
     function Get-PSAlias{
 
         [CmdletBinding(PositionalBinding=$True)]

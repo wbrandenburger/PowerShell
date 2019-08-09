@@ -1,23 +1,22 @@
-# ==============================================================================
-#   Profile.Repository.ps1 -----------------------------------------------------
-# ==============================================================================
+# ============================================================================
+#   Profile.Repository.ps1 ---------------------------------------------------
+# ============================================================================
 
-#   settings -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   settings -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 $Script:RepositoryFile = $Null
 $Env:RepositoryFileBackUp = $Null
 
-#   Class ----------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-Class ValidateRepositoryAlias : System.Management.Automation.IValidateSetValuesGenerator {
+#   validation ---------------------------------------------------------------
+# ----------------------------------------------------------------------------
+Class ValidateRepositoryAlias: System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
-        return [String[]] ((Get-Repository -Unformated | Select-Object -ExpandProperty alias) + "")
+        return [String[]] (Get-Project | Where-Object {$_.type -eq "repository"} | Select-Object -ExpandProperty Alias)
     }
 }
 
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Set-RepositoryConfiguration{
 
     [CmdletBinding()]
@@ -36,151 +35,8 @@ function Set-RepositoryConfiguration{
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Get-Repository {
-
-    [CmdletBinding()]
-
-    [OutputType([PSCustomObject])]
-
-    Param (
-        [Parameter()]
-        [Switch] $Unformated
-    )
-
-    Process {
-
-        $data = Get-Content $Script:RepositoryFile | ConvertFrom-Json
-        if ($Unformated) {
-            return $data
-        }
-        
-        return Format-Repository $data
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Format-Repository {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param (
-        [Parameter(Position=1, Mandatory=$True)]
-        [PSCustomObject] $Data
-    )
-
-    Process {
-
-        return $Data | Format-Table -Property Name, Alias, @{ Label="Fork"; Expression = {if($_.Fork){$True}else{$Null} }}, Path, @{ Label="GitHub"; Expression = {if($_.repository -eq "Collection"){"Collection"} else {$_.Github} }}
-
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Test-Repository {
-
-    [CmdletBinding(PositionalBinding=$True)]
-
-    [OutputType([Boolean])]
-
-    Param (
-        [Parameter(Position=1, Mandatory=$True)]
-        [PSCustomObject] $data,
-
-        [Parameter(Position=2, Mandatory=$True)]
-        [System.String] $Name
-    )
-    
-    Process {
-
-        if (($data.Alias -contains $Name) -or (($data.Name -contains $Name))) {
-            return $True
-        }
-
-        return $False
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Select-Repository {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param (
-        [Parameter(Position=1, Mandatory=$True)]
-        [System.String] $Name,
-
-        [Parameter(Position=2, Mandatory=$True)]
-        [System.String] $Property
-    )
-
-    Process { 
-
-        $data = Get-Repository -Unformated
-        if (-not (Test-Repository $data $Name)) {
-            Write-FormatedError -Message "No entry with user specification was found."
-            return $Null
-        }
-    
-        $datum = $data | Where-Object {$_.Name -eq $Name -or $_.Alias -eq $Name}
-
-        if ($datum.$Property) {
-            $selection = $datum | Select-Object -ExpandProperty $Property
-        }
-        else {
-            $selection = $Null
-        }
-
-        return $selection
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Start-RepositoryWeb {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param (
-        [ValidateSet([ValidateRepositoryAlias])]
-        [Parameter(Position=1)]
-        [System.String] $Name,
-
-        [Parameter()]
-        [Switch] $Fork
-    )
-
-    Process {
-
-        $property = "GitHub"
-        if ($Fork) {
-            $property = "Fork"
-        }
-        $selection = Select-Repository $Name $property
-
-        if ($selection) { Start-Process -FilePath $selection }
-        else {
-            Write-FormatedError -Message "No valid url was found."
-            return Get-Repository
-        }
-
-        return $Null
-
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Get-ActiveRepositoryCollection {
     
     [CmdletBinding()]
@@ -210,8 +66,8 @@ function Get-ActiveRepositoryCollection {
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Start-RepositoryCollection {
     
     [CmdletBinding(PositionalBinding=$True)]
@@ -219,7 +75,7 @@ function Start-RepositoryCollection {
     [OutputType([PSCustomObject])]
 
     Param (
-        [ValidateSet([ValidatePSModuleAlias])]
+        [ValidateSet([ValidateRepositoryAlias])]
         [Parameter(Position=1, Mandatory=$True)]
         [System.String] $Name,
        
@@ -233,15 +89,17 @@ function Start-RepositoryCollection {
             Stop-RepositoryCollection
         }
 
-        $repositorySpecies = Select-Repository $Name Repository
+        $repositorySpecies = Select-Project -Name $Name -Property Repository -Type Repository
+
         if (-not ($repositorySpecies -eq "Collection")){
             Write-FormatedError -Message "User specification is not a collection of repositories."
-            return Get-Repository
+            return Get-ProfileProject Repository
         }
 
-        $repositoryFile = Select-Repository $Name Repository-Config-File
+        $repositoryFile =  Select-Project -Name $Name -Property Repository-Config-File -Type Repository
+
         if ($repositoryFile -and (Test-Path -Path $repositoryFile)) {
-            [System.Environment]::SetEnvironmentVariable("PSPROFILE_REPOSITORY_COLLECTION", (Select-Repository $Name Alias), "process")
+            [System.Environment]::SetEnvironmentVariable("PSPROFILE_REPOSITORY_COLLECTION", (Select-Project -Name $Name -Property Alias -Type Repository), "process")
 
             $Script:RepositoryFile = $repositoryFile
             $Script:ProjectFiles += @{Path=$repositoryFile; Tag=$Name}
@@ -249,7 +107,7 @@ function Start-RepositoryCollection {
             if (-not $Silent){
                 Write-FormatedSuccess -Message "Activated repository collection '$Name'." -Space
 
-                return Get-Repository
+                return Get-ProfileProject Repository
             }
         }
         else{
@@ -257,12 +115,11 @@ function Start-RepositoryCollection {
         }
 
         return $Null
-
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Stop-RepositoryCollection {
 
     [CmdletBinding(PositionalBinding=$True)]

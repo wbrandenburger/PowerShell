@@ -1,23 +1,23 @@
-# ==============================================================================
-#   Profile.Modules.ps1 --------------------------------------------------------
-# ==============================================================================
+# ============================================================================
+#   Profile.Modules.ps1 ------------------------------------------------------
+# ============================================================================
 
-#   settings -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   settings -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 $Script:ModuleFile = $Null
 $Script:ModuleProfile = $Null
 $Script:ModulePSPath = $Null
 
-#   Class ----------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-Class ValidatePSModuleAlias : System.Management.Automation.IValidateSetValuesGenerator {
+#   validation ---------------------------------------------------------------
+# ----------------------------------------------------------------------------
+Class ValidatePSModuleAlias: System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
-        return [String[]] ((Get-PSModule -Unformated | Select-Object -ExpandProperty alias) + "")
+        return [String[]] (Get-Project | Where-Object {$_.type -eq "psmodule"} | Select-Object -ExpandProperty Alias)
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Set-PSModuleConfiguration{
 
     [CmdletBinding()]
@@ -40,8 +40,8 @@ function Set-PSModuleConfiguration{
     $Script:ModulePSPath = $PSModulePath   
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Get-PSModule{
 
     [CmdletBinding()]
@@ -79,155 +79,8 @@ function Get-PSModule{
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Format-PSModule {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param(
-        [Parameter(Position=1, Mandatory=$True)]
-        [PSCustomObject] $Data
-    )
-
-    Process {
-
-        return $Data | Format-Table -Property Name, Alias, Repository, Path
-
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Format-PSModuleProfile {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param(
-        [Parameter(Position=1, Mandatory=$True)]
-        [PSCustomObject] $data
-    )
-
-    Process {
-
-        return $Data | Format-List
-
-    }
-}
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Test-PSModule {
-
-    [CmdletBinding(PositionalBinding=$True)]
-
-    [OutputType([Boolean])]
-
-    Param(
-        [Parameter(Position=1, Mandatory=$True)]
-        [PSCustomObject] $Data,
-
-        [Parameter(Position=2, Mandatory=$True)]
-        [System.String] $Name,
-
-        [Parameter()]
-        [Switch] $Local
-    )
-    
-    Process {
-        
-        if ($Data.Alias -contains $Name){
-            $Name =  $Data | Where-Object {$_.Alias -eq $Name} | Select-Object -ExpandProperty Name
-        }
-
-        if (-not ($Data.Alias -contains $Name) -and -not (($Data.Name -contains $Name))) {
-            return $False
-        }
-
-        if (-not $Local) {
-            if (-not (Get-Module -ListAvailable -Name $Name)) {
-                return $False
-            }
-        }
-
-        return $True
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Select-PSModule {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param(
-        [Parameter(Position=1, Mandatory=$True)]
-        [System.String] $Name,
-
-        [Parameter(Position=2, Mandatory=$True)]
-        [System.String] $Property,
-
-        [Parameter()]
-        [Switch] $Local
-    )
-
-    Process{ 
-
-        $data = Get-PSModule -Unformated
-        if (-not (Test-PSModule $data $Name -Local:$Local)) {
-            Write-FormatedError -Message "No entry with user specification was found."
-            return $Null
-        }
-    
-        $datum = $data | Where-Object {$_.Name -eq $Name -or $_.Alias -eq $Name}
-
-        if ($datum.$Property) {
-            $selection = $datum | Select-Object -ExpandProperty $Property
-        }
-        else {
-            $selection = $Null
-        }
-
-        return $selection
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-function Start-PSModuleWeb {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param(
-        [ValidateSet([ValidatePSModuleAlias])]
-        [Parameter(Position=1, Mandatory=$True)]
-        [System.String] $Name
-    )
-
-    Process {
-
-        $selection = @((Select-PSModule $Name GitHub), (Select-PSModule $Name PSGallery))
-
-        if ($selection) { $selection | ForEach-Object{ Start-Process -FilePath $_ }}
-        else { 
-            Write-FormatedError -Message "No valid url was found."
-            return Get-PSModule
-        }
-
-        return $Null
-        
-    }
-}
-
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Import-PSModule {
     
     [CmdletBinding(PositionalBinding=$True)]
@@ -242,29 +95,22 @@ function Import-PSModule {
 
     Process {
         $profiles = Get-PSModule -Profile -Unformated
-        $modules = Get-PSModule -Unformated
 
         Write-FormatedProcess -Message "Begin to import profile '$Profile'" -Space
         Write-FormatedMessage -Message "Profile '$Profile':" -Color DarkGray
 
         $profiles | Select-Object -ExpandProperty $Profile  | ForEach-Object {
-            if (Test-PSModule -Data $modules -Name $_) {
-                Write-Host $_
-                Import-Module -Name $_
-            }
-            else { 
-                Write-FormatedError -Message "Module $_ can not imported."
-            }
+            Write-Host $_
+            Import-Module -Name $_
         }
-
         Write-FormatedSuccess -Message "Finished importing profile '$Profile'." -Space
 
         return Get-Module
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Remove-PSModule {
     
     [CmdletBinding(PositionalBinding=$True)]
@@ -279,29 +125,21 @@ function Remove-PSModule {
 
     Process {
         $profiles = Get-PSModule -Profile -Unformated
-        $modules = Get-PSModule -Unformated
 
         Write-FormatedProcess -Message "Begin to remove profile '$Profile'." -Space
         Write-FormatedMessage -Message "Profile '$Profile':" -Color DarkGray
 
         $profiles | Select-Object -ExpandProperty $Profile  | ForEach-Object {
-            Write-Host $_
-            if (Test-PSModule -Data $modules -Name $_) {
-                Remove-Module -Name $_
-            }
-            else { 
-                Write-FormatedError -Message "Module $_ can not imported."
-            }
+            Remove-Module -Name $_
         }
-
         Write-FormatedSuccess -Message "Finished removing profile '$Profile'." -Space
         
         return Get-Module
     }
 }
 
-#   function -------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
 function Copy-PSModuleFromRepository {
 
     [CmdletBinding(PositionalBinding=$True)]
@@ -316,12 +154,12 @@ function Copy-PSModuleFromRepository {
 
     Process {
 
-        $moduleName = Select-PSModule $Name Name -Local
+        $moduleName = Select-Project -Name $Name -Property Name -Type PSModule
         if (-not $moduleName){
             Write-FormatedError -Message "Specified module does not exist."
             return Get-PSModule        
         }
-        $modulePath = Select-PSModule $Name Local -Local
+        $moduleName = Select-Project -Name $Name -Property Local -Type PSModule
         
         if ($modulePath -and (Test-Path -Path $modulePath)) {
             $Script:ModulePSPath | ForEach-Object {
