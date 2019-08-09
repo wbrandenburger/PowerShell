@@ -17,12 +17,11 @@ $Script:ConfigPapis = $Null
 
 #   validation ---------------------------------------------------------------
 # ----------------------------------------------------------------------------
-Class ValidateProjectAlias : System.Management.Automation.IValidateSetValuesGenerator {
+Class ValidatePapisLibraryAlias: System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
-        return [String[]] ((Get-Project | Select-Object -ExpandProperty alias) + "")
+        return [String[]] (Get-Project | Where-Object {$_.type -eq "papis"} | Select-Object -ExpandProperty Alias)
     }
 }
-
 #   Class --------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 Class ValidateVirtualEnv: System.Management.Automation.IValidateSetValuesGenerator {
@@ -47,114 +46,6 @@ function Set-PapisConfiguration{
     Process {
 
         $Script:PapisFile = $File
-    }
-}
-
-# #   function -----------------------------------------------------------------
-# # ----------------------------------------------------------------------------
-# function Get-Papis{
-
-#     [CmdletBinding()]
-
-#     [OutputType([PSCustomObject])]
-
-#     Param (
-
-#         [Parameter()]
-#         [Switch] $Unformated
-#     )
-
-#     Process {
-
-#         $data = Get-Content $Script:PapisFile | ConvertFrom-Json
-#         if ($Unformated) {
-#             return $data
-#         }
-        
-#         return Format-Papis -Data $data
-#     }
-# }
-
-#   function -----------------------------------------------------------------
-# ----------------------------------------------------------------------------
-function Format-Papis {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param (
-        [Parameter(Position=1, Mandatory=$True)]
-        [PSCustomObject] $Data
-    )
-
-    Process {
-
-        return $Data | Format-Table -Property $Script:FormatPapis
-
-    }
-}
-
-#   function -----------------------------------------------------------------
-# ----------------------------------------------------------------------------
-function Test-Papis {
-
-    [CmdletBinding(PositionalBinding=$True)]
-
-    [OutputType([Boolean])]
-
-    Param (
-        [Parameter(Position=1, Mandatory=$True)]
-        [PSCustomObject] $data,
-
-        [Parameter(Position=2, Mandatory=$True)]
-        [System.String] $Name
-    )
-    
-    Process {
-
-        if (($data.Alias -contains $Name) -or (($data.Name -contains $Name))) {
-            return $True
-        }
-
-        return $False
-    }
-}
-
-#   function -----------------------------------------------------------------
-# ----------------------------------------------------------------------------
-function Select-Papis {
-    
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([PSCustomObject])]
-
-    Param (
-        [Parameter(Position=1, Mandatory=$True)]
-        [System.String] $Name,
-
-        [Parameter(Position=2, Mandatory=$True)]
-        [System.String] $Property
-    )
-
-    Process { 
-
-        $data = Get-Papis -Unformated
-        if (-not (Test-Papis $data $Name)) {
-            Write-FormatedError -Message "No entry with user specification was found."
-            return $Null
-        }
-    
-        $datum = $data | Where-Object {$_.Name -eq $Name -or $_.Alias -eq $Name}
-
-        if ($datum.$Property) {
-            $selection = $datum | Select-Object -ExpandProperty $Property
-        }
-        else {
-            $selection = $Null
-        }
-
-        return $selection
     }
 }
 
@@ -267,7 +158,7 @@ function Start-PapisLibrary {
             }
             
         }
-        $selection = Select-Papis $Name papis
+        $selection = Select-Project -Name $Name -Property papis -Type Papis
 
         
         if ($selection) { 
@@ -275,7 +166,7 @@ function Start-PapisLibrary {
             [System.Environment]::SetEnvironmentVariable("PAPIS_LIB", $selection, "process")
 
             if (-not $VirtualEnv){
-                $VirtualEnv = Select-Papis $Name virtualenv
+                $VirtualEnv = Select-Project -Name $Name -Property virtualenv -Type Papis
             }
             Start-VirtualEnv -Name $VirtualEnv -Silent
             
@@ -339,7 +230,7 @@ function Set-PapisLibrary {
 
         Get-PapisConfiguration 
 
-        $selection = Select-Papis $Name papis
+        $selection = Select-Papis -Name $Name -Property papis -Type Papis
 
         if ($selection) { 
             $configPapis | Set-IniContent -Sections "settings" -NameValuePairs @{"default-library" =  "$selection"} | Out-IniFile $Env:PAPIS_CONFIG -Force
