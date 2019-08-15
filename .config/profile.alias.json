@@ -29,8 +29,13 @@
         "Value": "Open-ProjectBrowser",
         "Tag": "Project"
     },
+    {        
+        "Name": "cd-rep", 
+        "Value": "Get-Repository", 
+        "Tag": "Repository"
+    },
     {
-        "Name": "repx", 
+        "Name": "start-rep", 
         "Value": "Start-RepositoryCollection", 
         "Tag": "Repository"
     },
