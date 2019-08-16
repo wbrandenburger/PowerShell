@@ -5,8 +5,10 @@
         "workspace-config-file": "A:\\.config\\workspace.config.json",
         "papis-config-file": "A:\\.config\\papis.config.json",
         "powershell-functions": [
-            "A:\\.config\\powershell-functions.virtualenv.ps1",
-            "A:\\.config\\powershell-functions.papis.ps1"
+            "A:\\.config\\powershell\\psfunctions-git.ps1",
+            "A:\\.config\\powershell\\psfunctions-papis.ps1",
+            "A:\\.config\\powershell\\psfunctions-utils.ps1",
+            "A:\\.config\\powershell\\psfunctions-virtualenv.ps1"
         ],
         "powershell-module-config-file": "A:\\.config\\powershell-module.config.json",
         "powershell-module-import-file": "A:\\.config\\powershell-module.import.json",
