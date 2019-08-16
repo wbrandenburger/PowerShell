@@ -159,7 +159,7 @@ function Copy-PSModuleFromRepository {
             Write-FormatedError -Message "Specified module does not exist."
             return Get-PSModule        
         }
-        $moduleName = Select-Project -Name $Name -Property Local -Type PSModule
+        $modulePath = Select-Project -Name $Name -Property Local -Type PSModule
         
         if ($modulePath -and (Test-Path -Path $modulePath)) {
             $Script:ModulePSPath | ForEach-Object {
