@@ -442,7 +442,6 @@ function Open-ProjectFileExplorer {
     return $Null
 }
 
-
 #   function -----------------------------------------------------------------
 # ----------------------------------------------------------------------------
 function Open-ProjectBrowser {

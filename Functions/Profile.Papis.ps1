@@ -9,20 +9,12 @@ $Script:ConfigPapis = $Null
 
 #   validation ---------------------------------------------------------------
 # ----------------------------------------------------------------------------
-# Class ValidatePapisLibraryAlias: System.Management.Automation.IValidateSetValuesGenerator {
-#     [String[]] GetValidValues() {
-#         return [String[]] ((Get-Papis -Unformated | Select-Object -ExpandProperty Alias) + "")
-#     }
-# }
-
-#   validation ---------------------------------------------------------------
-# ----------------------------------------------------------------------------
 Class ValidatePapisLibraryAlias: System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
         return [String[]] (Get-Project | Where-Object {$_.type -eq "papis"} | Select-Object -ExpandProperty Alias)
     }
 }
-#   Class --------------------------------------------------------------------
+#   validation ---------------------------------------------------------------
 # ----------------------------------------------------------------------------
 Class ValidateVirtualEnv: System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
