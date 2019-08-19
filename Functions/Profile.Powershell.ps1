@@ -51,7 +51,7 @@ function Update-PSConfig {
             $papisConfigFile
         )
 
-        Set-ProjectConfiguration -File $projectConfigFile -Files $projectFiles
+        Set-ProjectConfiguration -File $projectConfigFile -Files $projectFiles -Workspace $workspaceConfigFile
 
         # additional powershell functions
         $powershellFunctions = $PSConfig | Select-Object -ExpandProperty "powershell-functions"

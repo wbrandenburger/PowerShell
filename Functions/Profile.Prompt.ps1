@@ -4,45 +4,132 @@
 
 #   function -----------------------------------------------------------------
 # ----------------------------------------------------------------------------
-Function Prompt 
-{
+Function Prompt {
 
-    # display current time
-    Write-Host "[" -NoNewline -ForegroundColor DarkCyan
-    Write-Host (Get-Date -UFormat %R) -NoNewline -ForegroundColor DarkCyan
-    Write-Host "] " -NoNewline -ForegroundColor DarkCyan
+    Write-PromptTime -Color "DarkCyan"              # display current time
+    Write-PromptAdmin -Value "Admin" -Color "Red"   # display admin
+
+    Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor "Gray"
+    # Write-Host " " -NoNewline -ForegroundColor "Gray"
+
+    If ((Get-Module).Name -contains "Posh-Git") {   # displays git status
+        Write-VcsStatus
+        Write-Host " " -NoNewline -ForegroundColor "Gray"
+    }
+
+    Write-PromptEnvStatus -Env "Venv" -Value (Split-Path $Env:VIRTUAL_ENV -leaf)
+    Write-PromptEnvStatus -Env "Papis" -Value $Env:PAPIS_LIB
+    Write-PromptEnvStatus -Env "Collection" -Value  $Env:PSPROFILE_REPOSITORY_COLLECTION
+}
+
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Write-PromptEnvStatus {
+
+    [CmdletBinding(PositionalBinding=$True)]
+
+    [OutputType([Void])]
+
+    Param (
+
+        [Parameter(Position=1, Mandatory=$True)]
+        [System.String] $Env,
+
+        [Parameter(Position=2, Mandatory=$True)]
+        [System.String] $Value,
+
+        [Parameter(Mandatory=$False)]
+        [System.String] $EnvColor = "DarkGray",
+
+        [Parameter(Mandatory=$False)]
+        [System.String] $ValueColor = "Yellow"
+
+    )
     
-    # displays administrator
+    Process{
+
+        If ($Value) {       
+            Write-Host $Env -NoNewline -ForegroundColor $EnvColor
+            Write-Host "[$Value] " -NoNewline -ForegroundColor $ValueColor
+        }
+        
+        return 0
+
+    }
+}
+
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Write-PromptAdmin{
+
+    [CmdletBinding(PositionalBinding=$True)]
+
+    [OutputType([Void])]
+
+    Param (
+
+        [Parameter(Position=1, Mandatory=$True)]
+        [System.String] $Value = "Admin",
+
+        [Parameter(Mandatory=$False)]
+        [System.String] $Color = "Red"
+
+    )
+
+    Process{
 
         # check whether the host as administrator rights
         $user = [Security.Principal.WindowsIdentity]::GetCurrent();
         $checkAs = (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
-    If ($checkAs) { 
-        Write-Host "(Admin) " -NoNewline -ForegroundColor Red
+        If ($checkAs) { 
+            Write-Host "($Value) " -NoNewline -ForegroundColor $Color
+        }
     }
+}
 
-    # displays running virtual environment, papis libraries and repository collection
-    If ($Env:VIRTUAL_ENV -or $Env:PAPIS_LIB -or $Env:PSPROFILE_REPOSITORY_COLLECTION) {
-        Write-Host "Active" -NoNewline -ForegroundColor DarkGreen
-        If ($Env:VIRTUAL_ENV){        
-            
-            Write-Host "[venv-$(Split-Path $Env:VIRTUAL_ENV -leaf)]" -NoNewline -ForegroundColor Cyan
-        }
-        if ($Env:PAPIS_LIB){
-            Write-Host "[$Env:PAPIS_LIB]"-NoNewline -ForegroundColor Cyan
-        }
-        If ($Env:PSPROFILE_REPOSITORY_COLLECTION){
-            Write-Host "[$Env:PSPROFILE_REPOSITORY_COLLECTION]" -NoNewline -ForegroundColor Cyan
-        }
-    }
-    Write-Host " " -NoNewline
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Write-PromptTime {
+
+    [CmdletBinding(PositionalBinding=$True)]
+
+    [OutputType([Void])]
+
+    Param (
+
+        [Parameter(Position=1, Mandatory=$False)]
+        [System.String] $Color = "DarkCyan"
+
+    )
+
+    Process{
+
+        Write-Host "[" -NoNewline -ForegroundColor $Color
+        Write-Host (Get-Date -UFormat %R) -NoNewline -ForegroundColor $Color
+        Write-Host "] " -NoNewline -ForegroundColor $Color
     
-    # displays location
-    Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor Gray 
-    Write-Host " " -NoNewline
+    }
+}
 
-    # displays git status
-    If ((Get-Module).Name -contains "Posh-Git") {
-        Write-VcsStatus
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Write-PromptLocation {
+
+    [CmdletBinding(PositionalBinding=$True)]
+
+    [OutputType([Void])]
+
+    Param (
+
+        [Parameter(Position=1, Mandatory=$False)]
+        [System.String] $Color = "Gray"
+
+    )
+
+    Process {
+
+        Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor $Color
+        Write-Host " " -NoNewline
+
     }
 }

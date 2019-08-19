@@ -6,6 +6,7 @@
 # ----------------------------------------------------------------------------
 $Script:ProjectConfigFile = $Null
 $Script:ProjectFiles = $Null
+$Script:WorkspaceConfigFiles = $Null
 
 #   settings -----------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -46,11 +47,16 @@ function Set-ProjectConfiguration{
         [System.String] $File,
 
         [Parameter(Position=2, Mandatory=$True)]
-        [PSCustomObject[]] $Files
+        [PSCustomObject[]] $Files,
+
+        [Parameter(Position=3, Mandatory=$True)]
+        [PSCustomObject] $Workspace
+
     )
 
     $Script:ProjectConfigFile = $File
     $SCript:ProjectFiles = $Files
+    $Script:WorkspaceFile = $Workspace
 }
 
 #   function -----------------------------------------------------------------
@@ -91,6 +97,10 @@ function Get-Project {
                 }
                 "Repository" {
                     $data = Get-Content $Script:RepositoryFile | ConvertFrom-Json
+                    break
+                }
+                "Workspace" {
+                    $data = Get-Content $Script:WorkspaceFile | ConvertFrom-Json
                     break
                 }
             }
@@ -385,14 +395,25 @@ function Open-ProjectWorkspace {
         [System.String] $Name
     )
 
+    $type = Get-ProjectType $Name
+
     $selection = Select-Project $Name Path
 
-    if ($selection){
+    if ($type -eq "Workspace"){
+        $workspace = Select-Project -Name $Name -Property Workspace -Type Workspace
+    }
 
-        $selection | ForEach-Object {
-            if (-not (Test-Path -Path $_)) {
-                Write-FormatedError -Message "Path of project is not valid."
-                return Get-ProfileProject
+    if ($selection){
+        if ($workspace){
+            
+            $selection = $workspace
+        }
+        else{
+            $selection | ForEach-Object {
+                if (-not (Test-Path -Path $_)) {
+                    Write-FormatedError -Message "Path of project is not valid."
+                    return Get-ProfileProject
+                }
             }
         }
 
