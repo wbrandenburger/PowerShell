@@ -6,6 +6,7 @@
         "papis-config-file": "A:\\.config\\papis.config.json",
         "powershell-functions": [
             "A:\\.config\\powershell\\psfunctions-git.ps1",
+            "A:\\.config\\powershell\\psfunctions-latex.ps1",
             "A:\\.config\\powershell\\psfunctions-papis.ps1",
             "A:\\.config\\powershell\\psfunctions-utils.ps1",
             "A:\\.config\\powershell\\psfunctions-virtualenv.ps1"

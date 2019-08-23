@@ -10,6 +10,7 @@ Function Prompt {
     Write-PromptAdmin -Value "Admin" -Color "Red"   # display admin
 
     Write-Host ([Regex]::Replace($(Get-Location),"\\.+\\","\~\")) -NoNewline -ForegroundColor "Gray"
+    
     # Write-Host " " -NoNewline -ForegroundColor "Gray"
 
     If ((Get-Module).Name -contains "Posh-Git") {   # displays git status
