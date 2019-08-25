@@ -44,26 +44,3 @@ Function Set-Layout {
 
     }
 }
-
-Function Set-LayoutPapis
-{
-    [CmdletBinding()]
-
-    [OutputType([Void])]
-
-    Param(
-        [Parameter(Mandatory=$False)]
-        [Switch] $Prompt
-    ) 
-
-    Process{
-
-        Set-Layout -Application Papis
-
-        if ($Prompt) {
-        Start-Process pwsh "-NoExit -NoLogo -command Set-Layout -Application Papis-Default"
-
-        }
-    }
-}
-
