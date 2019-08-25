@@ -1,5 +1,5 @@
 # ============================================================================
-#   Profile.Projects.ps1 -----------------------------------------------------
+#   Profile-Projects.ps1 -----------------------------------------------------
 # ============================================================================
 
 #   settings -----------------------------------------------------------------
@@ -151,7 +151,7 @@ function Format-Project {
     Param (
 
         [ValidateSet([ValidateProfileType])]
-        [Parameter(Position=1, Mandatory=$True)]
+        [Parameter(Position=1, Mandatory=$False)]
         [System.String] $Name="Project",
 
         [Parameter(Position=2, Mandatory=$True)]

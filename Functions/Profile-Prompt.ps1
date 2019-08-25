@@ -1,5 +1,5 @@
 # ============================================================================
-#   Profile.Prompt.ps1 -------------------------------------------------------
+#   Profile-Prompt.ps1 -------------------------------------------------------
 # ============================================================================
 
 #   function -----------------------------------------------------------------
@@ -69,10 +69,10 @@ function Write-PromptAdmin{
 
     Param (
 
-        [Parameter(Position=1, Mandatory=$True)]
+        [Parameter(Position=1, Mandatory=$False)]
         [System.String] $Value = "Admin",
 
-        [Parameter(Mandatory=$False)]
+        [Parameter(Position=2, Mandatory=$False)]
         [System.String] $Color = "Red"
 
     )
