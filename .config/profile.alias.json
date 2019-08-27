@@ -65,7 +65,7 @@
         "Tag": "Common"
     },
     {
-        "Name": "clear", 
+        "Name": "refresh", 
         "Value": "Restart-PSSession",
         "Tag": "Common"
     }

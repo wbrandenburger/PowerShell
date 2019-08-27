@@ -20,7 +20,6 @@ Function Prompt {
 
     Write-PromptEnvStatus -Env "Venv" -Value (Split-Path $Env:VIRTUAL_ENV -leaf)
     Write-PromptEnvStatus -Env "Papis" -Value $Env:PAPIS_LIB
-    Write-PromptEnvStatus -Env "Collection" -Value  $Env:PSPROFILE_REPOSITORY_COLLECTION
 }
 
 #   function -----------------------------------------------------------------
@@ -54,8 +53,6 @@ function Write-PromptEnvStatus {
             Write-Host "[$Value] " -NoNewline -ForegroundColor $ValueColor
         }
         
-        return 0
-
     }
 }
 

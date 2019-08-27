@@ -11,10 +11,10 @@ $Script:WorkspaceConfigFiles = $Null
 #   settings -----------------------------------------------------------------
 # ----------------------------------------------------------------------------
 $Script:FormatProperty = @{
-    "Project" = "Name", "Alias", "Type", "Description", "Path"
-    "Papis" = "Name", "Alias", "Path", "Description"
-    "PSModule" = "Name", "Alias", "Repository", "Path"
-    "Repository" = "Name", "Alias", @{ Label="Fork"; Expression = {if($_.Fork){$True}else{$Null} }}, "Path", @{ Label="GitHub"; Expression = {if($_.repository -eq "Collection"){"Collection"} else {$_.Github} }}
+    "Project" = "Name", "Alias", "Type", "Description", "Folder"
+    "Papis" = "Name", "Alias", "Folder", "Description"
+    "PSModule" = "Name", "Alias", "Repository", "Folder"
+    "Repository" = "Name", "Alias", @{ Label="Fork"; Expression = {if($_.Fork){$True}else{$Null} }}, "Folder", @{ Label="GitHub"; Expression = {if($_.repository -eq "Collection"){"Collection"} else {$_.Github} }}
 }
 
 #   validation ---------------------------------------------------------------
@@ -283,7 +283,7 @@ function Get-ProjectChildItem {
             return Get-ProfileProject
         }
 
-        $selection = Select-Project $Name Path
+        $selection = Select-Project $Name Folder
 
         if ($selection){
             $selection | ForEach-Object {
@@ -321,7 +321,7 @@ function Get-ProjectLocation {
 
     Process{ 
 
-        $selection = Select-Project $Name Path
+        $selection = Select-Project $Name Folder
 
         if ($selection){
             $selection | ForEach-Object {
@@ -358,7 +358,7 @@ function Set-ProjectLocation {
 
     Process{ 
 
-        $selection = Select-Project $Name Path
+        $selection = Select-Project $Name Folder
  
         if ($selection){
             $selection | ForEach-Object {
@@ -397,7 +397,7 @@ function Open-ProjectWorkspace {
 
     $type = Get-ProjectType $Name
 
-    $selection = Select-Project $Name Path
+    $selection = Select-Project $Name Folder
 
     if ($type -eq "Workspace"){
         $workspace = Select-Project -Name $Name -Property Workspace -Type Workspace
@@ -442,7 +442,7 @@ function Open-ProjectFileExplorer {
         [System.String] $Name
     )
 
-    $selection = Select-Project $Name Path
+    $selection = Select-Project $Name Folder
     
     if ($selection){
         $selection | ForEach-Object {
@@ -475,10 +475,7 @@ function Open-ProjectBrowser {
 
         [ValidateSet([ValidateProjectAlias])]
         [Parameter(Position=1)]
-        [System.String] $Name,
-
-        [Parameter()]
-        [Switch] $Fork
+        [System.String] $Name
     )
 
     Process {
@@ -490,16 +487,13 @@ function Open-ProjectBrowser {
             return Get-ProfileProject
         }
 
-        $property = "GitHub"
-        if ($type -eq "Repository"){
-            if ($Fork) {
-                $property = "Fork"
-            }
-        }
+        $selection = Select-Project -Name $Name -Property url -Type $type
 
-        $selection = Select-Project -Name $Name -Property $property -Type $type
-        
-        if ($selection) { Start-Process -FilePath $selection }
+        if ($selection) { 
+            if ($selection.getType().Name -ne "String"){
+                $selection = $selection[0]
+            }
+            Start-Process -FilePath $selection }
         else {
             Write-FormatedError -Message "No valid url was found."
             return Get-ProfileProject
@@ -508,4 +502,31 @@ function Open-ProjectBrowser {
         return $Null
 
     }
+}
+
+
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Set-PowerShellProfile {
+    
+    [CmdletBinding(PositionalBinding=$True)]
+    
+    [OutputType([Void])]
+
+    Param ()
+
+    Start-PapisLibrary -Name lib-config
+
+    $Script:ProjectFiles  | ForEach-Object {
+        If (Test-Path -Path $_){
+            Remove-Item -Path $_ -Force
+        }
+        
+        $papisQuery = [System.IO.Path]::GetFileNameWithoutExtension($_)
+
+        $(papis export --format json --out $_ "type:$papisQuery" --all)
+        
+    }
+
+    Stop-PapisLibrary
 }
