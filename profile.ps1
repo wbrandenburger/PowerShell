@@ -4,20 +4,20 @@
 
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-Import-Module SciProfile
-Import-PSMModule
+if (Get-Module -ListAvailable | Where-Object {$_.Name -eq "SciProfile"}){
+    # import main module
+    Import-Module SciProfile
+    
+    # import user defined module
+    Import-PSMModule
 
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-Import-PSMFunction
+    # import user defined functions
+    Import-PSMFunction
 
-#   validation --------------------------------------------------------------
-# ---------------------------------------------------------------------------
-. (activate-sci)
+    # activate autocompletion
+    . (activate-sci)
+}
 
 #   settings ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 Set-PSReadlineKeyHandler -Chord Alt+F4 -Function ViExit # 'alt+F' or 'alt+space c'
-
-
-
