@@ -21,7 +21,7 @@ $sciprofile_import_file = Join-Path -Path $settings.XDG_CONFIG_HOME -ChildPath "
 # ---------------------------------------------------------------------------
 $env_module_path = [System.Environment]::GetEnvironmentVariable("PSModulePath", "process")
 if (-not $($env_module_path -match $($modules_path -replace "\\", "\\"))){
-    [System.Environment]::SetEnvironmentVariable("PSModulePath", $modules_path, "User")
+    [System.Environment]::SetEnvironmentVariable("PSModulePath", $env_module_path + ";" + $modules_path, "User")
 }
 
 [System.Environment]::SetEnvironmentVariable("XDG_CONFIG_HOME", $settings.XDG_CONFIG_HOME, "User")
