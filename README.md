@@ -19,6 +19,8 @@ This repository contains a PowerShell profile with the focus on scientific work 
 
 ## Installation
 
+
+
 ## Dependencies
 
 The following PowerShell module will be automatically installed:
