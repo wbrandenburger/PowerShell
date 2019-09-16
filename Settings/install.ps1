@@ -17,6 +17,7 @@ $sciprofile_import_file = Join-Path -Path $XDG_CONFIG_HOME -ChildPath "sciprofil
 
 #   environment -------------------------------------------------------------
 # ---------------------------------------------------------------------------
+# @todo[to change]: check environment variables, abort if they do not exist. prompt user to set variables
 # $env_module_path = [System.Environment]::GetEnvironmentVariable("PSModulePath", "process")
 # if (-not $($env_module_path -match $($modules_path -replace "\\", "\\"))){
 #     [System.Environment]::SetEnvironmentVariable("PSModulePath", $env_module_path + ";" + $modules_path, "User")
@@ -28,10 +29,11 @@ if (-not $(Test-Path -Path )) {
 
 #   install -----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+# @todo[to change]: install module only if it is not available, instead update module
 # $module = Get-Module -ListAvailable
 # $module_list = 
-
 # if ($module)
+
 Install-Module SciProfile -Scope CurrentUser -AllowClobber -Force
 
 Start-Process -FilePath pwsh -Wait -NoNewWindow
