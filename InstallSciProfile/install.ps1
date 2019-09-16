@@ -11,27 +11,23 @@ $settings_file = Join-Path -Path $path -ChildPath "sciprofile.json"
 $import_file = Join-Path -Path $path -ChildPath "import.json"
 $refresh_cmd = Join-Path -Path $path -ChildPath "RefreshEnv.cmd"
 $settings = Get-Content -Path $settings_file | ConvertFrom-Json
+$XDG_CONFIG_HOME = [System.Environment]::GetEnvironmentVariable("XDG_CONFIG_HOME")
 
 $sciprofile_path = Join-Path -Path $pwsh_path -ChildPath "SciProfile"
 $modules_path = Join-Path -Path $pwsh_path -ChildPath "Modules"
-$sciprofile_config_file = Join-Path -Path $settings.XDG_CONFIG_HOME -ChildPath "sciprofile\config.ini"
-$sciprofile_import_file = Join-Path -Path $settings.XDG_CONFIG_HOME -ChildPath "sciprofile\config\import.json"
+$sciprofile_config_file = Join-Path -Path $XDG_CONFIG_HOME -ChildPath "sciprofile\config.ini"
+$sciprofile_import_file = Join-Path -Path $XDG_CONFIG_HOME -ChildPath "sciprofile\config\import.json"
 
-# #   environment -------------------------------------------------------------
-# # ---------------------------------------------------------------------------
+#   environment -------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # $env_module_path = [System.Environment]::GetEnvironmentVariable("PSModulePath", "process")
 # if (-not $($env_module_path -match $($modules_path -replace "\\", "\\"))){
 #     [System.Environment]::SetEnvironmentVariable("PSModulePath", $env_module_path + ";" + $modules_path, "User")
 # }
 
-# [System.Environment]::SetEnvironmentVariable("XDG_CONFIG_HOME", $settings.XDG_CONFIG_HOME, "User")
-# [System.Environment]::SetEnvironmentVariable("XDG_CONFIG_DIRS", "$($settings.XDG_CONFIG_HOME);", "User")
-
-if (-not $(Test-Path -Path $settings.XDG_CONFIG_HOME)) {
-    New-Item -Path $settings.XDG_CONFIG_HOME -ItemType Directory
+if (-not $(Test-Path -Path )) {
+    New-Item -Path $XDG_CONFIG_HOME -ItemType Directory
 }
-
-Start-Process -FilePath $refresh_cmd -Wait -NoNewWindow
 
 #   install -----------------------------------------------------------------
 # ---------------------------------------------------------------------------
