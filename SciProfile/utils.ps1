@@ -64,23 +64,6 @@ function Global:Publish-SciProfile {
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-Function Global:Test-Administrator {
-
-    [CmdletBinding(PositionalBinding=$True)]
-    
-    [OutputType([Bool])]
-
-    Param()
-
-    Process {
-
-        return (New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
-
-    }
-}
-
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
 Function Global:Update-PowerShell {
 
     [CmdletBinding(SupportsShouldProcess=$True)]

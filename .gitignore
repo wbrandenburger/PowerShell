@@ -1,1 +1,4 @@
 *Modules/*
+!Modules/posh-git
+!Modules/posh-vcpkg
+!Modules/ChocolateyProfile
