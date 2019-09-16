@@ -25,7 +25,7 @@ if (-not $($env_module_path -match $($modules_path -replace "\\", "\\"))){
 }
 
 [System.Environment]::SetEnvironmentVariable("XDG_CONFIG_HOME", $settings.XDG_CONFIG_HOME, "User")
-[System.Environment]::SetEnvironmentVariable("XDG_CONFIG_DIRS", "$($settings.XDG_CONFIG_DIRS);", "User")
+[System.Environment]::SetEnvironmentVariable("XDG_CONFIG_DIRS", "$($settings.XDG_CONFIG_HOME);", "User")
 
 if (-not $(Test-Path -Path $settings.XDG_CONFIG_HOME)) {
     New-Item -Path $settings.XDG_CONFIG_HOME -ItemType Directory
