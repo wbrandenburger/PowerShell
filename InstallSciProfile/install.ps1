@@ -17,7 +17,7 @@ $settings = Get-Content -Path $settings_file | ConvertFrom-Json
 [System.Environment]::SetEnvironmentVariable("XDG_CONFIG_HOME", "$($settings.XDG_CONFIG_DIRS);", "User")
 
 if (-not $(Test-Path -Path $settings.XDG_CONFIG_HOME)) {
-    New-Item -Path  -Directory
+    New-Item -Path $settings.XDG_CONFIG_HOME -Directory
 }
 
 Start-Process -FilePath $refresh_cmd -Wait -NoNewWindow
