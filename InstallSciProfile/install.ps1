@@ -7,10 +7,7 @@
 $path = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $pwsh_path = Split-Path -Path $path  -Parent
 
-$settings_file = Join-Path -Path $path -ChildPath "sciprofile.json"
 $import_file = Join-Path -Path $path -ChildPath "import.json"
-$refresh_cmd = Join-Path -Path $path -ChildPath "RefreshEnv.cmd"
-$settings = Get-Content -Path $settings_file | ConvertFrom-Json
 $XDG_CONFIG_HOME = [System.Environment]::GetEnvironmentVariable("XDG_CONFIG_HOME")
 
 $sciprofile_path = Join-Path -Path $pwsh_path -ChildPath "SciProfile"
