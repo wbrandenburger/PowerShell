@@ -15,11 +15,9 @@
 
 ## Description
 
-This repository contains a PowerShell profile with the focus on scientific work with python and C++. .
+This repository contains a PowerShell profile with the focus on scientific work with python and C++.
 
 ## Installation
-
-
 
 ## Dependencies
 
