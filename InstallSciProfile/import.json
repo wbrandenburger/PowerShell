@@ -1,0 +1,12 @@
+[
+    {
+        "default": [
+            "posh-git",
+            "PSReadLine"
+        ],
+        
+        "developer": [],
+
+        "admin": []
+    }
+]
