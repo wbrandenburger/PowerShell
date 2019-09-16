@@ -28,6 +28,10 @@ if (-not $(Test-Path -Path )) {
 
 #   install -----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+# $module = Get-Module -ListAvailable
+# $module_list = 
+
+# if ($module)
 Install-Module SciProfile -Scope CurrentUser -AllowClobber -Force
 
 Start-Process -FilePath pwsh -Wait -NoNewWindow

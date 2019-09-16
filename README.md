@@ -6,7 +6,10 @@
   - [Table of Contents](#table-of-contents)
   - [Description](#description)
   - [Installation](#installation)
-  - [Dependencies](#dependencies)
+    - [Prerequisites](#prerequisites)
+    - [Arrangement](#arrangement)
+    - [Proceeding](#proceeding)
+  - [PowerShell Modules](#powershell-modules)
   - [Authors/Contributors](#authorscontributors)
     - [Author](#author)
 
@@ -16,11 +19,28 @@ This repository contains a PowerShell profile with the focus on scientific work 
 
 ## Installation
 
-Set environment variable `%XDG_CONFIG_HOME%` to default configuration folder, e.g. `C:\Users\Name\.config`.
+### Prerequisites
 
-Start a new powershell session and invoke file `.\Settings\install.ps1` via dot sourcing. Do not forget to change execution policy of powershell.
+For full functionality, the following packages have to be installed:
 
-## Dependencies
+- [PowerShell Core](https://github.com/PowerShell/PowerShell)
+- [Python 3](https://www.python.org/)
+- [Papis](https://github.com/papis/papis)
+
+### Arrangement
+
+Set following environment variables manually
+
+- `%XDG_CONFIG_HOME%` to existing default configuration folder, e.g. `C:\Users\Name\.config`
+- `PYTHONHOME` to existing folder of system's python distribution
+
+### Proceeding
+
+- Clone this repository into the local powershell path, generally `C:\Users\User\Documents\PowerShell`
+- Start a new powershell session and invoke file `.\Settings\install.ps1` via dot sourcing. Do not forget to change execution policy of powershell.
+- Clone repository [PyVirtualEnv](https://github.com/wbrandenburger/PyVirtualEnv) into requirements folder of virtual environment working directory.
+
+## PowerShell Modules
 
 The following PowerShell module will be automatically installed:
 
