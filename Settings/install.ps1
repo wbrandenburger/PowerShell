@@ -56,34 +56,68 @@ if ($flag_folder) {
 } else {
     Write-Host -Object "All paths to files and folders or environment variables are set as well as does exist." -ForegroundColor Green
 }
+
 Write-Host
 
 #   install -----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-$session_module = Get-Module -ListAvailable
+Write-Host -Object "Install or update powershell modules..." -ForegroundColor "Yellow" 
+
+$module_available = Get-Module -ListAvailable
 @("Module") | ForEach-Object {
     $property = $_
 
     $Install.($property) | ForEach-Object {
         $module = $_
-        if ($session_module | Where-Object {$_.Name -eq $module}){
-            Write-Host -Object "Update $($_):" -ForegroundColor Yellow
-            # Update-Module -Name $module -Force
+        if ($module_available  | Where-Object {$_.Name -eq $module}){
+            Write-Host -Object "Update $($_)..." -ForegroundColor Yellow
+            Update-Module -Name $module -Force
         } else {
-            Write-Host -Object "Install $($_):" -ForegroundColor Yellow
-            # Install-Module -Name $module -Scope "CurrentUser" -AllowClobber -Force 
+            Write-Host -Object "Install $($_)..." -ForegroundColor Yellow
+            Install-Module -Name $module -Scope "CurrentUser" -AllowClobber -Force 
         }
     }
 }
 
-Start-Process -FilePath pwsh -Wait -NoNewWindow
+Write-Host
 
 #   configuration -----------------------------------------------------------
 # ---------------------------------------------------------------------------
-Get-IniContent -FilePath $Install.File["sciprofile_config"] | Set-IniContent -NameValuePairs @{"module-dir"=$Install.Path["module"]} -Sections "sciprofile" |  Set-IniContent -NameValuePairs @{"scripts-dir"=$Install.Path["sciprofile"] } -Sections "user" | Out-IniFile $Install.File["sciprofile_config"] -Force -Pretty -Loose
+Write-Host -Object "Set fields in configuration file..." -ForegroundColor "Yellow" 
 
-if (-not $(Test-Path -Path $Install.File["sciprofile_import"] )) {
-    Copy-Item -Path $Install.File["import"] -Destination $Install.File["sciprofile_import"] -Force
+$config_content = Get-IniContent -FilePath $Install.File["sciprofile_config"]
+@(
+    @{ 
+        NameValuePairs = @{"module-dir"=$Install.Path["module"]}
+        Sections = "sciprofile"
+    }
+    @{
+        NameValuePairs = @{"scripts-dir"=$Install.Path["sciprofile"]}
+        Sections ="user"
+    }
+) | ForEach-Object {
+    $config_content = $config_content | Set-IniContent -NameValuePairs $_.NameValuePairs -Sections $_.Sections 
+}
+$config_content | Out-IniFile $Install.File["sciprofile_config"] -Force -Pretty -Loose
+
+Write-Host
+
+#   files -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+Write-Host -Object "Copy files..." -ForegroundColor "Yellow" 
+
+@(
+    @{ 
+        Path = $Install.File["import"]
+        Destination = $Install.File["sciprofile_import"]
+    }
+) | ForEach-Object {
+    if (-not $(Test-Path -Path $_.Path )) {
+        Write-Host -Object "[CP] $($_.Path) $($_.Destination)." -ForegroundColor "Yellow" 
+        Copy-Item -Path $_.Path -Destination $_.Destination -Force
+    } else {
+        Write-Host -Object "File $($_.Destination) does exist." -ForegroundColor "Green" 
+    }
 }
 
 Start-Process -FilePath pwsh -Wait -NoNewWindow
