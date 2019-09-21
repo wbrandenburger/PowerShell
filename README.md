@@ -31,7 +31,7 @@ For full functionality, the following packages have to be installed:
 
 Set following environment variables manually
 
-- `%XDG_CONFIG_HOME%` to existing default configuration folder, e.g. `C:\Users\Name\.config`
+- `XDG_CONFIG_HOME` to existing default configuration folder, e.g. `C:\Users\Name\.config`
 - `PYTHONHOME` to existing folder of system's python distribution
 
 ### Proceeding
