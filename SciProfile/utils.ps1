@@ -47,18 +47,48 @@ function Global:Publish-SciProfile {
     Param(
         [Parameter(Position=1, HelpMessage="Specifies the name of the module that you want to publish. Publish-Module searches for the specified module name in `$Env:PSModulePath.")]
         [ValidateSet("SciProfile", "PSVirtualEnv", "PSPocs")]
-        [System.String] $Name
+        [System.String] $Name = "",
+
+        [Parameter(HelpMessage=".")]
+        [Switch] $Check
+
     )
 
     Process {
 
         $local_module = @(
-            @{ Name = "SciProfile"; NuGetApiKey="oy2pa5ev5v4qo7dv3bkq3u76pm2z34yujo7gzl4ykno3x4"}
-            @{ Name = "PSVirtualEnv"; NuGetApiKey="oy2g2qz54gynlzaf23aaydgh3j3ipelungwxlhthucfxwe"}
-            @{ Name = "PSPocs"; NuGetApiKey="oy2itxr6nv3o6c5emaqqtyua3nlgauwuxet3e2cujj6gfa"}
+            @{  Name = "SciProfile";
+                Alias = "psm-profile";
+                NuGetApiKey="oy2pa5ev5v4qo7dv3bkq3u76pm2z34yujo7gzl4ykno3x4"}
+            @{  Name = "PSVirtualEnv";
+                Alias = "psm-virtualenv";
+                NuGetApiKey="oy2g2qz54gynlzaf23aaydgh3j3ipelungwxlhthucfxwe"}
+            @{  Name = "PSPocs";
+                Alias = "psm-pocs";
+                NuGetApiKey="oy2itxr6nv3o6c5emaqqtyua3nlgauwuxet3e2cujj6gfa"}
         )
 
-        Publish-Module -Name $Name -NuGetApiKey $($local_module | Where-Object {$_.Name -eq $Name} | Select-Object -ExpandProperty "NuGetApiKey") 
+        $module_list = $local_module | Select-Object -ExpandProperty Name
+
+        if ($Check) {
+            $psgallery_list = Find-Module -Name ($module_list)
+            $local_list = Get-Module $module_list
+            $version_list = $module_list | ForEach-Object {
+                $module = $_
+                [PSCustomObject] @{
+                    Name = $module
+                    PSGallery = $psgallery_list | Where-Object {$_.Name -eq $module} | Select-Object -ExpandProperty "Version"
+                    Local = $local_list | Where-Object {$_.Name -eq $module} | Select-Object -ExpandProperty "Version"
+                }
+            }
+            
+
+            return $version_list
+        }
+
+        if ($Name) {
+            Publish-Module -Name $Name -NuGetApiKey $($local_module | Where-Object {$_.Name -eq $Name} | Select-Object -ExpandProperty "NuGetApiKey")
+        } 
     }
 }
 
