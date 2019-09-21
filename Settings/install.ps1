@@ -9,24 +9,43 @@
 $path = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $pwsh_path = Split-Path -Path $path -Parent
 $Install = New-Object -TypeName PSObject -Property @{
-    # path definitions
+    # prerequisites
+    Command = @(
+        "pwsh.exe"
+        "git.exe"
+        "code.cmd"
+    )
+
+    # path to 
     Path = @{
         sciprofile = Join-Path -Path $pwsh_path -ChildPath "SciProfile"
         module = Join-Path -Path $pwsh_path -ChildPath "Modules"
     }
+
+    # path to files
+    File = @{}
 
     # environment variables
     Env = @{
         XDG_CONFIG_HOME = [System.Environment]::GetEnvironmentVariable("XDG_CONFIG_HOME")
         PYTHONHOME = [System.Environment]::GetEnvironmentVariable("PYTHONHOME")
     }
+
     # powershell module
     Module = @(
-        "SciProfile"
-        "PSPocs"
-        "PSVirtualEnv"
         "PSIni"
+        "PSVirtualEnv"
+        "PSPocs"
+        "SciProfile"
     )
+
+    # repositories
+    Repository = @{
+        Requirement = @{
+                "Dir" = Join-Path -Path $env:USERPROFILE -ChildPath "PSVirtualEnv\.require"
+                "Url" = "https://github.com/wbrandenburger/PyVirtualEnv"
+        }
+    }
 }
 
 
@@ -46,6 +65,22 @@ $flag_folder = $False
     $Install.($property) | Format-Table 
 }
 
+$command = @{}
+$Install.Command | ForEach-Object {
+    $command_info = Get-Command $_ -ErrorAction SilentlyContinue
+    
+    if (-not $command_info){
+        $flag_folder = $True
+        $command[$_] = $Null
+    } else {
+        $command[$_] = $command_info | Select-Object -ExpandProperty Source
+    }
+}
+Write-Host -Object "Property Command:" -ForegroundColor Yellow
+$command
+
+Write-Host
+
 if ($flag_folder) {
     Write-Host -Object "Some paths to files and folders or environment variables are not set or does not exist. Abort installation." -ForegroundColor Red
     return
@@ -54,19 +89,16 @@ if ($flag_folder) {
 }
 
 # set additional path to files and directories, which will be generated
-$Install | Add-Member -MemberType NoteProperty -Name File -Value @{
+$Install.File +=  @{
     install_import = Join-Path -Path $path -ChildPath "import.json"
     sciprofile_config = Join-Path -Path $Install.Env["XDG_CONFIG_HOME"] -ChildPath "sciprofile\config.ini"
     sciprofile_import = Join-Path -Path $Install.Env["XDG_CONFIG_HOME"] -ChildPath "sciprofile\config\import.json"
 }
 
-Install-SciProfileModules
-Install-SciProfileConfiguration
-Install-SciProfileFile
+Write-Host
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-
 function Install-SciProfileModules {
 
     Write-Host -Object "Install or update powershell modules..." -ForegroundColor "Yellow" 
@@ -79,20 +111,26 @@ function Install-SciProfileModules {
             $module = $_
             if ($module_available  | Where-Object {$_.Name -eq $module}){
                 Write-Host -Object "Update $($_)..." -ForegroundColor Yellow
-                Update-Module -Name $module -Force
+                Update-Module -Name $module -ErrorAction SilentlyContinue
             } else {
                 Write-Host -Object "Install $($_)..." -ForegroundColor Yellow
-                Install-Module -Name $module -Scope "CurrentUser" -AllowClobber -Force 
+                
+                Install-Module -Name $module -Scope "CurrentUser" -AllowClobber -Force
             }
+
+            Write-Host -Object "Import $($_)..." -ForegroundColor Yellow
+
+            Import-Module -Name $module -Force
         }
     }
+    
+    #Start-Process -FilePath pwsh -Wait -NoNewWindow
 
     Write-Host
 }
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-
 function Install-SciProfileConfiguration {
 
     Write-Host -Object "Set fields in configuration file..." -ForegroundColor "Yellow" 
@@ -117,7 +155,6 @@ function Install-SciProfileConfiguration {
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-
 function Install-SciProfileFile {
 
     Write-Host -Object "Copy files..." -ForegroundColor "Yellow" 
@@ -128,7 +165,7 @@ function Install-SciProfileFile {
             Destination = $Install.File["sciprofile_import"]
         }
     ) | ForEach-Object {
-        if (-not $(Test-Path -Path $_.Path )) {
+        if (-not $(Test-Path -Path $_.Destination )) {
             Write-Host -Object "[CP] $($_.Path) $($_.Destination)." -ForegroundColor "Yellow" 
             Copy-Item -Path $_.Path -Destination $_.Destination -Force
         } else {
@@ -136,7 +173,66 @@ function Install-SciProfileFile {
         }
     }
 
-    Start-Process -FilePath pwsh -Wait -NoNewWindow
+    #Start-Process -FilePath pwsh -Wait -NoNewWindow
 
     Write-Host
 }
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+function Install-SciProfileRepository {
+
+    Write-Host -Object "Clone repositories..." -ForegroundColor "Yellow" 
+
+    $Install.Repository.Values | ForEach-Object {
+        Write-Host
+
+        if (Test-Path -Path $_["Dir"]) {
+            if (Test-GitWorkingTree -Path $_["Dir"]){
+                Write-Host -Object "[UD] $($_['Url']) in $($_['Dir'])" -ForegroundColor Yellow
+                Start-Process -FilePath "git" -Args "-C",  $_["Dir"], "pull" -NoNewWindow -Wait
+                return
+            } 
+
+            Remove-Item $_["Dir"] -Recurse -Force
+        }
+        Write-Host -Object "[MK] $($_['Url']) to $($_['Dir'])" -ForegroundColor Yellow
+
+        Start-Process -FilePath "git" -Args "clone", $_["Url"], $_["Dir"] -NoNewWindow -Wait
+
+    }
+    Write-Host
+}
+
+# #   function ----------------------------------------------------------------
+# # ---------------------------------------------------------------------------
+function Test-GitWorkingTree {
+    Param(
+        [System.String] $Path
+    )
+
+    if (-not $(Test-Path -Path $Path)){
+        return $False
+    }
+    
+    #Write-Host -Object "Check git repository with 'git -C $Path rev-parse --is-inside-work-tree'" -ForegroundColor Yellow
+
+    $working_tree = git -C $Path rev-parse --is-inside-work-tree
+    if(-not $($working_tree -eq "true")) {
+        return $False
+    }
+
+    return $True
+}
+
+#   install -----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+Install-SciProfileModules
+Install-SciProfileConfiguration
+Install-SciProfileFile
+$Install.Repository["Requirement"]["Dir"] = $env:PSVIRTUALENV_REQUIRE
+Install-SciProfileRepository
+
+#   restart -----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+Start-Process -FilePath pwsh -Wait -NoNewWindow

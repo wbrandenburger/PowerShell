@@ -25,7 +25,7 @@ For full functionality, the following packages have to be installed:
 
 - [PowerShell Core](https://github.com/PowerShell/PowerShell)
 - [Python 3](https://www.python.org/)
-- [Papis](https://github.com/papis/papis)
+- [Git](https://git-scm.com/)
 
 ### Arrangement
 
@@ -38,16 +38,15 @@ Set following environment variables manually
 
 - Clone this repository into the local powershell path, generally `C:\Users\User\Documents\PowerShell`
 - Start a new powershell session and invoke file `.\Settings\install.ps1` via dot sourcing. Do not forget to change execution policy of powershell.
-- Clone repository [PyVirtualEnv](https://github.com/wbrandenburger/PyVirtualEnv) into requirements folder of virtual environment working directory.
 
 ## PowerShell Modules
 
 The following PowerShell module will be automatically installed:
 
-- [PSIni](https://github.com/lipkau/PsIni)
 - [SciProfile](https://github.com/wbrandenburger/SciProfile)
 - [PSPocs](https://github.com/wbrandenburger/PSPocs)
 - [PSVirtualEnv](https://github.com/wbrandenburger/PSVirtualEnv)
+- [PSIni](https://github.com/lipkau/PsIni)
 
 ## Authors/Contributors
 
