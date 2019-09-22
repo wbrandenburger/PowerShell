@@ -10,3 +10,4 @@
 !Modules/PSModuleUtils
 *SciProfile/utils.ps1
 *Scripts/*
+*Packages/*
