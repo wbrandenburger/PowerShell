@@ -1,0 +1,26 @@
+[
+    {
+        "Id" : "Editor",
+        "Field" : "default-editor",
+        "Section" : "user", 
+        "Default" : "notepad"
+    },
+    {
+        "Id" : "EditorArgs",
+        "Field" : "editor-arguments", 
+        "Section" : "user", 
+        "Default" : ""
+    },
+    {
+        "Id" : "VirtualEnv",
+        "Field" : "virtual-env", 
+        "Section" : "pocs", 
+        "Default" : "papis-attempt"
+    },
+    {
+        "Id" : "PapisPckg",
+        "Field" : "papis-package", 
+        "Section" : "pocs", 
+        "Default" : "-e git+http://github.com/wbrandenburger/papis.git@beta#egg=papis"
+    }
+]

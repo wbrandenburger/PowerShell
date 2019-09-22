@@ -10,6 +10,7 @@
     - [Arrangement](#arrangement)
     - [Proceeding](#proceeding)
   - [PowerShell Modules](#powershell-modules)
+  - [Optional](#optional)
   - [Authors/Contributors](#authorscontributors)
     - [Author](#author)
 
@@ -47,6 +48,12 @@ The following PowerShell module will be automatically installed:
 - [PSPocs](https://github.com/wbrandenburger/PSPocs)
 - [PSVirtualEnv](https://github.com/wbrandenburger/PSVirtualEnv)
 - [PSIni](https://github.com/lipkau/PsIni)
+
+## Optional
+
+The following repositories are useful for the usage of `SciProfile`:
+
+- [PyVirtualEnv](https://github.com/wbrandenburger/PyVirtualEnv)
 
 ## Authors/Contributors
 

@@ -2,3 +2,9 @@
 !Modules/posh-git
 !Modules/posh-vcpkg
 !Modules/ChocolateyProfile
+!Modules/PSPocs
+!Modules/PSVirtualEnv
+!Modules/PSIni
+!Modules/SciProfile
+!Modules/PSModuleUtils
+SciProfile\utils.ps1

@@ -111,7 +111,7 @@ function Install-SciProfileModules {
             $module = $_
             if ($module_available  | Where-Object {$_.Name -eq $module}){
                 Write-Host -Object "Update $($_)..." -ForegroundColor Yellow
-                Update-Module -Name $module -ErrorAction SilentlyContinue
+                # Update-Module -Name $module -ErrorAction SilentlyContinue
             } else {
                 Write-Host -Object "Install $($_)..." -ForegroundColor Yellow
                 
