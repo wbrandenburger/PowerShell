@@ -4,4 +4,6 @@
 
 #   settings ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-$PSVirtualEnv.Python = Find-Python -NoVirtualEnv -Verbose 
+$PSVirtualEnv.Python = Find-Python -Verbose
+
+Repair-Python -Silent

@@ -1,3 +1,4 @@
+*.vscode/*
 *Modules/*
 !Modules/posh-git
 !Modules/posh-vcpkg
