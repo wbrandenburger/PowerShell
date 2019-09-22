@@ -7,5 +7,5 @@
 !Modules/PSIni
 !Modules/SciProfile
 !Modules/PSModuleUtils
-./SciProfile/utils.ps1
+*SciProfile/utils.ps1
 *Scripts/*
