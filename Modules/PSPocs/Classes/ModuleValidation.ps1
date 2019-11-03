@@ -37,5 +37,12 @@ Class ValidatePocsSection : IValidateSetValuesGenerator {
         return [String[]] ((ValidatePocsConfigSection) + "")
     }
 }
+#   validation --------------------------------------------------------------
+# ---------------------------------------------------------------------------
+Class ValidatePocsConfigFiles : IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+        return [String[]] (ValidatePocsConfigFiles)
+    }
+}
 
 

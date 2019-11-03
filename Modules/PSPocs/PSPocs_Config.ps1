@@ -6,13 +6,14 @@
 # ---------------------------------------------------------------------------
 $PSPocs = New-Object -TypeName PSCustomObject -Property @{
     Name = $Module.Name
+    WorkDir = Get-ConfigProjectDir -Name $Module.Name
 
-    PapisConfig = (Get-ConfigProjectFile -Name "Papis") -replace "\.ini", ""
+    PapisConfigHome = Get-ConfigProjectDir -Name "papis"
+    PapisConfig = $(Get-ConfigProjectFile -Name "papis") -replace "\.ini", ""
     PapisConfigContent = $Null
 
     Library = @()
-    LibraryDefault = $default_library
-
+    Type = @("docs", "paper", "work")
     Logger = @()
 }
 

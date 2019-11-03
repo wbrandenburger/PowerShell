@@ -31,11 +31,18 @@ function Edit-PocsConfig {
 
     [OutputType([Void])]
 
-    Param()
+    Param(
+        [ValidateSet([ValidatePocsConfigFiles])]
+        [Parameter(Position=1, HelpMessage="File name of a configuration file.")]
+        [System.String] $Name = "config.ini"
+    )
 
     Process {
 
-        $editor_args = $($PSPocs.EditorArgs + " " + $Module.Config)
+        # get existing requirement file 
+        $file = Join-Path -Path $PSPocs.WorkDir -ChildPath $Name
+
+        $editor_args = $($PSPocs.EditorArgs + " " +  $file)
         
         # open existing requirement file
         if (Test-Path -Path $Module.Config){

@@ -31,17 +31,19 @@ function Remove-PocsLibrary {
 
     Process{
 
-        # update existing literature and document libraries
-        Update-PocsLibrary
+        if ($Name) {
+            # update existing literature and document libraries
+            Update-PocsLibrary
 
-        # get specified library and create structure fur further processing
-        $library_structure = Get-LibraryStructure
+            # get specified library and create structure fur further processing
+            $library_structure = Get-LibraryStructure
 
-        # get modified document and bibliography libraries
-        $library_structure.Library.Remove($Name)
-        $library_structure.Source = $library_structure.Library
+            # get modified document and bibliography libraries
+            $library_structure.Library.Remove($Name)
+            $library_structure.Source = $library_structure.Library
 
-        # remove key from literature and document configuration settings and update module structures
-        Update-PocsLibraryFromInput -Structure $library_structure -Action "remove"
+            # remove key from literature and document configuration settings and update module structures
+            Update-PocsLibraryFromInput -Structure $library_structure -Action "remove"
+        }
     }
 }

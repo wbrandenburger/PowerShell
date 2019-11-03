@@ -1,4 +1,44 @@
-[
+[    
+    {
+        "Id" : "WorkDir", 
+        "Field" : "work-dir", 
+        "Section" : "user", 
+        "Default" : "%(WorkDir)s",
+        "Required" : true,
+        "Folder" : true
+    },
+    {
+        "Id" : "ConfigDir", 
+        "Field" : "config-dir", 
+        "Section" : "user", 
+        "Default" : "%(WorkDir)s\\config",
+        "Required" : true,
+        "Folder" : true
+    },
+    {
+        "Id" : " PapisConfigHome", 
+        "Field" : "papis-work-dir", 
+        "Section" : "user", 
+        "Default" : "%(PapisConfigHome)s",
+        "Required" : true,
+        "Folder" : true
+    },
+    {
+        "Id" : "PapisCacheDir", 
+        "Field" : "papis-cache-dir", 
+        "Section" : "user", 
+        "Default" : "%(PapisConfigHome)s\\cache",
+        "Required" : true,
+        "Folder" : true
+    },
+    {
+        "Id" : "PapisLibDir", 
+        "Field" : "papis-lib-dir", 
+        "Section" : "user", 
+        "Default" : "%(PapisConfigHome)s\\libraries",
+        "Required" : true,
+        "Folder" : true
+    },    
     {
         "Id" : "Editor",
         "Field" : "default-editor",

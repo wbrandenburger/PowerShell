@@ -13,6 +13,10 @@
         Name="ProjectEnvOld"
         Value="$($PSPocs.Name.ToUpper())_PROJECT_OLD"
     }
+    @{  # offline use of module
+        Name="ProjectOffline"
+        Value="PSVIRTUALENV_OFFLINE"
+    }
 ) | ForEach-Object {
     $PSPocs | Add-Member -MemberType NoteProperty -Name $_.Name -Value $_.Value
 }

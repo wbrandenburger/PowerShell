@@ -86,3 +86,31 @@ function ValidatePocsConfigSection {
     
     }
 }
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
+function ValidatePocsConfigFiles {
+
+    <#
+    .DESCRIPTION
+        Return values for the use of validating existing module configuration files.
+    
+    .OUTPUTS
+        System.String[]. Existing module configuration files.
+    #>
+
+    [CmdletBinding(PositionalBinding)]
+    
+    [OutputType([System.String[]])]
+
+    Param()
+
+    Process{
+        
+        $file_list = (Get-ChildItem -Path $PSPocs.WorkDir -File -Recurse).FullName
+        
+        return ($file_list | ForEach-Object {
+            $_ -replace ($PSPocs.WorkDir -replace "\\", "\\")})
+    
+    }
+}

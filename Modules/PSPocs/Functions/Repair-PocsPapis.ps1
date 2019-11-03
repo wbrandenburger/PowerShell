@@ -36,8 +36,12 @@ function Repair-PocsPapis {
 
         if (-not $((Get-VirtualEnv -Name $PSPocs.VirtualEnv -Unformatted) | Where-Object { $_.Name -eq "papis"})){
             Write-FormattedWarning -Message "Package 'papis' can not be found in virtual environment '$($PSPocs.VirtualEnv)' can not be found. Installation of 'papis'." -Module $PSPocs.Name
-            
-            Install-VirtualEnv -Name $PSPocs.VirtualEnv -Package "$($PSPocs.PapisPckg)"
+
+            if (-not [System.Environment]::GetEnvironmentVariable($SciProfile.ProjectOffline)) {
+                Install-VirtualEnv -Name $PSPocs.VirtualEnv -Package "$($PSPocs.PapisPckg)"
+            } else {
+                Install-VirtualEnv -Name "python" -Offline "\offline-papis" -Silent:$Silent    
+            }
         } 
 
         if (-not $(Test-Path -Path $PSPocs.PapisConfig)){

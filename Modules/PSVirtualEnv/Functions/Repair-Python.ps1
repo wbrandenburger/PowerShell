@@ -42,7 +42,6 @@ function Repair-Python {
             # }
         }
         else {
-
             Install-VirtualEnv -Name "python" -Offline "\offline-pip" -Silent:$Silent
         }
     }

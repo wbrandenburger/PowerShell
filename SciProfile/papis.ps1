@@ -55,7 +55,7 @@ function Global:Papis-GetBib{
             Remove-Item -Path $Path -Force
         }
         
-        Start-PapisLibrary -Name $Library
+        Start-PocsLibrary -Name $Library
 
         
         write-Host "$(papis config dir)"
@@ -65,7 +65,7 @@ function Global:Papis-GetBib{
             $(papis export --format bibtex --out $Path --all $_)
         }
 
-        Stop-PapisLibrary
+        Stop-PocsLibrary -VirtualEnv
     }
 }
 

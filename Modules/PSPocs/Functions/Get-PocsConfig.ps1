@@ -41,18 +41,40 @@ function Get-PocsConfig {
     [OutputType([System.Object])]
 
     Param(
+        [ValidateSet([ValidatePocsConfigFiles])]
+        [Parameter(Position=1, HelpMessage="File name of a configuration file.")]
+        [System.String] $Name = "config.ini",
+
         [Parameter(HelpMessage="Return information not as readable table with additional details.")]
         [Switch] $Unformatted
     )
 
     Process {
 
-        $config_content = Get-IniContent -FilePath $Module.Config -IgnoreComments
-        $config_content = Format-IniContent -Content $config_content -Substitution $PSPocs 
+        # get existing requirement file 
+        $file = Join-Path -Path $PSPocs.WorkDir -ChildPath $Name
         
-        $result = @()
-        $config_content.Keys | ForEach-Object {
-            $result += $config_content[$_] 
+        # open existing requirement file 
+        switch ([System.IO.Path]::GetExtension($file)){
+            ".ini" {
+                $config_content = Get-IniContent -FilePath $file -IgnoreComments
+                $config_content = Format-IniContent -Content $config_content -Substitution $PSPocs
+                
+                $result = @()
+                $config_content.Keys | ForEach-Object {
+                    $result += $config_content[$_]
+                }
+                break
+            }
+            ".json" {
+                $result = Get-Content -Path $file | ConvertFrom-Json
+                break
+            }
+            default { 
+                $result = Get-Content -Path $file
+                $Unformatted = $True
+                break
+            }
         }
 
         if ($Unformatted) {

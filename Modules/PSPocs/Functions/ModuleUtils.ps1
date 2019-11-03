@@ -186,7 +186,7 @@ function New-ConfigBackup {
 
     Param(
 
-        [Parameter(Position=1, HelpMessage="Structure of library, containing details about the ocomposition of sections.")]
+        [Parameter(Position=1, HelpMessage="Structure of library, containing details about the composition of sections.")]
         [System.Object] $Structure,
 
         [Parameter(HelpMessage="Performed action for logging purposes.")]
@@ -205,8 +205,9 @@ function New-ConfigBackup {
             }
         
             # copy source to backup location
-            Copy-Item -Path $path.Source -Destination $path.Backup -Force
-            
+            if (Test-Path -Path $path.Source) {
+                Copy-Item -Path $path.Source -Destination $path.Backup -Force
+            }
             $path_list += $path
         }
 
@@ -281,18 +282,11 @@ function Get-LocalConfigFile {
 
     Process {
         # extract local config file from document and bibliography library settings
-        $library = $Library
+        $library = Format-FileContent -Content $Library
         if ($library.Keys -contains "local-config-file"){
             $config_file = $library["local-config-file"]
-
-            # if variable subsitution is enabled, the corresponding pattern '%(variable)'
-            $config_folder = [regex]::Match($library["local-config-file"], "\%\((.+)\)s").captures.groups[1].value
-            if ($config_folder) {
-                # if the pattern is found it has to be replaced with the corresponding path
-                $config_file = $config_file -replace "\%\((.+)\)s",  $library[$config_folder]
-                if (Test-Path -Path $config_file){
-                    return $config_file
-                }
+            if (Test-Path -Path $config_file){
+                return $config_file
             }
         }
     }

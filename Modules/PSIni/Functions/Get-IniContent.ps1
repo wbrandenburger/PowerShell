@@ -89,7 +89,8 @@
 
         $commentRegex = "^\s*([$($CommentChar -join '')].*)$"
         $sectionRegex = "^\s*\[(.+)\]\s*$"
-        $keyRegex     = "^\s*(.+?)\s*=\s*(['`"]?)(.*)\2\s*$"
+        $keyRegex     = "^\s*(.+?)\s*=\s*(['`"]?)(?m)((.*)(\n\t.*)*)\2\s*$"
+        $indentRegex  = "^( {4,}.*)\s*$"
 
         Write-Debug ("commentRegex is {0}." -f $commentRegex)
     }
@@ -143,17 +144,36 @@
                 }
                 $name, $value = $matches[1, 3]
                 Write-Verbose "$($MyInvocation.MyCommand.Name):: Adding key $name with value: $value"
-                if (-not $ini[$section][$name]) {
+                $content = $ini[$section][$name]
+                if (-not $content) {
                     $ini[$section][$name] = $value
                 }
                 else {
-                    if ($ini[$section][$name] -is [string]) {
+                    if ($content -is [string]) {
                         $ini[$section][$name] = [System.Collections.ArrayList]::new()
-                        $ini[$section][$name].Add($ini[$section][$name]) | Out-Null
+                        $ini[$section][$name].Add($content) | Out-Null
                         $ini[$section][$name].Add($value) | Out-Null
                     }
                     else {
                         $ini[$section][$name].Add($value) | Out-Null
+                    }
+                }
+                continue
+            }
+            $indentRegex {
+                if (!(test-path "variable:local:section")) {
+                    $section = $script:NoSection
+                    $ini[$section] = New-Object System.Collections.Specialized.OrderedDictionary([System.StringComparer]::OrdinalIgnoreCase)
+                }
+                $value = $matches[1]
+                Write-Verbose "$($MyInvocation.MyCommand.Name):: Adding indent content to key $name with value: $value"
+                $content = $ini[$section][$name]
+                if ($content){
+                    if ($content -is [string]) {
+                        $ini[$section][$name] += "`n$value"
+                    }
+                    else {
+                        $ini[$section][$name][-1] += "`n$value"
                     }
                 }
                 continue
