@@ -13,7 +13,7 @@
 RootModule = "SciProfile.psm1"
 
 # Version number of this module.
-ModuleVersion = "0.3.8"
+ModuleVersion = "0.3.9"
 
 # Supported PSEditions
 # CompatiblePSEditions = @()

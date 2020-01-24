@@ -114,15 +114,22 @@ function Set-EnvVariable
         [Parameter(Position=1, Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName , HelpMessage="Name of environment variable")]
         [System.String] $Name,
 
-        [Parameter(Position=2, Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName , HelpMessage="Value ofor specified environment variable")]
+        [Parameter(Position=2, Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName , HelpMessage="Value for specified environment variable")]
         [System.String] $Value,
 
         [Parameter(Position=3, HelpMessage="Scope of specified environment variable")]
         [ValidateSet("process", "machine", "user")]
-        [System.String] $Scope = "process"
+        [System.String] $Scope = "process",
+
+        [Parameter(HelpMessage="Concatenates the specified environment variable")]
+        [Switch] $Concatenate
     )
   
     Process {
+
+        if ($Concatenate) {
+            $Value = $Value + ";" + [System.Environment]::GetEnvironmentVariable($Name, $Scope)
+        } 
 
         [System.Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
 

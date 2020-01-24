@@ -32,6 +32,14 @@
         "Folder" : true
     },
     {
+        "Id" : "SearchDir", 
+        "Field" : "search-dir", 
+        "Section" : "user", 
+        "Default" : "%(WorkDir)s\\.search",
+        "Required" : true,
+        "Folder" : true
+    },
+    {
         "Id" : "ProjectFile",
         "Field" : "project-file", 
         "Section" : "user", 
