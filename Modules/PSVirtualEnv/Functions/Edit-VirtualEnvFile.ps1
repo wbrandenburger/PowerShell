@@ -19,7 +19,7 @@ function Edit-VirtualEnvFile {
 
     .PARAMETER SearchDirs
 
-    .PARAMETER Settings
+    .PARAMETER Template
 
     .EXAMPLE
         PS C:\> Edit-VirtualEnvFile
@@ -29,7 +29,7 @@ function Edit-VirtualEnvFile {
         Open the content of module's configuration file in predefined editor.
 
     .EXAMPLE
-        PS C:\> Edit-VirtualEnvFile -Settings
+        PS C:\> Edit-VirtualEnvFile -Template
 
         -----------
         Description
@@ -68,6 +68,9 @@ function Edit-VirtualEnvFile {
     [OutputType([Void])]
 
     Param(
+        [Parameter(ParameterSetName="Log",  HelpMessage="Show pip's last log file.")]
+        [Switch] $Log,
+
         [ValidateSet([ValidateVenvRequirements])]
         [Parameter(ParameterSetName="Requirement", Position=1,  HelpMessage="Relative path to a requirements file in predefined requirements folder.")]
         [System.String] $Requirement,
@@ -80,8 +83,8 @@ function Edit-VirtualEnvFile {
         [Parameter(ParameterSetName="SearchDirs", Position=1,  HelpMessage="Relative path to existing file with additional search directories in predefined folder.")]
         [System.String] $SearchDirs,
 
-        [Parameter(ParameterSetName="Settings", Position=1, HelpMessage="Opens the file with the settings of each virtual environment..")]
-        [Switch] $Settings
+        [Parameter(ParameterSetName="Template", Position=1, HelpMessage="how all templates for special virtual environments.")]
+        [Switch] $Template
     )
 
     Process {
@@ -91,27 +94,31 @@ function Edit-VirtualEnvFile {
         switch ($PSCmdlet.ParameterSetName) {
             "Config" {
                 $file_path = $Module.Config
-                break;
+                break
+            }
+            "Log" {
+                $file_path = $PSVirtualEnv.PipLogFile
+                break
             }
 
             "Requirement" {
                 $file_path = Join-Path -Path $PSVirtualEnv.RequireDir -ChildPath $Requirement 
-                break;
+                break
             }
 
             "Script" {
                 $file_path = Join-Path -Path $PSVirtualEnv.ScriptDir -ChildPath $Script
-                break;
+                break
             }
 
             "SearchDirs" {
                 $file_path = Join-Path -Path $PSVirtualEnv.SearchDir -ChildPath $SearchDirs
-                break;
+                break
             }
 
-            "Settings" {
-                $file_path = $PSVirtualEnv.VenvSettings
-                break;
+            "Template" {
+                $file_path = $PSVirtualEnv.TemplateFile
+                break
             }
         }
 

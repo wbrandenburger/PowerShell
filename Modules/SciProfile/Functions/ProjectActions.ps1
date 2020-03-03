@@ -155,7 +155,9 @@ function Set-ProjectLocation {
     Param (
         [ValidateSet([ValidateProjectAlias])]
         [Parameter(Position=1, HelpMessage="Name or alias of an project.")]
-        [System.String] $Name
+        [System.String] $Name,
+
+        [Switch] $NewWindow
     )
 
     Process{ 
@@ -166,7 +168,13 @@ function Set-ProjectLocation {
 
         $path_list = Get-ProjectLocation -Name $Name
         foreach ($path in $path_list){
-            Start-Process -FilePath pwsh -WorkingDirectory $path
+            if ($NewWindow) {
+                foreach ($path in $path_list){
+                    Start-Process -FilePath pwsh -WorkingDirectory $path
+                }
+            } else {
+                Set-Location -Path $path
+            }
         }
     }
 }

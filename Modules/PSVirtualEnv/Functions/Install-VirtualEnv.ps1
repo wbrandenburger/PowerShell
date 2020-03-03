@@ -96,18 +96,18 @@ function Install-VirtualEnv {
 
     Param (
         [ValidateSet([ValidateVirtualEnv])]
-        [Parameter(Position=1, ValueFromPipeline, HelpMessage="Name of the virtual environment.")]
-        [System.String] $Name="",
+        [Parameter(Position=0, Mandatory, ValueFromPipeline, HelpMessage="Name of the virtual environment.")]
+        [System.String] $Name,
 
-        [Parameter(ParameterSetName="Package", Position=2, Mandatory, HelpMessage="Specified packages will be installed.")]
+        [Parameter(ParameterSetName="Package", Position=1, Mandatory, HelpMessage="Specified packages will be installed.")]
         [System.String[]] $Package,
 
         [ValidateSet([ValidateVenvRequirements])]
-        [Parameter(ParameterSetName="Requirement", Position=2, HelpMessage="Relative path to a requirements file in predefined requirements folder.")]
+        [Parameter(ParameterSetName="Requirement", Position=1, HelpMessage="Relative path to a requirements file in predefined requirements folder.")]
         [System.String] $Requirement,
 
-        [ValidateSet([ValidateVenvLocalDirs])]
-        [Parameter(ParameterSetName="Offline", Position=2, HelpMessage="Path to a folder with local packages.")]
+        [ValidateSet([ValidateVenvLocal])]
+        [Parameter(ParameterSetName="Offline", Position=1, HelpMessage="Path to a folder with local packages.")]
         [System.String] $Offline="",
 
         [Parameter(HelpMessage="If switch 'silent' is true no output will written to host.")]
@@ -116,17 +116,8 @@ function Install-VirtualEnv {
     
     Process {
 
-        # check valide virtual environment 
-        if ($Name)  {
-            if (-not (Test-VirtualEnv -Name $Name)){
-                Write-FormattedError -Message "The virtual environment '$($Name)' does not exist." -Module $PSVirtualEnv.Name -Space -Silent:$Silent -Space 
-                Get-VirtualEnv
-                return
-            }
+        $virtual_env = @{ Name = $Name }
 
-            $virtual_env = @{ Name = $Name }
-        }
-        
         switch ($PSCmdlet.ParameterSetName) {
             "Package" { 
                 # create a valide requirement file for a specified package
@@ -148,20 +139,8 @@ function Install-VirtualEnv {
             "Offline" {
                 $local_path = Join-Path -Path $PSVirtualEnv.LocalDir -ChildPath $Offline
 
-                if (-not $(Test-Path -Path $local_path)){
-                    Write-FormattedError -Message "File $($local_path) does not exist. Abort operation." -Module $PSVirtualEnv.Name
-                    return
-                }
-    
-                $packages = Get-ChildItem -Path $local_path  
-    
-                $packages_bin = $packages | Where-Object {-not ($_.Name -match ".zip")} |  Select-Object -ExpandProperty FullName
-                $packages_rep = $packages | Where-Object {$_.Name -match ".zip"} |  Select-Object -ExpandProperty FullName
-    
-                $packages =  $packages_bin + $packages_rep
-    
                 $requirement_file = New-TemporaryFile -Extension ".txt"
-                Out-File -FilePath $requirement_file -InputObject $packages                
+                Out-File -FilePath $requirement_file -InputObject $local_path         
                 break
             }
         }
@@ -241,15 +220,17 @@ function Install-VirtualEnvPackage {
         $message = "reinstall"
     }
 
+    $options_cmd = "--cache-dir", "$($PSVirtualEnv.PipCache)", "--log", "$($PSVirtualEnv.PipLogFile)" 
+
     Write-FormattedProcess -Message "Try to $($message) packages from requirement file '$Requirement'." -Module $PSVirtualEnv.Name -Silent:$Silent
 
     Set-VirtualEnv -Name $Name
     
     # install packages from a requirement file
     if ($Silent) {
-        pip $install_cmd --requirement $Requirement $upgrade_cmd $dev_cmd 2>&1> $Null
+        pip $install_cmd --requirement $Requirement $upgrade_cmd $dev_cmd $options_cmd 2>&1> $Null
     } else {
-        pip $install_cmd --requirement $Requirement $upgrade_cmd $dev_cmd
+        pip $install_cmd --requirement $Requirement $upgrade_cmd $dev_cmd $options_cmd
     }
 
     Restore-VirtualEnv

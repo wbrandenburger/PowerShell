@@ -15,6 +15,7 @@
     @{ Name = "ls-env";         Value = "Get-EnvVariable"}
     @{ Name = "lsx";            Value = "Get-ProjectChildItem"} 
     @{ Name = "sx";             Value = "Set-ProfileProjectList"}
+    @{ Name = "gcis";           Value = "Get-ChildItemSize"}
     @{ Name = "s-env";          Value = "Set-EnvVariable"}
     @{ Name = "t-env";          Value = "Test-EnvPath"}
     @{ Name = "vsx";            Value = "Open-ProjectWorkspace"}

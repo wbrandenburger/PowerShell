@@ -1,10 +1,10 @@
 # ===========================================================================
-#   Set-VirtualEnvSearchDirs.ps1 --------------------------------------------
+#   Set-VirtualEnvSystem.ps1 ------------------------------------------------
 # ===========================================================================
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-function Set-VirtualEnvSearchDirs {
+function Set-VirtualEnvSystem {
 
     <#
     .SYNOPSIS
@@ -39,15 +39,18 @@ function Set-VirtualEnvSearchDirs {
     Param(
 
         [ValidateSet([ValidateVenvSearchDirs])]
-        [Parameter(ParameterSetName="Path", Position=1, Mandatory, HelpMessage="Relative path to existing file with additional search directories.")]
+        [Parameter(ParameterSetName="Path", Position=0, Mandatory, HelpMessage="Relative path to existing file with additional search directories.")]
         [System.String] $Path,
 
         [ValidateSet([ValidateVirtualEnv])]     
-        [Parameter(ParameterSetName="Public", Position=1, Mandatory, ValueFromPipeline, HelpMessage="Name of the virtual environment.")]
+        [Parameter(ParameterSetName="Public", Position=0, Mandatory, HelpMessage="Name of the virtual environment.")]
         [System.String] $Name,
   
-        [Parameter(ParameterSetName="Private", Position=1, Mandatory, ValueFromPipeline, HelpMessage="Name of the virtual environment.")]
-        [System.String] $PrivateName
+        [Parameter(ParameterSetName="Private", Position=0, Mandatory, HelpMessage="Name of the virtual environment.")]
+        [System.String] $PrivateName,
+
+        [Parameter(HelpMessage="Remove defined systems' environment variables.")]
+        [Switch] $Restore
     )
 
     Process {
@@ -60,7 +63,7 @@ function Set-VirtualEnvSearchDirs {
                 $Name = $PrivateName
             }
 
-            $settings = Get-VirtualEnvFile -Settings -Unformatted  | Where-Object{$_.Name -eq $Name}
+            $settings = Get-VirtualEnvFile -TemplateList -Unformatted  | Where-Object{$_.Name -eq $Name}
             if ($settings -and ("SearchDirs" -in $settings.PSobject.Properties.Name)){
                 $settings | Select-Object -ExpandProperty "SearchDirs" | ForEach-Object {
                     $value = $value + (Get-VirtualEnvFile -SearchDirs ("\" + $_) -Unformatted) + ";" 
@@ -70,7 +73,12 @@ function Set-VirtualEnvSearchDirs {
 
             if ($settings -and ("EnvVars" -in $settings.PSobject.Properties.Name)){
                 $settings | Select-Object -ExpandProperty "EnvVars" | ForEach-Object {
-                    [System.Environment]::SetEnvironmentVariable($_.Name, $_.Value, "process" )
+                    if ($Restore){
+                        [System.Environment]::SetEnvironmentVariable($_.Name, $Null, "process" )
+                    }
+                    else {
+                        [System.Environment]::SetEnvironmentVariable($_.Name, $_.Value, "process" )
+                    }
                 } 
             }
         }
@@ -79,7 +87,6 @@ function Set-VirtualEnvSearchDirs {
         }
 
         if ($value) {
-
             [System.Environment]::SetEnvironmentVariable("PATH", $value, "process")
         }
     }

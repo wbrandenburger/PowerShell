@@ -19,8 +19,6 @@ function Get-VirtualEnv {
 
     .PARAMETER Unformatted
 
-    .PARAMETER ExpandProperty
-
     .EXAMPLE
         PS C:\> Get-VirtualEnv
 
@@ -84,33 +82,22 @@ function Get-VirtualEnv {
 
     Param (
         [ValidateSet([ValidateVirtualEnv])]
-        [Parameter(Position=1, ValueFromPipeline, HelpMessage="Information about all packages installed in the specified virtual environment will be returned.")]
+        [Parameter(Position=0, ValueFromPipeline, HelpMessage="Information about all packages installed in the specified virtual environment will be returned.")]
         [System.String] $Name,
 
         [Parameter(HelpMessage="Return information about required packages.")]
         [Switch] $Full,
 
         [Parameter(HelpMessage="Return information not as readable table with additional details.")]
-        [Switch] $Unformatted,
-
-        [Parameter(HelpMessage="Return only the specified property.")]
-        [System.String] $ExpandProperty = "Name"
+        [Switch] $Unformatted
     )
 
     Process {
 
-        # return information about specified virtual distribution
-        if ($Name) {                     
-            # check whether the specified virtual environment exists
-            if (-not $(Test-VirtualEnv -Name $Name -Verbose)){
-                return Get-VirtualEnv
-            }
-
+        if ($Name) {
             return Get-VirtualEnvPackage -Name $Name -Full:$Full -Unformatted:$Unformatted
         }
-
-        #  return information about all virtual environments in the predefined directory are gathered
-        if (-not $Name) {
+        else{
             # get all virtual environment directories in predefined directory as well as the local directories and requirement files
             $virtual_env = Get-VirtualEnvWorkDir
             if (-not $virtual_env) { 

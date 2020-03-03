@@ -28,28 +28,28 @@ function Repair-PocsPapis {
 
     Process {
 
-        if (-not $(Get-VirtualEnv -Unformatted | Where-Object { $_.Name -eq $PSPocs.VirtualEnv})){
-            Write-FormattedWarning -Message "Virtual environment '$($PSPocs.VirtualEnv)' cannot be found. Installation of new virtual environment." -Module $PSPocs.Name
+        # if (-not $(Get-VirtualEnv -Unformatted | Where-Object { $_.Name -eq $PSPocs.VirtualEnv})){
+        #     Write-FormattedWarning -Message "Virtual environment '$($PSPocs.VirtualEnv)' cannot be found. Installation of new virtual environment." -Module $PSPocs.Name
 
-            New-VirtualEnv -Name $PSPocs.VirtualEnv
-        } 
+        #     New-VirtualEnv -Name $PSPocs.VirtualEnv
+        # } 
 
-        if (-not $((Get-VirtualEnv -Name $PSPocs.VirtualEnv -Unformatted) | Where-Object { $_.Name -eq "papis"})){
-            Write-FormattedWarning -Message "Package 'papis' can not be found in virtual environment '$($PSPocs.VirtualEnv)' can not be found. Installation of 'papis'." -Module $PSPocs.Name
+        # if (-not $((Get-VirtualEnv -Name $PSPocs.VirtualEnv -Unformatted) | Where-Object { $_.Name -eq "papis"})){
+        #     Write-FormattedWarning -Message "Package 'papis' can not be found in virtual environment '$($PSPocs.VirtualEnv)' can not be found. Installation of 'papis'." -Module $PSPocs.Name
 
-            if (-not [System.Environment]::GetEnvironmentVariable($SciProfile.ProjectOffline)) {
-                Install-VirtualEnv -Name $PSPocs.VirtualEnv -Package "$($PSPocs.PapisPckg)"
-            } else {
-                Install-VirtualEnv -Name "python" -Offline "\offline-papis" -Silent:$Silent    
-            }
-        } 
+        #     if (-not [System.Environment]::GetEnvironmentVariable($SciProfile.ProjectOffline)) {
+        #         Install-VirtualEnv -Name $PSPocs.VirtualEnv -Package "$($PSPocs.PapisPckg)"
+        #     } else {
+        #         Install-VirtualEnv -Name "python" -Offline "\offline-papis" -Silent:$Silent    
+        #     }
+        # } 
 
-        if (-not $(Test-Path -Path $PSPocs.PapisConfig)){
+        # if (-not $(Test-Path -Path $PSPocs.PapisConfig)){
             
-            Write-FormattedWarning -Message "Papis configuration file '$($PSPocs.PapisConfig)' cannot be found." -Module $PSPocs.Name
+        #     Write-FormattedWarning -Message "Papis configuration file '$($PSPocs.PapisConfig)' cannot be found." -Module $PSPocs.Name
 
-            Invoke-VirtualEnv -Name $PSPocs.VirtualEnv -ScriptBlock {papis config dir} -Silent
-        }
+        #     Invoke-VirtualEnv -Name $PSPocs.VirtualEnv -ScriptBlock {papis config dir} -Silent
+        # }
 
     }
 }

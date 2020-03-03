@@ -48,11 +48,26 @@
         "Folder" :  true
     },
     {
-        "Id" : "VenvSettings",
-        "Field" : "venv-setting-file", 
+        "Id" : "TemplateFile",
+        "Field" : "venv-template-file", 
         "Section" : "user", 
         "Default" : "%(LocalDir)s\\setting.json",
         "Required" : true
+    },
+    {
+        "Id" : "PipLogFile",
+        "Field" : "pip-log-file", 
+        "Section" : "user", 
+        "Default" : "%(LocalDir)s\\pip.log",
+        "Required" : true
+    },
+    {
+        "Id" : "PipCache",
+        "Field" : "pip-cache-dir", 
+        "Section" : "user", 
+        "Default" : "%(LocalDir)s\\cache",
+        "Required" : true,
+        "Folder" : true
     },
     {
         "Id" : "Editor",

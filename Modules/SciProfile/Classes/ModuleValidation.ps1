@@ -48,6 +48,15 @@ Class ValidateSystemEnv: System.Management.Automation.IValidateSetValuesGenerato
 
 #   validation ---------------------------------------------------------------
 # ----------------------------------------------------------------------------
+Class ValidateSystemEnvPath: System.Management.Automation.IValidateSetValuesGenerator {
+    [String[]] GetValidValues() {
+        return [String[]] ([System.Environment]::GetEnvironmentVariable("Path", "process") -Split ';')
+    }
+}
+
+
+#   validation ---------------------------------------------------------------
+# ----------------------------------------------------------------------------
 Class ValidateSciProfileConfigFiles: System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
         return [String[]] (ValidateSciProfileConfigFiles)

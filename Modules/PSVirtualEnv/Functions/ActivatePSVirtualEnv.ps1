@@ -54,33 +54,6 @@ function ValidateVirtualEnvDirectories {
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
-function ValidateVirtualEnvLocalDirs {
-
-    <#
-    .DESCRIPTION
-        Return values for the use of validating existing local package folders.
-    
-    .OUTPUTS
-        System.String[]. Local package folder.
-    #>
-
-    [CmdletBinding(PositionalBinding)]
-    
-    [OutputType([System.String[]])]
-
-    Param()
-
-    Process{
-
-        $file_list = (Get-ChildItem -Path $PSVirtualEnv.LocalDir -Directory)
-        return ($file_list | ForEach-Object {
-            $_ -replace ($PSVirtualEnv.LocalDir -replace "\\", "\\")})
-    }
-}
-
-
-#   function ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
 function ValidateVirtualEnvSearchDirs {
     <#
     .DESCRIPTION
@@ -124,7 +97,7 @@ function ValidateVirtualEnvTemplates {
 
     Process{
 
-        return (Get-VirtualEnvFile -Settings -Unformatted | Select-Object -ExpandProperty Name)
+        return ( Get-Content -Path $PSVirtualEnv.TemplateFile | ConvertFrom-Json | ForEach-Object { $_.Name})
 
     }
 }
@@ -147,7 +120,7 @@ function ValidateVirtualEnvFiles {
 
     Param(
 
-        [ValidateSet("Requirement", "Script")]
+        [ValidateSet("Requirement", "Script", "Offline")]
         [Parameter(Position=1, Mandatory)]
         [System.String] $Type, 
         
@@ -167,9 +140,14 @@ function ValidateVirtualEnvFiles {
                 $file_include = "*.py", "*.ps1"
                 break;
             }
+            "Offline" {
+                $file_path = $PSVirtualEnv.LocalDir
+                $file_include = "*.whl"
+                break;
+            }
         }
 
-        if (-not $Folder) {1
+        if (-not $Folder) {
             $file_list = (Get-ChildItem -Path $file_path -Include $file_include -Recurse).FullName
             
             $result = $file_list | ForEach-Object {

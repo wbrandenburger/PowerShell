@@ -38,14 +38,14 @@ function Update-VirtualEnv {
 
     Param(
         [ValidateSet([ValidateVirtualEnv])]
-        [Parameter(Position=1, ValueFromPipeline, Mandatory, HelpMessage="Name of the virtual environment.")]
+        [Parameter(Position=0, ValueFromPipeline, HelpMessage="Name of the virtual environment.")]
         [System.String] $Name,
 
         [ValidateSet([ValidateVenvRequirements])]
-        [Parameter(ParameterSetName="Requirement", Position=2, HelpMessage="Relative path to a requirements file in predefined requirements folder.")]
+        [Parameter(ParameterSetName="Requirement", Position=1, HelpMessage="Relative path to a requirements file in predefined requirements folder.")]
         [System.String] $Requirement,
 
-        [Parameter(ParameterSetName="Package", Position=2, Mandatory, HelpMessage="Specified packages will be upgraded.")]
+        [Parameter(ParameterSetName="Package", Position=1, Mandatory, HelpMessage="Specified packages will be upgraded.")]
         [System.String[]] $Package,
 
         [Parameter(ParameterSetName="Pip", HelpMessage="If switch 'silent' is true package pip will be upgraded in specified virtual environment.")]
@@ -63,19 +63,11 @@ function Update-VirtualEnv {
 
     Process {
 
-       # check valide virtual environment 
-       if ($Name)  {
-            if (-not (Test-VirtualEnv -Name $Name)){
-                Write-FormattedError -Message "The virtual environment '$($Name)' does not exist." -Module $PSVirtualEnv.Name -Space -Silent:$Silent -Space 
-                Get-VirtualEnv
-                return
-            }
-
+        if ($Name)  {
             $virtual_env = @{ Name = $Name }
         }
-
-        # get all existing virtual environments if 'Name' is not set
-        if ($All) {
+        else {
+            # get all existing virtual environments if 'Name' is not set
             $virtual_env = Get-VirtualEnv
         }
 
@@ -154,11 +146,13 @@ function Update-VirtualEnvPip {
 
     Set-VirtualEnv -Name $Name
 
+    $options_cmd = "--cache-dir", "$($PSVirtualEnv.PipCache)", "--log", "$($PSVirtualEnv.PipLogFile)" 
+
     # install packages from a requirement file
     if ($Silent) {
-        python -m pip install --upgrade pip 2>&1> $Null
+        python -m pip install --upgrade pip $options_cmd 2>&1> $Null
     } else {
-        python -m pip install --upgrade pip 
+        python -m pip install --upgrade pip $options_cmd
     }
 
     Restore-VirtualEnv
