@@ -65,10 +65,16 @@ function Set-VirtualEnvSystem {
 
             $settings = Get-VirtualEnvFile -TemplateList -Unformatted  | Where-Object{$_.Name -eq $Name}
             if ($settings -and ("SearchDirs" -in $settings.PSobject.Properties.Name)){
+                $value = [System.Environment]::GetEnvironmentVariable("PATH","process")
                 $settings | Select-Object -ExpandProperty "SearchDirs" | ForEach-Object {
-                    $value = $value + (Get-VirtualEnvFile -SearchDirs ("\" + $_) -Unformatted) + ";" 
+                    if ($Restore) {
+                        $value = ($value -Split ';' | Where-Object { $_ -ne $Path }) -Join ";"
+                    }
+                    else {
+                        $value = (Get-VirtualEnvFile -SearchDirs ("\" + $_) -Unformatted) + ";" + $value
+                    }
                 }
-                $value = $value +  $env:PATH  
+                [System.Environment]::SetEnvironmentVariable("PATH", $value, "process")
             }
 
             if ($settings -and ("EnvVars" -in $settings.PSobject.Properties.Name)){
@@ -84,9 +90,6 @@ function Set-VirtualEnvSystem {
         }
         else{
             $value = (Get-VirtualEnvFile -SearchDirs ("\" + $_) -Unformatted) + ";" +  $env:PATH
-        }
-
-        if ($value) {
             [System.Environment]::SetEnvironmentVariable("PATH", $value, "process")
         }
     }
