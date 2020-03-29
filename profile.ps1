@@ -2,9 +2,6 @@
 #   Profile.ps1 -------------------------------------------------------------
 # ===========================================================================
 
-#   settings ----------------------------------------------------------------
-# ---------------------------------------------------------------------------
-
 #   import ------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 if (Get-Module -ListAvailable | Where-Object {$_.Name -eq "SciProfile"}){
@@ -25,9 +22,3 @@ if (Get-Module -ListAvailable | Where-Object {$_.Name -eq "SciProfile"}){
 #   settings ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 Set-PSReadlineKeyHandler -Chord Alt+F4 -Function ViExit # 'alt+F' or 'alt+space c'
-
-#region conda initialize
-# !! Contents within this block are managed by 'conda init' !!
-# (& "A:\Temp\_MEI109802\Scripts\conda.exe" "shell.powershell" "hook") | Out-String | Invoke-Expression
-#endregion
-
