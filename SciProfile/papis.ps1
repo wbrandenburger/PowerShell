@@ -100,7 +100,7 @@ function Global:Papis-AddFromJson {
     Process{
 
         # Start a virtual and papis environment
-        $(papisx $Library)
+        $(sa-pocs $Library)
     
         try{
             papis
@@ -152,9 +152,15 @@ function Global:Papis-AddFromJson {
 
         # Stop the virtual and papis environment if specified
         if ($Stop){
-            $(stop-papis)
+            $(sp-pocs-venv)
         }
     }
+}
+
+#   function -----------------------------------------------------------------
+# ----------------------------------------------------------------------------
+function Global:Papis-AddFromTemp-OneDrive{
+    Papis-AddFromTemp -Library pocs-paper -BibTex "A:\OneDrive\Download\Literature\" -Stop
 }
 
 #   function -----------------------------------------------------------------
@@ -187,7 +193,7 @@ function Global:Papis-AddFromTemp{
     Process {
 
         # Start a virtual and papis environment
-        $(papisx $Library)
+        $(sa-pocs $Library)
     
         try{
             papis
@@ -262,7 +268,7 @@ function Global:Papis-AddFromTemp{
 
         # Stop the virtual and papis environment if specified
         if ($Stop){
-            $(stop-papis)
+            $(sp-pocs-venv)
         }
     }
 }

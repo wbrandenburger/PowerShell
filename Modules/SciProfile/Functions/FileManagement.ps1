@@ -16,17 +16,36 @@ function Get-ChildItemSize {
         System.String. Path of project configuration file.
     #>
 
-    [CmdletBinding(PositionalBinding)]
+    [CmdletBinding(PositionalBinding, DefaultParameterSetName="Default")]
     
     [OutputType([Void])]
 
     Param (
-        [Parameter(Position=1, HelpMessage="Existing project type.")]
-        [System.String] $Path = ".\"
+        [Parameter(ParameterSetname="Default", Position=0, HelpMessage="Existing project type.")]
+        [System.String] $Path = ".\",
+
+        [Parameter(Position=1, HelpMessage="Depth of recusion.")]
+        [UInt32] $Depth = 0,
+
+        [ValidateSet("AppData")]
+        [Parameter(ParameterSetname="Template", Position=1, HelpMessage="Templates.")]
+        [System.String] $Template
     )
 
     Process {
-        $result = Get-ChildItem -Path $Path -ErrorAction SilentlyContinue | Where-Object { 
+
+        if($PSCmdlet.ParameterSetName -eq "Template"){
+            switch ($Template){
+                "AppData" {
+                    $Path = Join-Path -Path $Env:USERPROFILE -ChildPath "AppData"
+                    $Depth = 1
+                    break
+                }
+            } 
+        }
+
+
+        $result = Get-ChildItem -Path $Path -Depth $Depth -Recurse -ErrorAction SilentlyContinue | Where-Object { 
             $_ -is [IO.Directoryinfo] 
         } | ForEach-Object {
             $length = 0
