@@ -39,7 +39,6 @@ Function Global:Prompt {
             Write-Host  "-CUDA:($($ENV:CUDA_VISIBLE_DEVICES))" -NoNewline -ForegroundColor "DarkGreen"
         }
         Write-Host  "] " -NoNewline -ForegroundColor "Yellow"
-        Write-Host " " -NoNewline -ForegroundColor "Gray"
     }
 }
 
