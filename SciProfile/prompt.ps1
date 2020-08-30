@@ -34,7 +34,7 @@ Function Global:Prompt {
 
         Write-Host "Exp" -NoNewline -ForegroundColor "DarkGray"
         Write-Host "["  -NoNewline -ForegroundColor "Yellow"
-        Write-Host  E$nv:EXPMGMT_PROJECT -NoNewline -ForegroundColor "Cyan"
+        Write-Host  $Env:EXPMGMT_PROJECT -NoNewline -ForegroundColor "Cyan"
         if ($ENV:CUDA_VISIBLE_DEVICES){
             Write-Host  "-CUDA:($($ENV:CUDA_VISIBLE_DEVICES))" -NoNewline -ForegroundColor "DarkGreen"
         }
