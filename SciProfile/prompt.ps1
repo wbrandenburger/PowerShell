@@ -21,12 +21,17 @@ Function Global:Prompt {
     }
         
     if ($ENV:PSVIRTUALENV_PROJECT) {
-            Write-VirtualEnvStatus
-            Write-Host " " -NoNewline -ForegroundColor "Gray"
+        Write-VirtualEnvStatus
+        Write-Host " " -NoNewline -ForegroundColor "Gray"
     }
 
     if ($ENV:PSPOCS_PROJECT) {
         Write-PocsLibStatus
+        Write-Host " " -NoNewline -ForegroundColor "Gray"
+    }
+
+    if ($Env:EXPMGMT_PROJECT) {
+        Write-PromptEnvStatus -Env "Exp" -Value $Env:EXPMGMT_PROJECT -ValueColor "Green"
         Write-Host " " -NoNewline -ForegroundColor "Gray"
     }
 }

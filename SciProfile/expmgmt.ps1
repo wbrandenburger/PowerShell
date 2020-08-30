@@ -19,7 +19,7 @@ function Global:Get-ExpmgmtProject{
 # ---------------------------------------------------------------------------
 function Global:Set-ExpmgmtProject{
     Param(
-        [ValidateSet("dl-multi-train", "dl-multi-train-test", "dl-multi-eval", "dl-multi-eval-tile", "dl-multi-tfrecord", "dl-multi-test", "expmgmt", "rsvis-datasets", "rsvis-lecture", "rsvis-dl", "shdw")]
+        [ValidateSet("dl-multi-train", "dl-multi-train-3n", "dl-multi-eval", "dl-multi-eval-3n", "dl-multi-tfrecord", "dl-multi-test", "rsvis-datasets", "rsvis-dl")]
         [System.String] $Project
     )
     Set-EnvVariable -Name "EXPMGMT_PROJECT" -Value $Project
@@ -46,7 +46,7 @@ Function Global:Start-RSVis
         [Parameter(Position=1, HelpMessage="Name of virtual environment.")]
         [System.String] $VirtualEnv="dev-rsvis",
 
-        [ValidateSet("dl-multi-train", "dl-multi-train-test", "dl-multi-eval", "dl-multi-eval-tile", "dl-multi-tfrecord", "dl-multi-test", "expmgmt", "rsvis-datasets", "rsvis-lecture", "rsvis-dl", "shdw")]
+        [ValidateSet("dl-multi-train", "dl-multi-train-3n", "dl-multi-eval", "dl-multi-eval-3n", "dl-multi-tfrecord", "dl-multi-test", "rsvis-datasets", "rsvis-dl")]
         [Parameter(Position=2, HelpMessage="Name of experiment project.")]
         [System.String] $Project="rsvis-datasets"
     ) 
@@ -74,24 +74,5 @@ Function Global:Start-Inkscape
         Start-VirtualEnv -Name inkscape -Silent
         . "C:\Program Files\Inkscape\bin\inkscape.exe"
         Stop-VirtualEnv -Silent
-    }
-}
-
-#   function -----------------------------------------------------------------
-# ----------------------------------------------------------------------------
-Function Global:Open-RSVis
-{
-    [CmdletBinding()]
-
-    [OutputType([Void])]
-
-    Param(
-        [ValidateSet("vai", "dfc", "dfc-single", "mtarsi", "mtarsi-single", "mtarsi-single-5")]
-        [Parameter(Position=1, HelpMessage="Name of the experiment.")]
-        [System.String] $Name="vai"
-    ) 
-
-    Process{
-        expmgmt run -e $Name
     }
 }
