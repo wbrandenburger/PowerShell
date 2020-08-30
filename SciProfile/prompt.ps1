@@ -31,7 +31,7 @@ Function Global:Prompt {
     }
 
     if ($Env:EXPMGMT_PROJECT) {
-        Write-PromptEnvStatus -Env "Exp" -Value $Env:EXPMGMT_PROJECT -ValueColor "Green"
+        Write-PromptEnvStatus -Env "Exp" -Value $Env:EXPMGMT_PROJECT
         Write-Host " " -NoNewline -ForegroundColor "Gray"
     }
 }
