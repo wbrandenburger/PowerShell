@@ -27,6 +27,15 @@ function Global:Set-ExpmgmtProject{
 
 #   function ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
+function Global:Set-CudaDevices{
+    Param(
+        [System.String] $Devices
+    )
+    Set-EnvVariable -Name "CUDA_VISIBLE_DEVICES" -Value $Devices
+}
+
+#   function ----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 function Global:Remove-ExpmgmtTemp{
     
     Get-ChildItem -Path ([System.Environment]::GetEnvironmentVariable("TEMP")) | Where-Object {($_.name -match "expmgmt") -or ($_.name -match "shdw")} | Remove-Item -Force

@@ -31,7 +31,14 @@ Function Global:Prompt {
     }
 
     if ($Env:EXPMGMT_PROJECT) {
-        Write-PromptEnvStatus -Env "Exp" -Value $Env:EXPMGMT_PROJECT
+
+        Write-Host "Exp" -NoNewline -ForegroundColor "DarkGray"
+        Write-Host "["  -NoNewline -ForegroundColor "Yellow"
+        Write-Host  Env:EXPMGMT_PROJECT -NoNewline -ForegroundColor "Cyan"
+        if ($ENV:CUDA_VISIBLE_DEVICES){
+            Write-Host  "($($ENV:CUDA_VISIBLE_DEVICES))" -NoNewline -ForegroundColor "Green"
+        }
+        Write-Host  "] " -NoNewline -ForegroundColor "Yellow"
         Write-Host " " -NoNewline -ForegroundColor "Gray"
     }
 }
