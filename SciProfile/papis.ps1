@@ -160,7 +160,7 @@ function Global:Papis-AddFromJson {
 #   function -----------------------------------------------------------------
 # ----------------------------------------------------------------------------
 function Global:Papis-AddFromTemp-OneDrive{
-    Papis-AddFromTemp -Library pocs-paper -BibTex "A:\OneDrive\Download\Literature\" -Stop
+    Papis-AddFromTemp -Library pocs-paper -BibTex "A:\Downloads\Literature\" -Stop
 }
 
 #   function -----------------------------------------------------------------

@@ -19,7 +19,7 @@ function Global:Get-ExpmgmtProject{
 # ---------------------------------------------------------------------------
 function Global:Set-ExpmgmtProject{
     Param(
-        [ValidateSet("dl-multi-train", "dl-multi-train-3n", "dl-multi-eval", "dl-multi-eval-3n", "dl-multi-tfrecord", "rsexp", "rsvis-datasets", "rsvis-dl", "rsvis-amt")]
+        [ValidateSet("dl-multi-train", "dl-multi-train-3n", "dl-multi-eval", "dl-multi-eval-3n", "dl-multi-tfrecord", "rsexp", "rsvis-datasets", "rsvis-dl", "rsvis-amt", "rsvis-agan")]
         [System.String] $Project
     )
     Set-EnvVariable -Name "EXPMGMT_PROJECT" -Value $Project
@@ -55,7 +55,7 @@ Function Global:Start-RSVis
         [Parameter(Position=1, HelpMessage="Name of virtual environment.")]
         [System.String] $VirtualEnv="dev-rsvis",
 
-        [ValidateSet("dl-multi-train", "dl-multi-train-3n", "dl-multi-eval", "dl-multi-eval-3n", "dl-multi-tfrecord", "rsexp", "rsvis-datasets", "rsvis-dl", "rsvis-amt")]
+        [ValidateSet("dl-multi-train", "dl-multi-train-3n", "dl-multi-eval", "dl-multi-eval-3n", "dl-multi-tfrecord", "rsexp", "rsvis-datasets", "rsvis-dl", "rsvis-amt", "rsvis-agan")]
         [Parameter(Position=2, HelpMessage="Name of experiment project.")]
         [System.String] $Project="rsvis-datasets"
     ) 
