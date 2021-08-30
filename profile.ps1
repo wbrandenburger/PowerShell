@@ -22,3 +22,9 @@ if (Get-Module -ListAvailable | Where-Object {$_.Name -eq "SciProfile"}){
 #   settings ----------------------------------------------------------------
 # ---------------------------------------------------------------------------
 Set-PSReadlineKeyHandler -Chord Alt+F4 -Function ViExit # 'alt+F' or 'alt+space c'
+Set-PSReadlineKeyHandler -Key Tab -Function Complete
+
+function Open-History {
+    $file_path = (Get-PSReadlineOption).HistorySavePath
+    code -n $file_path
+}
