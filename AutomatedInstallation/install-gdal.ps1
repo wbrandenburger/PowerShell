@@ -1,46 +1,4 @@
-$env:AutoInstall = $Null
-$env:AutoSetEnvironment = $Null
-
-function getInstaller {
-    Param(
-        [String] $Path,
-        [String] $Url,
-        [String] $Identifier = 'Installer'
-    )
-
-    if (-not (Test-Path -Path $Path)) {
-        Write-FormattedProcess -Message "Download of $($Identifier)"
-        curl --output $Path --url $Url
-        if (-not (Test-Path -Path $Path)) {
-            New-Item -Path $temp_path -ItemType Directory
-            Write-FormattedError -Message "Download of $($Identifier) failed"
-            return 1
-        }
-        else {
-            Write-FormattedSuccess -Message "$($Identifier) successfully downloaded"
-        }        
-    } else {
-        Write-FormattedWarning -Message "$($Identifier) has already been downloaded"
-    }
-}
-
-$temp_path = './.temp'
-
-if (-not (Test-Path -Path $temp_path)) {
-    New-Item -Path $temp_path -ItemType Directory
-}
-
-# Downloading Python
-
-$id = 'Python - 3.7.9'
-$msi_python = Join-Path -Path $temp_path -ChildPath "python-3.7.9.exe"
-$url_python = 'https://www.python.org/ftp/python/3.7.9/python-3.7.9-amd64.exe' # 3.7.9
-
-# $url_python = https://www.python.org/ftp/python/3.9.6/python-3.9.6-amd64.exe # 3.9.6
-
-$result = getInstaller -Path $msi_python -Url $url_python -Identifier $id
-if ($env:AutoInstall -and $result){. $msi_python }
-
+. "./AutomatedInstallation/utils.ps1"
 
 # Downloading GDAL Core
 $id = 'GDAL Core - 3.2.3'
@@ -66,7 +24,8 @@ if ($env:AutoInstall -and $result) { . $msi_gdal_python }
 
 if ($env:AutoSetEnvironment){
     Set-EnvPath -Path "C:\Program Files\GDAL" -Scope "user"
-    Set-EnvVariable "GDAL_DATA" -Value "C:\Program Files\GDAL\gdal-data" -Scope "user"
+    # Set-EnvVariable "GDAL_DATA" -Value "C:\Program Files\GDAL\gdal-data" -Scope "user"
+    Set-EnvVariable "GDAL_DATA" -Value "C:\Program Files\PostgreSQL\13\gdal-data" -Scope "user"    
     Set-EnvVariable "GDAL_DRIVER_PATH" -Value "C:\Program Files\GDAL\gdalplugins" -Scope "user" 
     Set-EnvVariable "GDAL_VERSION" -Value "3.2.3" -Scope "user"
 }
