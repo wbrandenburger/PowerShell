@@ -10,12 +10,12 @@ function getInstaller {
 
     if (-not (Test-Path -Path $Path)) {
         Write-FormattedProcess -Message "Download of $($Identifier)"
-        
+        Write-FormattedProcess -Message "$($Url) -> $($Path)"
+
         $webclient = New-Object System.Net.WebClient 
         $webclient.DownloadFile($Url, $Path)    
         # curl --output $Path --url $Url
         if (-not (Test-Path -Path $Path)) {
-            New-Item -Path $temp_path -ItemType Directory
             Write-FormattedError -Message "Download of $($Identifier) failed"
             return 1
         }
