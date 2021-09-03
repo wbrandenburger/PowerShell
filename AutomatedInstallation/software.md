@@ -1,10 +1,13 @@
 # Installation
 
-## Microsoft Store
+## UniBw
 
-* Pulse Secure
+* Pulse Secure - Microsoft Store
   * `https://webvpn.unibw.de` (UniBwM)
-
+* [Sophos](https://webvpn.unibw.de/rz/dienste-und-leistungen/it-sicherheit/,DanaInfo=www.unibw.de,SSL+virenschutz)
+* TeamDrive
+* TeamWire
+  
 ## PowerShell
 
 ### [PowerShell](https://github.com/PowerShell/PowerShell/releases)
@@ -76,5 +79,7 @@ choco install git --params "/GitAndUnixToolsOnPath  /WindowsTerminal /NoShellInt
 
 * Sophos
 * MathPix
-* TeamDrive
-* TeamWire
+
+* OSGEO
+* PostGreSQL
+* GDAL
