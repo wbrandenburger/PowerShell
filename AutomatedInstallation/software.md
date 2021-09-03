@@ -57,6 +57,7 @@ Use `install-docker.ps1`
 
 * [Adobe Acrobat Reader DC](https://community.chocolatey.org/packages/adobereader)
 * [7zip](https://community.chocolatey.org/packages/7zip/19.0)
+* [Google Earth Pro](https://community.chocolatey.org/packages/googleearthpro)
 * IrfanView
   * [IrfanView](https://community.chocolatey.org/packages/IrfanView)
   * If no parameters are passed, the following is assumed: --params '/assoc=1 /group=1 /ini=%APPDATA%\IrfanView'.
@@ -69,6 +70,7 @@ Use `install-docker.ps1`
 ```PowerShell
 choco install adobereader --params "/NoUpdates /UpdateMode:4"
 choco install 7zip
+choco install googleearthpro
 choco install irfanview
 choco install irfanviewplugins
 # choco install openoffice --params "'/locale:de'"
