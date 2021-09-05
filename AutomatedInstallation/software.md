@@ -5,8 +5,9 @@
 * Pulse Secure - Microsoft Store
   * `https://webvpn.unibw.de` (UniBwM)
 * [Sophos](https://webvpn.unibw.de/rz/dienste-und-leistungen/it-sicherheit/,DanaInfo=www.unibw.de,SSL+virenschutz)
-* TeamDrive
-* TeamWire
+* TeamDrive, use `install-teamdrive.ps1`.
+* TeamWire, use `install-teamwire.ps1`.
+* sWebex, download from `https://www.webex.com/de/downloads.html` and get further instructions from `https://wiki.unibw.de/display/FAQ/Cisco+WebEx+Meetings`
   
 ## PowerShell
 
