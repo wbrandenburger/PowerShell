@@ -18,9 +18,6 @@ if (-not $OnlyDownload -and -not $result) { . $msi_gdal_core }
 # $url_gdal_core = 'https://download.gisinternals.com/sdk/downloads/release-1928-x64-gdal-3-2-3-mapserver-7-6-3/gdal-302-1928-x64-core.msi' # GDAL-3.2.3
 # $url_gdal_core = 'http://download.gisinternals.com/sdk/downloads/release-1900-x64-gdal-3-1-3-mapserver-7-6-1/gdal-301-1900-x64-core.msi' # GDAL-3.1.3
 
-$result = getInstaller -Path $msi_gdal_python -Url $url_gdal_python -Identifier $id
-if (-not $OnlyDownload -and -not $result) { . $msi_gdal_python }
-
 if ($SetEnv) {
     if (-not (Get-EnvVariable -Name Path).Name.Contains("C:\Program Files\GDAL")){
         Set-EnvPath -Path "C:\Program Files\GDAL" -Scope "user"
