@@ -49,6 +49,14 @@ choco install docker-desktop
 
 Use `install-docker.ps1`
 
+### [Git](https://community.chocolatey.org/packages/git)
+
+```PowerShell
+choco install git --params "/GitAndUnixToolsOnPath  /WindowsTerminal /NoShellIntegration /NoGuiHereIntegration /NoShellHereIntegration /SChannel"
+git config --global user.name "Wolfgang Brandenburger"
+git config --global user.email "w.brandenburger@unibw.de"
+```
+
 ## LaTeX
 
 * [TeX Live Installer](https://community.chocolatey.org/packages/texlive)
@@ -66,16 +74,10 @@ Use `install-docker.ps1`
   * If no parameters are passed, the following is assumed: --params '/assoc=1 /group=1 /ini=%APPDATA%\IrfanView'.
   * [IrfanViewPlugins](https://community.chocolatey.org/packages/irfanviewplugins)
 <!-- * [Apache OpenOffice](https://community.chocolatey.org/packages/OpenOffice) -->
+* [Putty](https://community.chocolatey.org/packages/putty)
 * [TCP/IP Manager](https://community.chocolatey.org/packages/tcpipmanager)
 * [TeamViewer](https://community.chocolatey.org/packages/teamviewer)
-
-### [Git](https://community.chocolatey.org/packages/git)
-
-```PowerShell
-choco install git --params "/GitAndUnixToolsOnPath  /WindowsTerminal /NoShellIntegration /NoGuiHereIntegration /NoShellHereIntegration /SChannel"
-git config --global user.name "Wolfgang Brandenburger"
-git config --global user.email "w.brandenburger@unibw.de"
-```
+* [WinSCP](https://community.chocolatey.org/packages/winscp)
 
 ```PowerShell
 choco install adobereader --params "/NoUpdates /UpdateMode:4"
@@ -83,9 +85,11 @@ choco install 7zip
 choco install googleearthpro
 choco install irfanview
 choco install irfanviewplugins
+choco install putty
 # choco install openoffice --params "'/locale:de'"
 choco install tcpipmanager
 choco install teamviewer
+choco install winscp
 ```
 
 ### Provider
