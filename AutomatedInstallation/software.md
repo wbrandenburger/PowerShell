@@ -7,7 +7,7 @@
 * [Sophos](https://webvpn.unibw.de/rz/dienste-und-leistungen/it-sicherheit/,DanaInfo=www.unibw.de,SSL+virenschutz)
 * TeamDrive, use `install-teamdrive.ps1`.
 * TeamWire, use `install-teamwire.ps1`.
-* sWebex, download from `https://www.webex.com/de/downloads.html` and get further instructions from `https://wiki.unibw.de/display/FAQ/Cisco+WebEx+Meetings`
+* Webex, download from `https://www.webex.com/de/downloads.html` and get further instructions from `https://wiki.unibw.de/display/FAQ/Cisco+WebEx+Meetings`
   
 ## PowerShell
 
@@ -56,6 +56,8 @@ Use `install-docker.ps1`
 
 ## Miscellaneous
 
+### Chocolatey
+
 * [Adobe Acrobat Reader DC](https://community.chocolatey.org/packages/adobereader)
 * [7zip](https://community.chocolatey.org/packages/7zip/19.0)
 * [Google Earth Pro](https://community.chocolatey.org/packages/googleearthpro)
@@ -66,7 +68,14 @@ Use `install-docker.ps1`
 <!-- * [Apache OpenOffice](https://community.chocolatey.org/packages/OpenOffice) -->
 * [TCP/IP Manager](https://community.chocolatey.org/packages/tcpipmanager)
 * [TeamViewer](https://community.chocolatey.org/packages/teamviewer)
-* [Git](https://community.chocolatey.org/packages/git)
+
+### [Git](https://community.chocolatey.org/packages/git)
+
+```PowerShell
+choco install git --params "/GitAndUnixToolsOnPath  /WindowsTerminal /NoShellIntegration /NoGuiHereIntegration /NoShellHereIntegration /SChannel"
+git config --global user.name "Wolfgang Brandenburger"
+git config --global user.email "w.brandenburger@unibw.de"
+```
 
 ```PowerShell
 choco install adobereader --params "/NoUpdates /UpdateMode:4"
@@ -77,12 +86,9 @@ choco install irfanviewplugins
 # choco install openoffice --params "'/locale:de'"
 choco install tcpipmanager
 choco install teamviewer
-choco install git --params "/GitAndUnixToolsOnPath  /WindowsTerminal /NoShellIntegration /NoGuiHereIntegration /NoShellHereIntegration /SChannel"
 ```
+
+### Provider
 
 * Sophos
 * MathPix
-
-* OSGEO
-* PostGreSQL
-* GDAL

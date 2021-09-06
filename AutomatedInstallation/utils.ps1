@@ -1,6 +1,3 @@
-# $env:AutoInstall = $Null
-# $env:AutoSetEnvironment = $Null
-
 function getInstaller {
     Param(
         [String] $Path,

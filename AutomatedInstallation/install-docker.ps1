@@ -1,10 +1,22 @@
-. "./AutomatedInstallation/utils.ps1"
+Param(
+    [Switch] $DockerDesktop,
+    [Switch] $LinuxKernel,
+    [Switch] $OnlyDownload
+)
 
-# Downloading TCP IP Manager
+if ($DockerDesktop) {
+    choco install docker-desktop --confirm
+}
 
-$id = 'Linux Kernel'
-$msi_tcp_ip = Join-Path -Path $temp_path -ChildPath "linux-kernel.msi"
-$url_tcp_ip = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
+if ($LinuxKernel){
+    # Downloading TCP IP Manager
+    
+    . "./AutomatedInstallation/utils.ps1"
 
-$result = getInstaller -Path $msi_tcp_ip -Url $url_tcp_ip -Identifier $id
-if ($env:AutoInstall -and -not $result) { . $msi_tcp_ip }
+    $id = 'Linux Kernel'
+    $msi_tcp_ip = Join-Path -Path $temp_path -ChildPath "linux-kernel.msi"
+    $url_tcp_ip = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
+
+    $result = getInstaller -Path $msi_tcp_ip -Url $url_tcp_ip -Identifier $id
+    if (-not $OnlyDownload -and -not $result) { . $msi_tcp_ip }
+}
