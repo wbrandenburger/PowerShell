@@ -1,0 +1,1 @@
+(chocolatey list -l)  -match "tcpipmanager"(chocolatey list -l)  -match "tcpipmanager"
