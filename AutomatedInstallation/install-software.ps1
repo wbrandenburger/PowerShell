@@ -11,3 +11,4 @@ choco install tcpipmanager --confirm
 choco install teamviewer --confirm
 choco install git --params "/GitAndUnixToolsOnPath  /WindowsTerminal /NoShellIntegration /NoGuiHereIntegration /NoShellHereIntegration /SChannel" --confirm
 choco install winscp --confirm
+choco install texlive --params="'/scheme:full'"
