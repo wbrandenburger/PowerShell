@@ -28,6 +28,19 @@ Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadlineOption -BellStyle None
 
 function Open-History {
+    # Get-Content (Get-PSReadlineOption).HistorySavePath
     $file_path = (Get-PSReadlineOption).HistorySavePath
     code -n $file_path
+}
+
+function Start-DEMShell{
+  Start-Process pwsh -ArgumentList '-noexit -command "
+    cd A:\Repositories\EvalObjD;
+    . .\init.ps1
+  "'
+}
+function Start-DEMDevelopment {
+  Start-DEMShell
+  Start-DEMShell
+  Start-Process code -ArgumentList 'A:\Repositories\EvalObjD'
 }
