@@ -34,13 +34,67 @@ function Open-History {
 }
 
 function Start-DEMShell{
-  Start-Process pwsh -ArgumentList '-noexit -command "
-    cd A:\Repositories\EvalObjD;
-    . .\init.ps1
-  "'
+
+  Param (
+    [Parameter(Position = 0, Mandatory = $True)]
+    [ValidateSet('default', 'all', 'dqp-db', 'gsp-db', 'dem-db', 'db', 'dqp', 'gsp', 'rs-gsp', 'rs-dem', 'rs-dqp')]
+    [string] $server,
+
+    [string] $ip
+  )
+
+  if ($server -ne "default") {
+    $cmd =  "Start-DEMServer -server $server"
+  }
+  if ($ip) { $cmd += " -ip $ip"}
+
+  Start-Process pwsh -ArgumentList @("-noexit -command
+    cd $env:DEM_HOME;
+    . .\init.ps1;
+    `"$cmd`";
+  ")
 }
+
+function Start-DEMShellServer {
+  Start-DEMShell -all
+}
+
 function Start-DEMDevelopment {
-  Start-DEMShell
-  Start-DEMShell
-  Start-Process code -ArgumentList 'A:\Repositories\EvalObjD'
+  Start-DEMShell -server dem-db
+  Start-DEMShell -server gsp 
+  Start-DEMShell -server rs-gsp -ip system
+  Start-Process code -ArgumentList $env:DEM_HOME
 }
+
+function Invoke-GitInternship {
+  Param(
+    [Parameter(Mandatory=$True)]
+    $branch,
+    [Parameter(Mandatory = $True)]
+    $message
+  )
+
+  git add *
+  git commit -m $message
+  git push origin $branch
+
+  git checkout "feature/students"
+  git merge $branch
+  git push origin "feature/students"
+
+  git checkout "feature/data-prepartion"
+  git merge "feature/students"
+  git push origin "feature/data-preparation"
+
+  git checkout "feature/visualization"
+  git merge "feature/students"
+  git push origin "feature/visualization"
+
+  git checkout "feature/patch-generation"
+  git merge "feature/students"
+  git push origin "feature/patch-generation"
+
+  git checkout $branch
+}
+
+function ipy { python .\run.py }
