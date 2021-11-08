@@ -40,9 +40,10 @@ function Start-DEMShell{
     [ValidateSet('default', 'all', 'dqp-db', 'gsp-db', 'dem-db', 'db', 'dqp', 'gsp', 'rs-gsp', 'rs-dem', 'rs-dqp')]
     [string] $server,
 
+    [ValidateSet('localhost', 'system')]
     [string] $ip
   )
-
+  
   if ($server -ne "default") {
     $cmd =  "Start-DEMServer -server $server"
   }
@@ -60,9 +61,11 @@ function Start-DEMShellServer {
 }
 
 function Start-DEMDevelopment {
-  Start-DEMShell -server dem-db
-  Start-DEMShell -server gsp 
+  Start-DEMShell -server db
   Start-DEMShell -server rs-gsp -ip system
+  
+  Start-Sleep -Seconds 5
+  Start-DEMShell -server gsp 
   Start-Process code -ArgumentList $env:DEM_HOME
 }
 
@@ -82,7 +85,7 @@ function Invoke-GitInternship {
   git merge $branch
   git push origin "feature/students"
 
-  git checkout "feature/data-prepartion"
+  git checkout "feature/data-preparation"
   git merge "feature/students"
   git push origin "feature/data-preparation"
 
