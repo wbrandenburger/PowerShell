@@ -73,7 +73,7 @@ function Start-DEMDevelopment {
 $DEM_GIT_INTERNSHIP =  @("feature/students", "feature/data-preparation", "feature/visualization", "feature/patch-generation")
 $DEM_GIT_ALL =  @("main", "dev", "feature/students", "feature/data-preparation", "feature/visualization", "feature/patch-generation")
 
-function Invoke-GitInternship {
+function Invoke-GitDEMPush {
   Param(
     [Parameter(Mandatory=$True)]
     $branch,
@@ -84,7 +84,23 @@ function Invoke-GitInternship {
   $branches | ForEach-Object {
     git checkout $_
     git merge $branch
+    git pull origin  $_
     git push origin $_
+  }
+  git checkout $branch
+}
+
+function Invoke-GitDEMPull {
+  Param(
+    [Parameter(Mandatory = $True)]
+    $branch,
+    [Parameter(Mandatory = $True)]
+    [system.string[]] $branches
+  )
+
+  $branches | ForEach-Object {
+    git checkout $_
+    git pull origin  $_
   }
   git checkout $branch
 }
