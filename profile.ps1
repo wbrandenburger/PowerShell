@@ -69,34 +69,23 @@ function Start-DEMDevelopment {
   Start-Process code -ArgumentList $env:DEM_HOME
 }
 
+
+$DEM_GIT_INTERNSHIP =  @("feature/students", "feature/data-preparation", "feature/visualization", "feature/patch-generation")
+$DEM_GIT_ALL =  @("main", "dev", "feature/students", "feature/data-preparation", "feature/visualization", "feature/patch-generation")
+
 function Invoke-GitInternship {
   Param(
     [Parameter(Mandatory=$True)]
     $branch,
     [Parameter(Mandatory = $True)]
-    $message
+    [system.string[]] $branches
   )
 
-  git add *
-  git commit -m $message
-  git push origin $branch
-
-  git checkout "feature/students"
-  git merge $branch
-  git push origin "feature/students"
-
-  git checkout "feature/data-preparation"
-  git merge "feature/students"
-  git push origin "feature/data-preparation"
-
-  git checkout "feature/visualization"
-  git merge "feature/students"
-  git push origin "feature/visualization"
-
-  git checkout "feature/patch-generation"
-  git merge "feature/students"
-  git push origin "feature/patch-generation"
-
+  $branches | ForEach-Object {
+    git checkout $_
+    git merge $branch
+    git push origin $_
+  }
   git checkout $branch
 }
 
