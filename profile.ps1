@@ -72,6 +72,7 @@ function Start-DEMDevelopment {
 
 $DEM_GIT_INTERNSHIP =  @("feature/students", "feature/data-preparation", "feature/visualization", "feature/patch-generation")
 $DEM_GIT_ALL =  @("main", "dev", "feature/students", "feature/data-preparation", "feature/visualization", "feature/patch-generation")
+$DEM_GIT_MAIN = @("main", "dev", "prototyp/dem_beta")
 
 function Invoke-GitDEMPush {
   Param(
