@@ -41,13 +41,16 @@ function Start-DEMShell{
     [string] $server,
 
     [ValidateSet('localhost', 'system')]
-    [string] $ip
+    [string] $ip,
+
+    [switch] $local
   )
   
   if ($server -ne "default") {
     $cmd =  "Start-DEMServer -server $server"
   }
   if ($ip) { $cmd += " -ip $ip"}
+  if ($local) { $cmd += " -local" }
 
   Start-Process pwsh -ArgumentList @("-noexit -command
     cd $env:DEM_HOME;
@@ -61,8 +64,8 @@ function Start-DEMShellServer {
 }
 
 function Start-DEMDevelopment {
-  Start-DEMShell -server db
-  Start-DEMShell -server rs-gsp -ip system
+  Start-DEMShell -server dem-db
+  Start-DEMShell -server rs-gsp -ip system -local
   
   Start-Sleep -Seconds 5
   Start-DEMShell -server gsp 
